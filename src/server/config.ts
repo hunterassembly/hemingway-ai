@@ -22,7 +22,7 @@ const DEFAULTS: HemingwayConfig = {
   styleGuide: "./docs/style-guide.md",
   copyBible: "./docs/copy-bible.md",
   referenceGuide: "./packages/hemingway/reference/saas-and-services-copy-guide.md",
-  sourcePatterns: ["components/**/*.tsx", "src/**/*.tsx", "app/**/*.tsx"],
+  sourcePatterns: ["components/**/*.tsx", "src/**/*.tsx", "src/**/*.ts", "app/**/*.tsx"],
   excludePatterns: ["node_modules", ".next", "dist", "build"],
   shortcut: "ctrl+shift+h",
   accentColor: "#3b82f6",

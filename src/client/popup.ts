@@ -25,10 +25,13 @@ export interface DoneResult {
 
 // --- Inline SVG icons ---
 
-const SVG_MARK = `<svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z" fill="#2563EB"/></svg>`;
+const SVG_MARK = `<svg width="28" height="28" viewBox="0 0 28 28" fill="none"><path d="M14 17.8679V22.6897C7.53103 21.3379 3.68506 25.6345 2.51035 28H0L28 0V12.0967L18.3337 21.8153L14 17.8679Z" fill="#2563EB" style="fill:#2563EB;fill:color(display-p3 0.1451 0.3882 0.9216);fill-opacity:1;"/></svg>`;
 const SVG_MARK_WHITE = `<svg width="12" height="12" viewBox="0 0 24 24" fill="none"><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z" fill="white"/></svg>`;
 const SVG_ARROW = `<svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M3.5 8H12.5M9 4.5L12.5 8L9 11.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
 const SVG_CARET = `<svg width="10" height="10" viewBox="0 0 12 12" fill="none"><path d="M3 4.5L6 7.5L9 4.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+const SVG_BACK = `<svg width="18" height="18" viewBox="0 0 32 32" fill="none"><path d="M20 8L12 16L20 24" stroke="#262626" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+const SVG_CHECK_WHITE = `<svg width="12" height="12" viewBox="0 0 24 24" fill="none"><path d="M5 12l5 5L19 7" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+const SVG_REFRESH = `<svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M12.25 2.62501V5.25001C12.25 5.36605 12.2039 5.47733 12.1219 5.55937C12.0398 5.64142 11.9285 5.68751 11.8125 5.68751H9.1875C9.10092 5.68758 9.01627 5.66196 8.94426 5.61389C8.87225 5.56582 8.81612 5.49747 8.78298 5.41748C8.74984 5.3375 8.74117 5.24948 8.75808 5.16457C8.77499 5.07965 8.81671 5.00167 8.87797 4.94048L9.8793 3.93751C9.07378 3.16573 8.00236 2.73321 6.8868 2.72947H6.86219C5.71908 2.72723 4.62106 3.17516 3.8057 3.97634C3.72215 4.05434 3.61139 4.09654 3.49713 4.09392C3.38286 4.0913 3.27415 4.04406 3.19426 3.96232C3.11438 3.88057 3.06965 3.77081 3.06966 3.65651C3.06966 3.54221 3.1144 3.43245 3.1943 3.35072C4.16958 2.39783 5.47733 1.86176 6.84084 1.85594C8.20434 1.85013 9.51662 2.37501 10.5 3.31954L11.5041 2.31548C11.5653 2.2546 11.6432 2.21321 11.7279 2.19651C11.8126 2.17982 11.9004 2.18857 11.9802 2.22167C12.0599 2.25477 12.1281 2.31073 12.1761 2.3825C12.2242 2.45428 12.2499 2.53866 12.25 2.62501ZM10.1943 10.0237C9.38391 10.8152 8.29811 11.2615 7.16534 11.2688C6.03257 11.276 4.94114 10.8436 4.1207 10.0625L5.12203 9.06119C5.18385 9.00009 5.22608 8.92196 5.24331 8.83677C5.26055 8.75157 5.25202 8.66318 5.21881 8.58285C5.1856 8.50253 5.12922 8.43391 5.05685 8.38577C4.98449 8.33762 4.89942 8.31212 4.8125 8.31251H2.1875C2.07147 8.31251 1.96019 8.35861 1.87814 8.44065C1.79609 8.5227 1.75 8.63398 1.75 8.75001V11.375C1.74993 11.4616 1.77555 11.5462 1.82362 11.6183C1.87169 11.6903 1.94004 11.7464 2.02003 11.7795C2.10001 11.8127 2.18803 11.8213 2.27295 11.8044C2.35786 11.7875 2.43584 11.7458 2.49703 11.6845L3.5 10.6805C4.46917 11.6158 5.76247 12.1402 7.10938 12.1439H7.13836C8.50997 12.1475 9.82774 11.6105 10.8063 10.6493C10.8861 10.5676 10.9309 10.4578 10.9309 10.3435C10.9309 10.2292 10.8862 10.1195 10.8063 10.0377C10.7264 9.95597 10.6177 9.90873 10.5034 9.90611C10.3892 9.90349 10.2784 9.94569 10.1948 10.0237H10.1943Z" fill="#737373" style="fill:#737373;fill:color(display-p3 0.4510 0.4510 0.4510);fill-opacity:1;"/></svg>`;
 
 // --- Suggestion presets ---
 
@@ -70,7 +73,8 @@ const STYLES = /* css */ `
     backdrop-filter: blur(10px);
     -webkit-backdrop-filter: blur(10px);
     border-radius: 20px;
-    box-shadow: 0 0 0 1px rgba(0,0,0,0.05), 0 8px 40px rgba(0,0,0,0.12);
+    box-shadow: 0 0 2px 0 rgba(255, 255, 255, 0.20) inset, 0 0 20px 0 rgba(255, 255, 255, 0.20) inset, 0 0 0 1px rgba(0, 0, 0, 0.05);
+    box-shadow: 0 0 2px 0 color(display-p3 1 1 1 / 0.20) inset, 0 0 20px 0 color(display-p3 1 1 1 / 0.20) inset, 0 0 0 1px color(display-p3 0 0 0 / 0.05);
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
     color: #262626;
     font-size: 12px;
@@ -84,15 +88,7 @@ const STYLES = /* css */ `
   }
   .hw-popup.visible { display: flex; flex-direction: column; gap: 9px; }
 
-  /* Inner glow overlay */
-  .hw-popup::after {
-    content: '';
-    position: absolute;
-    inset: 0;
-    border-radius: inherit;
-    box-shadow: inset 0 0 2px rgba(255,255,255,0.2), inset 0 0 20px rgba(255,255,255,0.2);
-    pointer-events: none;
-  }
+  /* Inner glow is handled via inset box-shadow on .hw-popup */
 
   /* --- Header row --- */
   .hw-header {
@@ -272,31 +268,98 @@ const STYLES = /* css */ `
   }
   .hw-loading-text { font-size: 12px; color: #a3a3a3; }
 
-  /* --- Alternatives phase --- */
-  .hw-alts-phase { padding: 0 10px 10px; display: flex; flex-direction: column; gap: 8px; }
-  .hw-alts-label { font-size: 12px; color: #a3a3a3; font-weight: 500; }
+  /* --- Alternatives phase (Review) --- */
+  .hw-alts-phase { display: flex; flex-direction: column; gap: 9px; }
+
+  .hw-review-header {
+    display: flex; align-items: center; gap: 6px; padding: 10px;
+  }
+  .hw-review-back {
+    display: flex; align-items: center; justify-content: center;
+    width: 32px; height: 32px;
+    background: none; border: none; cursor: pointer; padding: 0;
+    border-radius: 8px; transition: background 0.15s;
+  }
+  .hw-review-back:hover { background: rgba(0,0,0,0.05); }
+  .hw-review-title {
+    flex: 1; font-size: 14px; font-weight: 600; color: #262626;
+    letter-spacing: -0.09px; line-height: 16px;
+  }
+
+  .hw-alts-content { display: flex; flex-direction: column; gap: 16px; padding: 10px; }
+  .hw-alts-stats {
+    display: flex; justify-content: space-between; align-items: center;
+    font-size: 12px; font-weight: 500; letter-spacing: 0.01px; line-height: 14px;
+  }
+  .hw-alts-stats-count { color: #262626; }
+  .hw-alts-stats-tokens { color: #a3a3a3; }
+
+  .hw-alts-list { display: flex; flex-direction: column; gap: 8px; }
+
   .hw-alt-card {
-    padding: 12px;
+    display: flex; align-items: center; overflow: hidden;
+    padding: 4px;
     background: rgba(255,255,255,0.8);
     backdrop-filter: blur(60px);
     -webkit-backdrop-filter: blur(60px);
-    border-radius: 10px;
+    border-radius: 12px;
     box-shadow: 0 0 0 1px rgba(0,0,0,0.05), 0 1px 1px rgba(0,0,0,0.05);
     cursor: pointer;
-    transition: background 0.15s, box-shadow 0.2s, transform 0.2s;
+    transition: box-shadow 0.2s;
   }
   .hw-alt-card:hover {
-    background: rgba(255,255,255,1);
-    box-shadow: 0 0 0 1px rgba(0,0,0,0.06), 0 4px 16px rgba(0,0,0,0.08);
-    transform: translateY(-1px);
+    box-shadow: 0 0 0 1px rgba(0,0,0,0.08), 0 2px 8px rgba(0,0,0,0.06);
   }
-  .hw-alt-card-label {
-    font-size: 10px; color: #a3a3a3;
-    font-weight: 600; text-transform: uppercase;
-    letter-spacing: 0.04em;
-    margin-bottom: 4px;
+  .hw-alt-card.selected {
+    box-shadow: 0 0 0 3px rgba(0,0,255,0.2), 0 0 0 1px rgba(0,0,0,0.05), 0 1px 1px rgba(0,0,0,0.05);
   }
-  .hw-alt-card-text { font-size: 12px; line-height: 18px; color: #262626; }
+  .hw-alt-card-text {
+    flex: 1; padding: 10px 16px 10px 10px;
+    font-size: 12px; font-weight: 500; line-height: 16px;
+    color: #262626; letter-spacing: 0.01px;
+  }
+  .hw-alt-radio {
+    flex-shrink: 0; width: 18px; height: 18px;
+    border-radius: 999px;
+    background: rgba(255,255,255,0.8);
+    backdrop-filter: blur(60px);
+    -webkit-backdrop-filter: blur(60px);
+    box-shadow: 0 0 0 1px rgba(0,0,0,0.05), 0 1px 1px rgba(0,0,0,0.05);
+    margin-right: 6px;
+    display: flex; align-items: center; justify-content: center;
+    transition: background 0.15s;
+  }
+  .hw-alt-radio.checked {
+    background: #2563EB;
+  }
+
+  .hw-alts-footer {
+    display: flex; align-items: center; justify-content: space-between; padding: 0 10px 10px;
+  }
+  .hw-regen-btn {
+    display: flex; align-items: center; gap: 6px;
+    padding: 8px 0;
+    background: none; border: none; border-radius: 8px;
+    font-family: inherit; font-size: 12px; font-weight: 500;
+    color: #737373; letter-spacing: 0.01px;
+    cursor: pointer; transition: color 0.15s;
+  }
+  .hw-regen-btn:hover { color: #262626; }
+  .hw-apply-btn {
+    display: flex; align-items: center; gap: 6px;
+    padding: 8px 12px;
+    background: #2563EB; color: white;
+    border: none; border-radius: 8px;
+    font-family: inherit; font-size: 12px; font-weight: 500;
+    letter-spacing: 0.01px; line-height: 16px;
+    cursor: pointer; transition: background 0.15s, opacity 0.15s;
+    overflow: hidden;
+  }
+  .hw-apply-btn:hover { background: #1d4ed8; }
+  .hw-apply-btn:disabled { opacity: 0.5; cursor: default; }
+  .hw-apply-btn:disabled:hover { background: #2563EB; }
+
+  .hw-alt-card-label { display: none; }
 
   /* Multi-alternative card texts */
   .hw-alt-multi-texts { display: flex; flex-direction: column; gap: 8px; }
@@ -394,6 +457,7 @@ export class HemingwayPopup {
 
   // Single mode state
   private alternatives: Alternative[] = [];
+  private selectedAltIndex: number = -1;
   private currentText: string = "";
 
   // Multi mode state
@@ -487,6 +551,7 @@ export class HemingwayPopup {
 
   setAlternatives(alts: Alternative[]): void {
     this.alternatives = alts;
+    this.selectedAltIndex = 0;
     this.multiMode = false;
     this.phase = "alternatives";
     this.render();
@@ -551,14 +616,14 @@ export class HemingwayPopup {
         content.appendChild(this.renderLoadingPhase());
         break;
       case "alternatives":
-        // Alternatives render outside content for full-width
-        this.container.appendChild(content);
+        // Alternatives take over the entire popup — no header or current text
+        this.container.innerHTML = "";
         if (this.multiMode) {
           this.container.appendChild(this.renderMultiAlternativesPhase());
         } else {
           this.container.appendChild(this.renderAlternativesPhase());
         }
-        return; // already appended content
+        return;
       case "done":
         this.container.appendChild(this.renderDonePhase());
         return; // done phase replaces content
@@ -745,32 +810,115 @@ export class HemingwayPopup {
     const phase = document.createElement("div");
     phase.className = "hw-alts-phase";
 
-    const label = document.createElement("div");
-    label.className = "hw-alts-label";
-    label.textContent = "Pick an alternative";
-    phase.appendChild(label);
+    // --- Header: back + "Review" ---
+    const header = document.createElement("div");
+    header.className = "hw-review-header";
+
+    const backBtn = document.createElement("button");
+    backBtn.className = "hw-review-back";
+    backBtn.innerHTML = SVG_BACK;
+    backBtn.addEventListener("click", () => {
+      this.selectedAltIndex = -1;
+      this.setPhase("input");
+    });
+    header.appendChild(backBtn);
+
+    const title = document.createElement("div");
+    title.className = "hw-review-title";
+    title.textContent = "Review";
+    header.appendChild(title);
+
+    phase.appendChild(header);
+
+    // --- Content: stats + list ---
+    const content = document.createElement("div");
+    content.className = "hw-alts-content";
+
+    const stats = document.createElement("div");
+    stats.className = "hw-alts-stats";
+    const countEl = document.createElement("span");
+    countEl.className = "hw-alts-stats-count";
+    countEl.textContent = `${this.alternatives.length} variants`;
+    stats.appendChild(countEl);
+    content.appendChild(stats);
+
+    const list = document.createElement("div");
+    list.className = "hw-alts-list";
+
+    // Pre-select first alternative
+    if (this.selectedAltIndex < 0) this.selectedAltIndex = 0;
+
+    const applyBtnRef = { current: null as HTMLButtonElement | null };
 
     this.alternatives.forEach((alt, i) => {
       const card = document.createElement("div");
       card.className = "hw-alt-card";
-      card.addEventListener("click", () => this.onChoose?.(alt, i));
-
-      const cardLabel = document.createElement("div");
-      cardLabel.className = "hw-alt-card-label";
-      cardLabel.textContent = alt.label;
-      card.appendChild(cardLabel);
+      if (i === this.selectedAltIndex) card.classList.add("selected");
 
       const cardText = document.createElement("div");
       cardText.className = "hw-alt-card-text";
       cardText.textContent = alt.text;
       card.appendChild(cardText);
 
-      phase.appendChild(card);
-    });
+      const radio = document.createElement("div");
+      radio.className = "hw-alt-radio";
+      if (i === this.selectedAltIndex) {
+        radio.classList.add("checked");
+        radio.innerHTML = SVG_CHECK_WHITE;
+      }
+      card.appendChild(radio);
 
-    phase.appendChild(this.renderRetrySection());
-    phase.appendChild(this.renderCustomSection());
-    phase.appendChild(this.renderCancelButton());
+      card.addEventListener("click", () => {
+        this.selectedAltIndex = i;
+        // Update all cards
+        list.querySelectorAll(".hw-alt-card").forEach((c, ci) => {
+          c.classList.toggle("selected", ci === i);
+          const r = c.querySelector(".hw-alt-radio") as HTMLElement;
+          if (r) {
+            r.classList.toggle("checked", ci === i);
+            r.innerHTML = ci === i ? SVG_CHECK_WHITE : "";
+          }
+        });
+        if (applyBtnRef.current) applyBtnRef.current.disabled = false;
+      });
+
+      list.appendChild(card);
+    });
+    content.appendChild(list);
+    phase.appendChild(content);
+
+    // --- Footer: Regenerate + Apply ---
+    const footer = document.createElement("div");
+    footer.className = "hw-alts-footer";
+
+    const regenBtn = document.createElement("button");
+    regenBtn.className = "hw-regen-btn";
+    regenBtn.innerHTML = SVG_REFRESH;
+    const regenLabel = document.createTextNode("Regenerate");
+    regenBtn.appendChild(regenLabel);
+    regenBtn.addEventListener("click", () => {
+      this.onRegenerate?.("");
+    });
+    footer.appendChild(regenBtn);
+
+    const applyBtn = document.createElement("button");
+    applyBtn.className = "hw-apply-btn";
+    applyBtnRef.current = applyBtn;
+    const applyLabel = document.createTextNode("Apply");
+    applyBtn.appendChild(applyLabel);
+    const applyCheck = document.createElement("span");
+    applyCheck.innerHTML = SVG_CHECK_WHITE;
+    applyCheck.style.display = "flex";
+    applyCheck.style.alignItems = "center";
+    applyBtn.appendChild(applyCheck);
+    applyBtn.addEventListener("click", () => {
+      if (this.selectedAltIndex >= 0 && this.selectedAltIndex < this.alternatives.length) {
+        this.onChoose?.(this.alternatives[this.selectedAltIndex], this.selectedAltIndex);
+      }
+    });
+    footer.appendChild(applyBtn);
+
+    phase.appendChild(footer);
 
     return phase;
   }

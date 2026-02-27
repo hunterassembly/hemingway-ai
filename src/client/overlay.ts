@@ -963,13 +963,24 @@ function matchesShortcut(e: KeyboardEvent, shortcut: string): boolean {
   const key = parts[parts.length - 1];
   const modifiers = new Set(parts.slice(0, -1));
 
+  const isMac = /Mac|iPhone|iPad/.test(navigator.platform ?? navigator.userAgent);
+
   const needsMeta = modifiers.has("meta") || modifiers.has("cmd") || modifiers.has("command");
   const needsCtrl = modifiers.has("ctrl") || modifiers.has("control");
   const needsShift = modifiers.has("shift");
   const needsAlt = modifiers.has("alt") || modifiers.has("option");
 
-  if (needsMeta && !e.metaKey) return false;
-  if (needsCtrl && !e.ctrlKey) return false;
+  // On Mac, treat "ctrl" as Cmd (metaKey) since that's the standard convention
+  if (needsCtrl && !needsMeta) {
+    if (isMac) {
+      if (!e.metaKey) return false;
+    } else {
+      if (!e.ctrlKey) return false;
+    }
+  } else {
+    if (needsMeta && !e.metaKey) return false;
+    if (needsCtrl && !e.ctrlKey) return false;
+  }
   if (needsShift && !e.shiftKey) return false;
   if (needsAlt && !e.altKey) return false;
 

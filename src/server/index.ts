@@ -11,6 +11,7 @@ import {
 } from "./generate.js";
 import { writeText } from "./write.js";
 import { loadPreferences, recordPick, getTopPreferences } from "./preferences.js";
+import { getDemoHtml } from "./demo.js";
 
 // ---------------------------------------------------------------------------
 // Re-exports for consumer convenience
@@ -227,6 +228,19 @@ function handleHealth(_req: IncomingMessage, res: ServerResponse): void {
   sendJson(res, 200, { ok: true });
 }
 
+function handleDemo(
+  _req: IncomingMessage,
+  res: ServerResponse,
+  config: HemingwayConfig
+): void {
+  const html = getDemoHtml(config.port);
+  res.writeHead(200, {
+    "Content-Type": "text/html",
+    "Content-Length": Buffer.byteLength(html),
+  });
+  res.end(html);
+}
+
 async function handleGetPreferences(
   _req: IncomingMessage,
   res: ServerResponse
@@ -346,6 +360,8 @@ export async function startServer(
         await handleClientJs(req, res);
       } else if (req.method === "GET" && pathname === "/health") {
         handleHealth(req, res);
+      } else if (req.method === "GET" && pathname === "/demo") {
+        handleDemo(req, res, config);
       } else if (req.method === "GET" && pathname === "/config") {
         handleGetConfig(req, res, config);
       } else if (req.method === "POST" && pathname === "/config") {
@@ -370,12 +386,14 @@ export async function startServer(
     console.log("");
     console.log("  \x1b[1m\x1b[34m✎ Hemingway\x1b[0m");
     console.log(`  Server running at \x1b[36mhttp://localhost:${config.port}\x1b[0m`);
+    console.log(`  Demo page:        \x1b[36mhttp://localhost:${config.port}/demo\x1b[0m`);
     console.log("");
     console.log(`  Routes:`);
     console.log(`    POST /generate       — Generate copy alternatives`);
     console.log(`    POST /generate-multi — Generate multi-element alternatives`);
     console.log(`    POST /write          — Write chosen text to source`);
     console.log(`    GET  /client.js   — Browser overlay script`);
+    console.log(`    GET  /demo        — Demo page with overlay`);
     console.log(`    GET  /health      — Health check`);
     console.log(`    GET  /config      — Read current config`);
     console.log(`    POST /config      — Update config (model, styleGuide, copyBible)`);

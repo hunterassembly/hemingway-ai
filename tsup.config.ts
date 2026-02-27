@@ -1,5 +1,7 @@
 import { defineConfig } from "tsup";
 
+const isWatch = process.argv.includes("--watch");
+
 export default defineConfig([
   // Server bundle (Node.js)
   {
@@ -10,6 +12,7 @@ export default defineConfig([
     clean: true,
     platform: "node",
     target: "node20",
+    onSuccess: isWatch ? "node dist/server/index.js" : undefined,
   },
   // Client bundle (browser)
   {
