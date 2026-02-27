@@ -1,0 +1,66 @@
+{
+  "name": "hemingway-ai",
+  "version": "0.1.0",
+  "description": "AI-powered copy alternatives for your marketing site",
+  "type": "module",
+  "license": "MIT",
+  "author": "Hunter Assembly",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/hunterassembly/hemingway-ai.git"
+  },
+  "homepage": "https://github.com/hunterassembly/hemingway-ai",
+  "bugs": {
+    "url": "https://github.com/hunterassembly/hemingway-ai/issues"
+  },
+  "keywords": [
+    "ai",
+    "copy",
+    "copywriting",
+    "marketing",
+    "claude",
+    "anthropic",
+    "dev-tools",
+    "overlay"
+  ],
+  "bin": {
+    "hemingway-ai": "./bin/hemingway.mjs"
+  },
+  "exports": {
+    ".": {
+      "import": "./dist/server/index.js",
+      "types": "./dist/server/index.d.ts"
+    },
+    "./react": {
+      "import": "./dist/react.js",
+      "types": "./dist/react.d.ts"
+    },
+    "./client": {
+      "import": "./dist/client/overlay.js",
+      "types": "./dist/client/overlay.d.ts"
+    }
+  },
+  "files": [
+    "dist",
+    "bin"
+  ],
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsup --watch"
+  },
+  "devDependencies": {
+    "@types/node": "^20",
+    "@types/react": "^19",
+    "react": "^19.0.0",
+    "tsup": "^8.0.0",
+    "typescript": "^5"
+  },
+  "peerDependencies": {
+    "react": "^18.0.0 || ^19.0.0"
+  },
+  "peerDependenciesMeta": {
+    "react": {
+      "optional": true
+    }
+  }
+}
