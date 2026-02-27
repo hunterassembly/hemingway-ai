@@ -42,11 +42,15 @@
   },
   "files": [
     "dist",
-    "bin"
+    "bin",
+    "src",
+    "tsup.config.ts",
+    "tsconfig.json"
   ],
   "scripts": {
     "build": "tsup",
-    "dev": "tsup --watch"
+    "dev": "tsup --watch",
+    "prepare": "tsup"
   },
   "devDependencies": {
     "@types/node": "^20",
