@@ -1,0 +1,20 @@
+version: 1
+mappings:
+  - folder: src/server
+    doc: server-runtime.md
+    purpose: Node HTTP server, AI generation pipeline, config, and source writeback.
+  - folder: src/client
+    doc: browser-overlay.md
+    purpose: In-page overlay UX, element discovery, popup/indicator UI, and client-side orchestration.
+  - folder: src
+    doc: architecture.md
+    purpose: System-level architecture, lifecycle, and module boundaries.
+  - folder: bin
+    doc: operations-and-packaging.md
+    purpose: CLI entrypoint behavior and project bootstrap flow.
+  - folder: reference
+    doc: copy-intelligence.md
+    purpose: Built-in copywriting reference corpus and how it affects generation.
+  - folder: .
+    doc: README.md
+    purpose: Documentation index and quick routing guide for agents.

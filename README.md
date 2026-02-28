@@ -77,6 +77,17 @@ export default config;
 - **Framework agnostic** — works with any dev server via script tag or React component
 - **Source mapping** — writes changes back to your source files
 
+## Agent Reference Docs
+
+Detailed, agent-oriented system docs live in:
+
+- `docs/reference/README.md`
+- `docs/reference/architecture.md`
+- `docs/reference/server-runtime.md`
+- `docs/reference/browser-overlay.md`
+- `docs/reference/copy-intelligence.md`
+- `docs/reference/operations-and-packaging.md`
+
 ## License
 
 MIT
