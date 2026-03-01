@@ -320,8 +320,8 @@ export function getDemoHtml(port: number): string {
 
   <section class="hero">
     <span class="badge">Now in public beta</span>
-    <h1>Know what's working. Know what to fix. No dashboard required.</h1>
-    <p>Stop drowning in dashboards. Beacon surfaces the metrics that matter and tells you what to do about them.</p>
+    <h1>Rewrite.</h1>
+    <p>Beacon replaces your tab-switching, screenshot-sharing, metrics-guessing routine with one focused view — built for teams who'd rather ship than report.</p>
     <div class="cta-group">
       <a href="#" class="btn btn-primary">Start for free</a>
       <a href="#" class="btn btn-secondary">See a demo</a>
