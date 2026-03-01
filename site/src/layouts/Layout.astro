@@ -1,4 +1,7 @@
 ---
+import Nav from "../components/Nav.astro";
+import Footer from "../components/Footer.astro";
+
 interface Props {
   title: string;
   description?: string;
@@ -8,6 +11,8 @@ const {
   title,
   description = "AI-powered copy editing for your marketing site.",
 } = Astro.props;
+
+const currentPath = Astro.url.pathname;
 ---
 
 <!doctype html>
@@ -22,7 +27,11 @@ const {
     <title>{title}</title>
   </head>
   <body>
-    <slot />
+    <Nav currentPath={currentPath} />
+    <main>
+      <slot />
+    </main>
+    <Footer />
   </body>
 </html>
 

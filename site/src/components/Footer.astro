@@ -1,0 +1,71 @@
+---
+---
+
+<footer>
+  <div class="footer-inner">
+    <div class="footer-links">
+      <a
+        href="https://github.com/hunterassembly/hemingway-ai"
+        target="_blank"
+        rel="noopener noreferrer"
+      >
+        GitHub
+      </a>
+      <span class="separator" aria-hidden="true">&middot;</span>
+      <a
+        href="https://www.npmjs.com/package/hemingway-ai"
+        target="_blank"
+        rel="noopener noreferrer"
+      >
+        npm
+      </a>
+      <span class="separator" aria-hidden="true">&middot;</span>
+      <span>MIT License</span>
+    </div>
+    <p class="credit">Made by Hunter Assembly</p>
+  </div>
+</footer>
+
+<style>
+  footer {
+    border-top: 1px solid var(--border);
+    color: var(--text-muted);
+    font-size: 0.875rem;
+  }
+
+  .footer-inner {
+    max-width: var(--max-width);
+    margin: 0 auto;
+    padding: 3rem 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 1rem;
+  }
+
+  .footer-links {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .footer-links a {
+    color: var(--text-muted);
+    text-decoration: none;
+    transition: color 0.15s ease;
+  }
+
+  .footer-links a:hover {
+    color: var(--text);
+    text-decoration: underline;
+  }
+
+  .separator {
+    color: var(--border);
+  }
+
+  .credit {
+    color: var(--text-muted);
+  }
+</style>
