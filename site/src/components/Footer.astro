@@ -3,69 +3,52 @@
 
 <footer>
   <div class="footer-inner">
-    <div class="footer-links">
-      <a
-        href="https://github.com/hunterassembly/hemingway-ai"
-        target="_blank"
-        rel="noopener noreferrer"
-      >
-        GitHub
-      </a>
-      <span class="separator" aria-hidden="true">&middot;</span>
-      <a
-        href="https://www.npmjs.com/package/hemingway-ai"
-        target="_blank"
-        rel="noopener noreferrer"
-      >
-        npm
-      </a>
-      <span class="separator" aria-hidden="true">&middot;</span>
-      <span>MIT License</span>
+    <div class="footer-left">
+      <span class="footer-logo">HEMINGWAY.</span>
+      <span class="footer-copy">MIT licensed. Open source.</span>
     </div>
-    <p class="credit">Made by Hunter Assembly</p>
+    <div class="footer-right">
+      <a href="https://github.com/hunterassembly/hemingway-ai" class="pill-btn" target="_blank" rel="noopener noreferrer">
+        GITHUB
+        <svg width="10" height="10" viewBox="0 0 10 10" fill="none" aria-hidden="true">
+          <path d="M2 8L8 2M8 2H3M8 2V7" stroke="currentColor" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </a>
+    </div>
   </div>
 </footer>
 
 <style>
   footer {
     border-top: 1px solid var(--border);
-    color: var(--text-muted);
-    font-size: 0.875rem;
   }
 
   .footer-inner {
     max-width: var(--max-width);
     margin: 0 auto;
-    padding: 3rem 1.5rem;
+    padding: 2rem 24px;
     display: flex;
     align-items: center;
     justify-content: space-between;
-    flex-wrap: wrap;
     gap: 1rem;
+    flex-wrap: wrap;
   }
 
-  .footer-links {
+  .footer-left {
     display: flex;
     align-items: center;
-    gap: 0.5rem;
+    gap: 16px;
   }
 
-  .footer-links a {
-    color: var(--text-muted);
-    text-decoration: none;
-    transition: color 0.15s ease;
-  }
-
-  .footer-links a:hover {
+  .footer-logo {
+    font-size: 12px;
+    font-weight: 500;
     color: var(--text);
-    text-decoration: underline;
+    letter-spacing: 0;
   }
 
-  .separator {
-    color: var(--border);
-  }
-
-  .credit {
+  .footer-copy {
+    font-size: 12px;
     color: var(--text-muted);
   }
 </style>

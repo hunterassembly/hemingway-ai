@@ -1,50 +1,43 @@
-<section class="features fade-in">
+<section class="features">
   <div class="features-inner">
-    <h2 class="section-heading">Features</h2>
-    <div class="features-grid">
-      <div class="feature-card">
-        <h3 class="feature-title">Local-first</h3>
-        <p class="feature-desc">
-          Runs on localhost. Your copy never leaves your machine.
-        </p>
-      </div>
-      <div class="feature-card">
-        <h3 class="feature-title">Framework-agnostic</h3>
-        <p class="feature-desc">
-          One script tag works with React, Vue, Astro, or plain HTML.
-        </p>
-      </div>
-      <div class="feature-card">
-        <h3 class="feature-title">Writes to source</h3>
-        <p class="feature-desc">
-          Changes go back to your actual source files, not just the DOM.
-        </p>
-      </div>
-      <div class="feature-card">
-        <h3 class="feature-title">Learns your style</h3>
-        <p class="feature-desc">
-          Tracks which alternatives you pick and adapts future suggestions.
-        </p>
-      </div>
-      <div class="feature-card">
-        <h3 class="feature-title">Claude-powered</h3>
-        <p class="feature-desc">
-          Uses Anthropic's Claude for copy that actually sounds good.
-        </p>
-      </div>
-      <div class="feature-card">
-        <h3 class="feature-title">Zero dependencies</h3>
-        <p class="feature-desc">
-          No runtime deps. Just Node.js and your browser.
-        </p>
-      </div>
+    <div class="section-header">
+      <span class="label">FEATURES</span>
+      <div class="header-line" aria-hidden="true"></div>
     </div>
+    <h2 class="section-title">Built for the way developers actually work.</h2>
+    <dl class="features-list">
+      <div class="feature">
+        <dt>Local-first</dt>
+        <dd>Everything runs on localhost. Your copy goes to Anthropic's API and nowhere else. No accounts, no dashboards, no data sitting on someone else's server.</dd>
+      </div>
+      <div class="feature">
+        <dt>Framework-agnostic</dt>
+        <dd>Drop one script tag into any dev server. React, Vue, Svelte, Astro, plain HTML — if it renders in a browser, Hemingway works on it.</dd>
+      </div>
+      <div class="feature">
+        <dt>Writes to source</dt>
+        <dd>When you apply a change, Hemingway finds the string in your component files and overwrites it directly. The DOM update and the file write happen together.</dd>
+      </div>
+      <div class="feature">
+        <dt>Context-aware</dt>
+        <dd>Hemingway builds a page brief before every generation — narrative stage, section role, copy job classification. Claude gets a brief, not just a string.</dd>
+      </div>
+      <div class="feature">
+        <dt>Learns your preferences</dt>
+        <dd>Every alternative you pick gets recorded. After a few sessions, Hemingway weights future suggestions toward your style. It gets better the more you use it.</dd>
+      </div>
+      <div class="feature">
+        <dt>Your style guide, in every prompt</dt>
+        <dd>Point Hemingway at your brand voice doc and copy bible. They're included in every generation request, so suggestions stay on-brand without manual prompting.</dd>
+      </div>
+    </dl>
   </div>
 </section>
 
 <style>
   .features {
-    padding: 6rem 1.5rem;
+    padding: 4rem 24px;
+    border-top: 1px solid var(--border);
   }
 
   .features-inner {
@@ -52,48 +45,85 @@
     margin: 0 auto;
   }
 
-  .section-heading {
-    text-align: center;
-    font-size: 1.75rem;
-    font-weight: 700;
+  .section-header {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 28px;
+  }
+
+  .label {
+    color: var(--text);
+    font-size: 12px;
+    font-weight: 500;
+    letter-spacing: 0;
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+
+  .header-line {
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+  }
+
+  .section-title {
+    font-size: 20px;
+    font-weight: 400;
     letter-spacing: -0.02em;
-    margin-bottom: 3rem;
+    line-height: 1.4;
+    margin-bottom: 24px;
+    color: var(--text);
+    max-width: 460px;
   }
 
-  .features-grid {
+  .features-list {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 1.5rem;
+    grid-template-columns: 1fr 1fr;
+    gap: 0;
   }
 
-  .feature-card {
-    padding: 1.5rem;
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    background: white;
+  .feature {
+    padding: 20px 0;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
   }
 
-  .feature-title {
-    font-weight: 600;
-    font-size: 1rem;
-    margin-bottom: 0.5rem;
+  .feature:nth-child(odd) {
+    padding-right: 3rem;
+    border-right: 1px solid var(--border);
   }
 
-  .feature-desc {
+  .feature:nth-child(even) {
+    padding-left: 3rem;
+  }
+
+  dt {
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--text);
+  }
+
+  dd {
+    font-size: 14px;
     color: var(--text-muted);
-    font-size: 0.9375rem;
-    line-height: 1.5;
+    line-height: 1.6;
   }
 
-  @media (max-width: 768px) {
-    .features-grid {
-      grid-template-columns: repeat(2, 1fr);
-    }
-  }
-
-  @media (max-width: 480px) {
-    .features-grid {
+  @media (max-width: 600px) {
+    .features-list {
       grid-template-columns: 1fr;
+    }
+
+    .feature:nth-child(odd) {
+      padding-right: 0;
+      border-right: none;
+    }
+
+    .feature:nth-child(even) {
+      padding-left: 0;
     }
   }
 </style>

@@ -3,31 +3,35 @@ import DocsLayout from "../layouts/DocsLayout.astro";
 ---
 
 <DocsLayout title="FAQ — hemingway-ai" heading="FAQ">
+  <p class="lede">The honest answers.</p>
+
   <h2>General</h2>
 
   <details>
-    <summary>What is hemingway?</summary>
+    <summary>What is Hemingway?</summary>
     <p>
-      Hemingway is an AI-powered copy editing overlay for marketing sites. It
-      runs as a local development tool — you select text on your live site, see
-      Claude-generated alternatives, and apply them with one click.
+      Hemingway is a local development tool that puts a copy editing overlay on your live dev site. Select any text element, get three Claude-generated alternatives, and apply one with a single click. The change writes back to your source file — not just the DOM.
     </p>
   </details>
 
   <details>
     <summary>Who is it for?</summary>
     <p>
-      Developers and marketing teams who iterate on website copy. If you're tired
-      of rewriting headlines in a spreadsheet, hemingway lets you edit copy
-      directly on the live page.
+      Developers who own their marketing site copy. If you're the one who ends up editing the headlines, tweaking the CTAs, and arguing with the copywriter over Slack — Hemingway is for you. It meets you in the browser, where the work actually happens.
     </p>
   </details>
 
   <details>
     <summary>Is it free?</summary>
     <p>
-      Yes, hemingway is MIT licensed and free to use. You'll need your own
-      Anthropic API key, which has its own pricing.
+      Yes. Hemingway is MIT licensed and open source. You bring your own Anthropic API key — generation costs go to your Anthropic account at their standard rates.
+    </p>
+  </details>
+
+  <details>
+    <summary>Does it work in production?</summary>
+    <p>
+      No. Hemingway is a development tool. The server is designed to run alongside your local dev server. It logs a warning if <code>NODE_ENV</code> is set to <code>production</code> and is not designed for runtime use in deployed environments.
     </p>
   </details>
 
@@ -36,64 +40,82 @@ import DocsLayout from "../layouts/DocsLayout.astro";
   <details>
     <summary>What frameworks does it work with?</summary>
     <p>
-      Any framework that renders HTML. React, Vue, Svelte, Astro, Next.js, plain
-      HTML — just add a script tag or use the React component.
+      Any framework that renders HTML in a browser. The script tag approach is universal — React, Vue, Svelte, Astro, Next.js, SvelteKit, Remix, plain HTML. If it has a dev server and a browser, Hemingway works on it. There's also a React component for projects that prefer it.
     </p>
   </details>
 
   <details>
-    <summary>What AI models are supported?</summary>
+    <summary>What models does it use?</summary>
     <p>
-      Claude models via the Anthropic API. The default is claude-sonnet-4-6, but
-      you can configure any Claude model in your config file.
+      Claude models via the Anthropic API. The default is <code>claude-sonnet-4-6</code>. You can change the model from the overlay settings panel or by setting <code>model</code> in <code>hemingway.config.mjs</code>.
     </p>
   </details>
 
   <details>
-    <summary>Do I need an API key?</summary>
+    <summary>Do I need an Anthropic API key?</summary>
     <p>
-      Yes, you need an Anthropic API key. Set it as the
-      <code>ANTHROPIC_API_KEY</code> environment variable before starting the
-      server.
+      Yes. Set it as the <code>ANTHROPIC_API_KEY</code> environment variable before starting the server. The server will start without it but generation requests will fail.
+    </p>
+    <pre><code>export ANTHROPIC_API_KEY=sk-ant-...</code></pre>
+  </details>
+
+  <details>
+    <summary>Can I use it with a monorepo?</summary>
+    <p>
+      Yes. Use the <code>sourcePatterns</code> config option to point Hemingway at the right part of your repo. For example, if your marketing site lives in <code>apps/web/src</code>, set <code>{"sourcePatterns: [\"apps/web/src/**/*.{tsx,astro,vue}\"]"}</code> to limit write-back to those files.
     </p>
   </details>
 
   <h2>Usage</h2>
 
   <details>
-    <summary>How does write-back work?</summary>
+    <summary>How does source writeback work?</summary>
     <p>
-      When you apply an alternative, hemingway searches your source files for the
-      original text using heuristic matching. It handles HTML entities, curly
-      quotes, and whitespace variations, and scores matches by surrounding
-      context (tag names, CSS classes) to find the right location.
+      When you apply an alternative, Hemingway searches your source files for the original text using heuristic matching. It handles HTML entities, curly quotes, and whitespace variations, then scores each candidate match by surrounding context — tag name, CSS classes, parent elements — to find the right location. If it's confident, it writes directly. If the match is ambiguous, it shows a confirmation dialog before writing.
+    </p>
+    <p>
+      If it can't find a match at all, it copies the new text to your clipboard as a fallback.
     </p>
   </details>
 
   <details>
-    <summary>What if it picks the wrong file?</summary>
+    <summary>What if it writes to the wrong file?</summary>
     <p>
-      Configure <code>sourcePatterns</code> in your config to narrow the search
-      scope. For example, <code>["src/components/**/*.tsx"]</code> limits
-      write-back to your component files.
+      Narrow the search scope with <code>sourcePatterns</code> in your config. The more specific your patterns, the less ambiguity in matching. For example, <code>["src/components/marketing/**/*.tsx"]</code> limits write-back to your marketing components only.
     </p>
   </details>
 
   <details>
-    <summary>Can I use it in production?</summary>
+    <summary>How does multi-select work?</summary>
     <p>
-      No, hemingway is a development tool. The server logs a warning if
-      <code>NODE_ENV</code> is set to <code>production</code>. It's designed for
-      iterating on copy during development, not for runtime use.
+      Hold Cmd (Mac) or Ctrl (Windows) and click up to 5 elements. Hemingway treats the selection as a coherent set and generates alternatives across all selected elements together — so the heading and its supporting copy are rewritten in relation to each other.
     </p>
   </details>
 
   <details>
-    <summary>Does it support inline editing?</summary>
+    <summary>Can I edit text manually without using AI?</summary>
     <p>
-      Yes, double-click any text element to edit it directly in the browser.
-      Press Enter or click away to commit the change back to your source file.
+      Yes. Double-click any text element to edit it directly in the browser. Press Enter or click away to commit. The change writes back to your source file the same way an AI-generated alternative would.
     </p>
+  </details>
+
+  <details>
+    <summary>What's preference learning?</summary>
+    <p>
+      Every time you pick an alternative, Hemingway records which one and labels it across three axes: Clarity, Specificity, and Conversion orientation. After around 10 picks, the pattern becomes meaningful and gets included in future generation prompts — nudging suggestions toward your style. It takes a few sessions to become useful, but it compounds.
+    </p>
+  </details>
+
+  <details>
+    <summary>Can I use my own style guide?</summary>
+    <p>
+      Yes. Set <code>styleGuide</code> and <code>copyBible</code> in your config to point at markdown files. Both are included in full in every generation request — not summarized, not chunked. Claude gets your actual docs.
+    </p>
+    <pre><code>// hemingway.config.mjs
+export default {"{"}
+  styleGuide: "./docs/brand-voice.md",
+  copyBible: "./docs/copy-bible.md",
+{"}"}</code></pre>
   </details>
 
   <h2>Privacy &amp; Security</h2>
@@ -101,18 +123,46 @@ import DocsLayout from "../layouts/DocsLayout.astro";
   <details>
     <summary>Does my copy leave my machine?</summary>
     <p>
-      Only to Anthropic's API for generating alternatives. Hemingway makes no
-      other external network calls. Your copy is never stored on any third-party
-      server.
+      Only to Anthropic's API for generating alternatives. Hemingway makes no other external network calls. Your copy is never stored on any third-party server, and there are no Hemingway accounts or dashboards involved.
     </p>
   </details>
 
   <details>
-    <summary>Is it safe to use with client code?</summary>
+    <summary>Is it safe for client work?</summary>
     <p>
-      Yes, hemingway runs entirely on localhost. The server binds to
-      <code>127.0.0.1</code> by default and the overlay communicates only with
-      the local server.
+      Hemingway runs entirely on localhost — the server binds to <code>127.0.0.1</code> and only communicates with the local server. The only external call is to Anthropic's API. Review Anthropic's data handling policies before using it with confidential client copy.
+    </p>
+  </details>
+
+  <details>
+    <summary>What gets stored locally?</summary>
+    <p>
+      Only your style preferences, in <code>.hemingway/preferences.json</code>. This file records which alternatives you've picked and the labels derived from them. Nothing else is persisted between sessions.
+    </p>
+  </details>
+
+  <h2>Troubleshooting</h2>
+
+  <details>
+    <summary>The overlay isn't activating.</summary>
+    <p>
+      Check three things in order: (1) Is the Hemingway server running? It should be at <code>http://localhost:4800</code>. (2) Is the client script loading? Check the browser console for errors on the script tag. (3) Is the keyboard shortcut conflicting with something else? You can change it in <code>hemingway.config.mjs</code> with the <code>shortcut</code> option.
+    </p>
+  </details>
+
+  <details>
+    <summary>Generation is failing.</summary>
+    <p>
+      Almost always the API key. Check that <code>ANTHROPIC_API_KEY</code> is set in the environment where you started the server:
+    </p>
+    <pre><code>echo $ANTHROPIC_API_KEY</code></pre>
+    <p>If that's empty, the key isn't in scope. Add it to your shell profile or set it inline when starting the server.</p>
+  </details>
+
+  <details>
+    <summary>Writeback is writing to the wrong location.</summary>
+    <p>
+      Narrow your <code>sourcePatterns</code> config. The more specific the glob patterns, the more confident the heuristic match. If you have duplicate strings across files, narrow to the specific file or directory that contains the right one.
     </p>
   </details>
 </DocsLayout>

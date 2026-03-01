@@ -1,60 +1,98 @@
-<section class="quickstart fade-in">
+<section class="quickstart">
   <div class="quickstart-inner">
-    <h2 class="section-heading">Get started in 30 seconds</h2>
-    <p class="section-subtext">
-      <a href="/install/">Full guide &rarr;</a>
-    </p>
-    <div class="code-block">
-      <pre><code><span class="cmd">npm install hemingway-ai</span>
+    <div class="section-header">
+      <span class="label">QUICKSTART</span>
+      <div class="header-line" aria-hidden="true"></div>
+    </div>
+    <h2 class="section-title">Get started in five minutes.</h2>
+    <div class="code-block corner-dots-box">
+      <pre><code><span class="comment"># Install</span>
+<span class="cmd">npm install hemingway-ai</span>
 
+<span class="comment"># Run the server</span>
 <span class="cmd">npx hemingway-ai</span>
 
 <span class="comment"># Add to your site</span>
 <span class="cmd">&lt;script src="http://localhost:4800/client.js"&gt;&lt;/script&gt;</span>
 
-<span class="comment"># Press Cmd+Shift+C to activate</span></code></pre>
+<span class="comment"># Press Cmd+Shift+H to activate</span></code></pre>
     </div>
+    <p class="quickstart-footer">
+      <a href="/install/" class="pill-btn">Full installation guide →</a>
+    </p>
   </div>
 </section>
 
 <style>
   .quickstart {
-    padding: 6rem 1.5rem;
+    padding: 4rem 24px;
+    border-top: 1px solid var(--border);
   }
 
   .quickstart-inner {
-    max-width: 640px;
+    max-width: var(--max-width);
     margin: 0 auto;
   }
 
-  .section-heading {
-    text-align: center;
-    font-size: 1.75rem;
-    font-weight: 700;
+  .section-header {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 28px;
+  }
+
+  .label {
+    color: var(--text);
+    font-size: 12px;
+    font-weight: 500;
+    letter-spacing: 0;
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+
+  .header-line {
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+  }
+
+  .section-title {
+    font-size: 20px;
+    font-weight: 400;
     letter-spacing: -0.02em;
-    margin-bottom: 0.75rem;
-  }
-
-  .section-subtext {
-    text-align: center;
-    margin-bottom: 2rem;
-  }
-
-  .section-subtext a {
-    color: var(--text-muted);
-    font-size: 0.9375rem;
-  }
-
-  .section-subtext a:hover {
-    color: var(--accent);
+    line-height: 1.4;
+    margin-bottom: 24px;
+    color: var(--text);
   }
 
   .code-block {
-    background: #1a1a1a;
-    color: #e5e7eb;
-    border-radius: 12px;
+    background: var(--text);
+    color: rgb(212, 212, 212);
+    border-radius: 4px;
     padding: 1.5rem;
     overflow-x: auto;
+    position: relative;
+  }
+
+  /* Corner dots on code block */
+  .corner-dots-box::before,
+  .corner-dots-box::after {
+    content: '';
+    position: absolute;
+    width: 4px;
+    height: 4px;
+    border-radius: 100%;
+    background: rgba(255, 255, 255, 0.25);
+  }
+
+  .corner-dots-box::before {
+    top: 8px;
+    left: 8px;
+  }
+
+  .corner-dots-box::after {
+    top: 8px;
+    right: 8px;
   }
 
   .code-block pre {
@@ -63,18 +101,23 @@
 
   .code-block code {
     font-family: var(--font-mono);
-    font-size: 0.875rem;
-    line-height: 1.7;
+    font-size: 12px;
+    line-height: 1.9;
     background: none;
     padding: 0;
     color: inherit;
+    border-radius: 0;
   }
 
   .code-block .comment {
-    color: #6b7280;
+    color: rgba(255, 255, 255, 0.3);
   }
 
   .code-block .cmd {
-    color: #e5e7eb;
+    color: rgb(212, 212, 212);
+  }
+
+  .quickstart-footer {
+    margin-top: 20px;
   }
 </style>

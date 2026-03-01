@@ -1,35 +1,46 @@
-<section class="how-it-works fade-in">
+<section class="how-it-works">
   <div class="how-inner">
-    <h2 class="section-heading">How it works</h2>
-    <div class="steps">
-      <div class="step">
-        <span class="step-number">01</span>
-        <h3 class="step-title">Select text</h3>
-        <p class="step-desc">
-          Click any heading, paragraph, or button on your dev site.
-        </p>
-      </div>
-      <div class="step">
-        <span class="step-number">02</span>
-        <h3 class="step-title">See alternatives</h3>
-        <p class="step-desc">
-          Get three Claude-powered rewrites tailored to your page context.
-        </p>
-      </div>
-      <div class="step">
-        <span class="step-number">03</span>
-        <h3 class="step-title">Apply instantly</h3>
-        <p class="step-desc">
-          One click updates your source files. No copy-paste needed.
-        </p>
-      </div>
+    <div class="section-header">
+      <span class="label">HOW IT WORKS</span>
+      <div class="header-line" aria-hidden="true"></div>
     </div>
+    <h2 class="section-title">Three steps. No friction.</h2>
+    <ol class="steps">
+      <li class="step">
+        <span class="step-num">01</span>
+        <div class="step-content">
+          <span class="step-title">Select</span>
+          <p class="step-desc">
+            Click any heading, paragraph, button, or link on your dev site. Hemingway outlines everything that's editable.
+          </p>
+        </div>
+      </li>
+      <li class="step">
+        <span class="step-num">02</span>
+        <div class="step-content">
+          <span class="step-title">Generate</span>
+          <p class="step-desc">
+            Get three Claude-written alternatives. Each one is calibrated to its copy job — hero headline, section opener, CTA label — and to where it falls in your page's narrative arc.
+          </p>
+        </div>
+      </li>
+      <li class="step">
+        <span class="step-num">03</span>
+        <div class="step-content">
+          <span class="step-title">Apply</span>
+          <p class="step-desc">
+            One click updates the live page and writes the change back to your source file. No copy-paste. No round-trips.
+          </p>
+        </div>
+      </li>
+    </ol>
   </div>
 </section>
 
 <style>
   .how-it-works {
-    padding: 6rem 1.5rem;
+    padding: 4rem 24px;
+    border-top: 1px solid var(--border);
   }
 
   .how-inner {
@@ -37,51 +48,77 @@
     margin: 0 auto;
   }
 
-  .section-heading {
-    text-align: center;
-    font-size: 1.75rem;
-    font-weight: 700;
+  .section-header {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 28px;
+  }
+
+  .label {
+    color: var(--text);
+    font-size: 12px;
+    font-weight: 500;
+    letter-spacing: 0;
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+
+  .header-line {
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+  }
+
+  .section-title {
+    font-size: 20px;
+    font-weight: 400;
     letter-spacing: -0.02em;
-    margin-bottom: 3rem;
+    line-height: 1.4;
+    color: var(--text);
+    margin-bottom: 24px;
   }
 
   .steps {
-    display: flex;
-    gap: 2rem;
+    list-style: none;
   }
 
   .step {
-    flex: 1;
+    display: flex;
+    gap: 24px;
+    padding: 20px 0;
+    border-bottom: 1px solid var(--border);
+    align-items: flex-start;
   }
 
-  .step-number {
-    display: block;
-    font-size: 2rem;
-    font-weight: 700;
+  .step:first-child {
+    border-top: 1px solid var(--border);
+  }
+
+  .step-num {
+    font-family: var(--font-mono);
+    font-size: 12px;
     color: var(--text-muted);
-    margin-bottom: 0.75rem;
-    letter-spacing: -0.02em;
+    min-width: 24px;
+    padding-top: 2px;
+    flex-shrink: 0;
+  }
+
+  .step-content {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
   }
 
   .step-title {
-    font-weight: 600;
-    font-size: 1.125rem;
-    margin-bottom: 0.5rem;
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--text);
   }
 
   .step-desc {
+    font-size: 14px;
     color: var(--text-muted);
-    font-size: 0.9375rem;
-    line-height: 1.5;
-  }
-
-  @media (max-width: 640px) {
-    .steps {
-      flex-wrap: wrap;
-    }
-
-    .step {
-      flex: 1 1 100%;
-    }
+    line-height: 1.6;
   }
 </style>

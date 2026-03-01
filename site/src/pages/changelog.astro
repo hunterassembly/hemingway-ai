@@ -3,22 +3,55 @@ import DocsLayout from "../layouts/DocsLayout.astro";
 ---
 
 <DocsLayout title="Changelog — hemingway-ai" heading="Changelog">
-  <h2>v0.1.0</h2>
+  <p class="lede">Every version documented. Starting from the beginning.</p>
+
+  <h2>v0.1.0 — Initial release</h2>
+  <p>
+    This is the first public release. Everything listed below was built together, shipped together, and works together — it's not a feature-by-feature roadmap, it's the whole thing, ready to run.
+  </p>
 
   <h3>Added</h3>
   <ul>
-    <li>CLI server with AI-powered copy generation via Anthropic Claude</li>
-    <li>Browser overlay with automatic text discovery and selection</li>
-    <li>React component wrapper (<code>hemingway-ai/react</code>)</li>
-    <li>Source file write-back with heuristic text matching</li>
-    <li>Multi-element selection for cohesive rewrites (2–5 elements)</li>
-    <li>Inline editing with double-click</li>
-    <li>Style preference learning from user picks</li>
-    <li>Copy job classification (headline, CTA, body copy, etc.)</li>
-    <li>Section role detection (hero, features, pricing, etc.)</li>
-    <li>Page brief generation for full-page context</li>
-    <li>Style guide and copy bible configuration</li>
-    <li>Built-in demo page at /demo</li>
-    <li>Configurable keyboard shortcut, accent color, and model</li>
+    <li>
+      <strong>CLI server with AI-powered copy generation</strong> — Run <code>npx hemingway-ai</code> to start a local server that handles generation requests from the browser overlay. Connects to Anthropic's API using your key.
+    </li>
+    <li>
+      <strong>Browser overlay with automatic text discovery</strong> — A script tag activates an overlay on your dev site that walks the DOM, outlines every editable text element, and re-discovers elements on mutation.
+    </li>
+    <li>
+      <strong>React component wrapper (<code>hemingway-ai/react</code>)</strong> — For React projects that prefer a component import over a script tag. Renders nothing visible; injects the overlay script.
+    </li>
+    <li>
+      <strong>Source file write-back with heuristic text matching</strong> — When you apply an alternative, Hemingway finds the original string in your source files using encoding-aware heuristic matching and overwrites it in place. Falls back to clipboard copy if no confident match is found.
+    </li>
+    <li>
+      <strong>Multi-element selection for cohesive rewrites (2–5 elements)</strong> — Hold Cmd/Ctrl and click up to 5 elements. Alternatives are generated across the full selection so the copy reads as a unified whole.
+    </li>
+    <li>
+      <strong>Inline editing with double-click</strong> — Double-click any text element to edit it directly in the browser. Commits on Enter or blur, writes back to source.
+    </li>
+    <li>
+      <strong>Style preference learning from user picks</strong> — Each pick is labeled across Clarity, Specificity, and Conversion axes. After enough picks, your preferences are included in future generation prompts.
+    </li>
+    <li>
+      <strong>Copy job classification (10 types)</strong> — Every element is classified before generation: primary-headline, secondary-headline, section-opener, body-copy, cta-label, nav-label, feature-point, eyebrow, testimonial, footer-copy.
+    </li>
+    <li>
+      <strong>Section role detection (8 roles)</strong> — Hemingway infers where each element lives in the page's narrative structure: Hero, Problem, Solution, Features, Social Proof, Pricing, CTA, Footer.
+    </li>
+    <li>
+      <strong>Page brief generation for full-page context</strong> — Before every generation, Hemingway builds a structured brief covering page title, primary goal, core promise, narrative stage, and section flow. Claude gets the brief, not just the string.
+    </li>
+    <li>
+      <strong>Style guide and copy bible configuration</strong> — Point Hemingway at your brand voice doc and copy bible via <code>hemingway.config.mjs</code>. Both are included in full in every generation request.
+    </li>
+    <li>
+      <strong>Built-in demo page at /demo</strong> — A sample marketing page hosted by the Hemingway server for trying the overlay without connecting it to your own site.
+    </li>
+    <li>
+      <strong>Configurable keyboard shortcut, accent color, and model</strong> — Set <code>shortcut</code>, <code>accentColor</code>, and <code>model</code> in config or change them from the overlay settings panel at runtime.
+    </li>
   </ul>
+
+  <p><a href="https://github.com/hunterassembly/hemingway-ai" target="_blank" rel="noopener noreferrer">Follow the project on GitHub →</a></p>
 </DocsLayout>

@@ -3,72 +3,87 @@ import DocsLayout from "../layouts/DocsLayout.astro";
 ---
 
 <DocsLayout title="Features — hemingway-ai" heading="Features">
-  <h2>Text discovery</h2>
+  <p class="lede">Hemingway is not a chat interface for your copy. It's a context-aware editing layer that lives on your actual page and writes back to your actual files.</p>
+
+  <h2>It finds what's editable. You don't have to tell it.</h2>
   <p>
-    Hemingway uses a TreeWalker to find editable text elements on your page:
-    H1–H6, P, SPAN, A, BUTTON, LI, LABEL, TD, TH. It ignores script tags,
-    style tags, and hidden elements.
+    Hemingway walks the DOM and outlines every editable text element on your page — headings, paragraphs, buttons, links, list items, labels. It re-discovers editable elements whenever the DOM mutates, so it stays in sync as your framework re-renders.
   </p>
 
-  <h2>Copy job classification</h2>
-  <p>Every selected element gets classified by its role:</p>
+  <h2>Every element knows what it is.</h2>
+  <p>Each selected element gets classified by its copy job before any generation happens:</p>
   <ul>
-    <li><code>primary-headline</code> — H1 elements</li>
-    <li><code>cta-label</code> — Buttons and CTA links</li>
-    <li><code>section-opener</code> — First paragraph in a section</li>
-    <li><code>body-copy</code> — Other paragraphs</li>
-    <li><code>feature-point</code> — List items</li>
-    <li><code>eyebrow</code> — Short text before headings</li>
-    <li><code>testimonial</code> — Quoted testimonials</li>
+    <li><code>primary-headline</code> — the main H1</li>
+    <li><code>secondary-headline</code> — H2 and H3 headings</li>
+    <li><code>section-opener</code> — first paragraph in a section</li>
+    <li><code>body-copy</code> — supporting paragraphs</li>
+    <li><code>cta-label</code> — buttons and CTA links</li>
+    <li><code>nav-label</code> — navigation items</li>
+    <li><code>feature-point</code> — list items</li>
+    <li><code>eyebrow</code> — short text above headings</li>
+    <li><code>testimonial</code> — quoted social proof</li>
+    <li><code>footer-copy</code> — footer text and links</li>
   </ul>
 
-  <h2>Section role detection</h2>
+  <h2>It knows where you are on the page.</h2>
   <p>
-    Hemingway infers what part of the page you're editing — hero, problem
-    statement, solution, features, social proof, pricing, CTA, or footer — and
-    adjusts its suggestions accordingly.
+    Hemingway detects the section role of every element — not just its tag type, but where it lives in the page's narrative structure. Suggestions for a hero headline are written differently than suggestions for a pricing section CTA.
+  </p>
+  <p>Section roles: Hero · Problem · Solution · Features · Social Proof · Pricing · CTA · Footer</p>
+
+  <h2>Claude doesn't get a string. It gets a brief.</h2>
+  <p>Before every generation, Hemingway builds a full page brief and includes it in the prompt:</p>
+  <ul>
+    <li>Page title and primary goal</li>
+    <li>Core promise and target audience</li>
+    <li>Narrative stage (opening / middle / closing)</li>
+    <li>Section flow — all section roles in order</li>
+    <li>The element's copy job and section role</li>
+    <li>Your style guide and copy bible (if configured)</li>
+    <li>Your style preferences learned from past picks</li>
+  </ul>
+
+  <h2>Rewrite a heading and its body copy together.</h2>
+  <p>
+    Hold Cmd (Mac) or Ctrl (Windows) and click up to 5 elements. Hemingway treats the selection as a coherent set and generates alternatives that work together — so your headline and the paragraph beneath it don't feel written by different people.
   </p>
 
-  <h2>Page context</h2>
+  <h2>Sometimes you know exactly what you want to say.</h2>
   <p>
-    When you select text, hemingway builds a full brief: the page title,
-    narrative stage (opening/middle/closing), primary goal, core promise, and
-    section flow. This context helps Claude generate alternatives that fit
-    naturally.
+    Double-click any text element to edit it directly in the browser. Press Enter or click away to commit. The change writes back to your source file just like an AI-generated alternative would.
   </p>
 
-  <h2>Multi-select</h2>
+  <h2>Changes land in your files, not just your browser.</h2>
   <p>
-    Hold Cmd (Mac) or Ctrl (Windows) and click 2–5 elements. Hemingway generates
-    cohesive alternatives across all selected elements so the copy reads as a
-    unified whole.
+    When you apply a change, Hemingway searches your source files for the original text using heuristic matching — handling HTML entities, curly quotes, and whitespace variations. It scores candidates by tag name, CSS classes, and surrounding context to pick the right location. If the match is ambiguous, it asks for confirmation. If it can't find a match, it copies the new text to your clipboard as a fallback.
   </p>
 
-  <h2>Inline editing</h2>
+  <h2>It gets better the more you use it.</h2>
   <p>
-    Double-click any text element to edit it directly. Press Enter or click away
-    to commit. The change writes back to your source files.
+    Every time you pick an alternative, Hemingway records which one you chose and labels it across three axes: Clarity, Specificity, and Conversion orientation. After around 10 picks, the pattern becomes meaningful and gets included in future generation prompts. The more you use it, the more it sounds like you.
   </p>
 
-  <h2>Write-back</h2>
+  <h2>Your brand voice, in every prompt.</h2>
   <p>
-    When you apply an alternative, hemingway finds the original text in your
-    source files using heuristic matching with encoding-aware variants (HTML
-    entities, curly quotes, etc.). It scores matches by tag name, CSS classes,
-    and parent context to pick the right one.
+    Point Hemingway at your brand style guide and copy bible via config. Both documents are included in every generation request — not summarized, not chunked, included in full — so Claude follows your voice, terminology, and conventions without you having to re-explain them.
   </p>
+  <pre><code>// hemingway.config.mjs
+export default {"{"}
+  styleGuide: "./docs/brand-voice.md",
+  copyBible: "./docs/copy-bible.md",
+{"}"}</code></pre>
 
-  <h2>Style learning</h2>
-  <p>
-    Every time you pick an alternative, hemingway records your preference. After
-    a few picks, it feeds your top style preferences back into future generations
-    so suggestions get better over time.
-  </p>
+  <h2>Yours to configure.</h2>
+  <p>Key settings available in <code>hemingway.config.mjs</code>:</p>
+  <ul>
+    <li><code>model</code> — which Claude model to use</li>
+    <li><code>shortcut</code> — keyboard shortcut to toggle the overlay</li>
+    <li><code>accentColor</code> — overlay UI accent color</li>
+    <li><code>sourcePatterns</code> — glob patterns for write-back file discovery</li>
+    <li><code>styleGuide</code> — path to brand voice doc</li>
+    <li><code>copyBible</code> — path to copy bible</li>
+    <li><code>referenceGuide</code> — additional reference doc for generation</li>
+  </ul>
 
-  <h2>Style guide &amp; copy bible</h2>
-  <p>
-    Point hemingway at your brand style guide and copy bible via config. These
-    documents are included in every generation prompt, so Claude follows your
-    brand voice, terminology, and conventions.
-  </p>
+  <p><a href="/install/">Ready to try it? See the installation guide →</a></p>
 </DocsLayout>
