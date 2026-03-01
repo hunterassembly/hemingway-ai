@@ -1,0 +1,74 @@
+---
+import DocsLayout from "../layouts/DocsLayout.astro";
+---
+
+<DocsLayout title="Features — hemingway-ai" heading="Features">
+  <h2>Text discovery</h2>
+  <p>
+    Hemingway uses a TreeWalker to find editable text elements on your page:
+    H1–H6, P, SPAN, A, BUTTON, LI, LABEL, TD, TH. It ignores script tags,
+    style tags, and hidden elements.
+  </p>
+
+  <h2>Copy job classification</h2>
+  <p>Every selected element gets classified by its role:</p>
+  <ul>
+    <li><code>primary-headline</code> — H1 elements</li>
+    <li><code>cta-label</code> — Buttons and CTA links</li>
+    <li><code>section-opener</code> — First paragraph in a section</li>
+    <li><code>body-copy</code> — Other paragraphs</li>
+    <li><code>feature-point</code> — List items</li>
+    <li><code>eyebrow</code> — Short text before headings</li>
+    <li><code>testimonial</code> — Quoted testimonials</li>
+  </ul>
+
+  <h2>Section role detection</h2>
+  <p>
+    Hemingway infers what part of the page you're editing — hero, problem
+    statement, solution, features, social proof, pricing, CTA, or footer — and
+    adjusts its suggestions accordingly.
+  </p>
+
+  <h2>Page context</h2>
+  <p>
+    When you select text, hemingway builds a full brief: the page title,
+    narrative stage (opening/middle/closing), primary goal, core promise, and
+    section flow. This context helps Claude generate alternatives that fit
+    naturally.
+  </p>
+
+  <h2>Multi-select</h2>
+  <p>
+    Hold Cmd (Mac) or Ctrl (Windows) and click 2–5 elements. Hemingway generates
+    cohesive alternatives across all selected elements so the copy reads as a
+    unified whole.
+  </p>
+
+  <h2>Inline editing</h2>
+  <p>
+    Double-click any text element to edit it directly. Press Enter or click away
+    to commit. The change writes back to your source files.
+  </p>
+
+  <h2>Write-back</h2>
+  <p>
+    When you apply an alternative, hemingway finds the original text in your
+    source files using heuristic matching with encoding-aware variants (HTML
+    entities, curly quotes, etc.). It scores matches by tag name, CSS classes,
+    and parent context to pick the right one.
+  </p>
+
+  <h2>Style learning</h2>
+  <p>
+    Every time you pick an alternative, hemingway records your preference. After
+    a few picks, it feeds your top style preferences back into future generations
+    so suggestions get better over time.
+  </p>
+
+  <h2>Style guide &amp; copy bible</h2>
+  <p>
+    Point hemingway at your brand style guide and copy bible via config. These
+    documents are included in every generation prompt, so Claude follows your
+    brand voice, terminology, and conventions.
+  </p>
+</DocsLayout>

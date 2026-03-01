@@ -1,0 +1,17 @@
+---
+import Layout from "./Layout.astro";
+
+interface Props {
+  title: string;
+  heading: string;
+}
+
+const { title, heading } = Astro.props;
+---
+
+<Layout title={title}>
+  <article class="docs-content">
+    <h1>{heading}</h1>
+    <slot />
+  </article>
+</Layout>

@@ -1,0 +1,118 @@
+---
+import DocsLayout from "../layouts/DocsLayout.astro";
+---
+
+<DocsLayout title="FAQ — hemingway-ai" heading="FAQ">
+  <h2>General</h2>
+
+  <details>
+    <summary>What is hemingway?</summary>
+    <p>
+      Hemingway is an AI-powered copy editing overlay for marketing sites. It
+      runs as a local development tool — you select text on your live site, see
+      Claude-generated alternatives, and apply them with one click.
+    </p>
+  </details>
+
+  <details>
+    <summary>Who is it for?</summary>
+    <p>
+      Developers and marketing teams who iterate on website copy. If you're tired
+      of rewriting headlines in a spreadsheet, hemingway lets you edit copy
+      directly on the live page.
+    </p>
+  </details>
+
+  <details>
+    <summary>Is it free?</summary>
+    <p>
+      Yes, hemingway is MIT licensed and free to use. You'll need your own
+      Anthropic API key, which has its own pricing.
+    </p>
+  </details>
+
+  <h2>Setup</h2>
+
+  <details>
+    <summary>What frameworks does it work with?</summary>
+    <p>
+      Any framework that renders HTML. React, Vue, Svelte, Astro, Next.js, plain
+      HTML — just add a script tag or use the React component.
+    </p>
+  </details>
+
+  <details>
+    <summary>What AI models are supported?</summary>
+    <p>
+      Claude models via the Anthropic API. The default is claude-sonnet-4-6, but
+      you can configure any Claude model in your config file.
+    </p>
+  </details>
+
+  <details>
+    <summary>Do I need an API key?</summary>
+    <p>
+      Yes, you need an Anthropic API key. Set it as the
+      <code>ANTHROPIC_API_KEY</code> environment variable before starting the
+      server.
+    </p>
+  </details>
+
+  <h2>Usage</h2>
+
+  <details>
+    <summary>How does write-back work?</summary>
+    <p>
+      When you apply an alternative, hemingway searches your source files for the
+      original text using heuristic matching. It handles HTML entities, curly
+      quotes, and whitespace variations, and scores matches by surrounding
+      context (tag names, CSS classes) to find the right location.
+    </p>
+  </details>
+
+  <details>
+    <summary>What if it picks the wrong file?</summary>
+    <p>
+      Configure <code>sourcePatterns</code> in your config to narrow the search
+      scope. For example, <code>["src/components/**/*.tsx"]</code> limits
+      write-back to your component files.
+    </p>
+  </details>
+
+  <details>
+    <summary>Can I use it in production?</summary>
+    <p>
+      No, hemingway is a development tool. The server logs a warning if
+      <code>NODE_ENV</code> is set to <code>production</code>. It's designed for
+      iterating on copy during development, not for runtime use.
+    </p>
+  </details>
+
+  <details>
+    <summary>Does it support inline editing?</summary>
+    <p>
+      Yes, double-click any text element to edit it directly in the browser.
+      Press Enter or click away to commit the change back to your source file.
+    </p>
+  </details>
+
+  <h2>Privacy &amp; Security</h2>
+
+  <details>
+    <summary>Does my copy leave my machine?</summary>
+    <p>
+      Only to Anthropic's API for generating alternatives. Hemingway makes no
+      other external network calls. Your copy is never stored on any third-party
+      server.
+    </p>
+  </details>
+
+  <details>
+    <summary>Is it safe to use with client code?</summary>
+    <p>
+      Yes, hemingway runs entirely on localhost. The server binds to
+      <code>127.0.0.1</code> by default and the overlay communicates only with
+      the local server.
+    </p>
+  </details>
+</DocsLayout>
