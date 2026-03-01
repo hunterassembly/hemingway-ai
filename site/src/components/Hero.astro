@@ -1,0 +1,144 @@
+<section class="hero">
+  <div class="hero-inner">
+    <h1 class="hero-headline">Better copy, one click at a time</h1>
+    <p class="hero-subhead">
+      AI-powered copy alternatives for your marketing site. Select any text, see
+      better options, apply instantly.
+    </p>
+    <div class="hero-actions">
+      <div class="install-pill">
+        <code>npm install hemingway-ai</code>
+        <button
+          class="copy-btn"
+          type="button"
+          aria-label="Copy install command"
+        >
+          <svg
+            width="16"
+            height="16"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+            <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"
+            ></path>
+          </svg>
+        </button>
+      </div>
+      <button id="demo-toggle" class="demo-btn" type="button">
+        Try it on this page
+      </button>
+    </div>
+  </div>
+</section>
+
+<script>
+  const copyBtn = document.querySelector(".hero .copy-btn");
+  if (copyBtn) {
+    copyBtn.addEventListener("click", () => {
+      navigator.clipboard.writeText("npm install hemingway-ai");
+      const svg = copyBtn.querySelector("svg");
+      if (svg) {
+        const original = svg.innerHTML;
+        svg.innerHTML =
+          '<polyline points="20 6 9 17 4 12" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"></polyline>';
+        setTimeout(() => {
+          svg.innerHTML = original;
+        }, 1500);
+      }
+    });
+  }
+</script>
+
+<style>
+  .hero {
+    padding: calc(60px + 8rem) 1.5rem 4rem;
+    text-align: center;
+  }
+
+  .hero-inner {
+    max-width: var(--max-width);
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .hero-headline {
+    font-size: clamp(2.5rem, 6vw, 3.75rem);
+    font-weight: 700;
+    letter-spacing: -0.03em;
+    line-height: 1.1;
+    max-width: 720px;
+  }
+
+  .hero-subhead {
+    color: var(--text-muted);
+    font-size: 1.125rem;
+    line-height: 1.6;
+    max-width: 520px;
+    margin-top: 1.25rem;
+  }
+
+  .hero-actions {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+    margin-top: 2.5rem;
+  }
+
+  .install-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.75rem;
+    background: var(--code-bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 0.625rem 1rem;
+  }
+
+  .install-pill code {
+    font-family: var(--font-mono);
+    font-size: 0.875rem;
+    background: none;
+    padding: 0;
+  }
+
+  .copy-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: var(--text-muted);
+    padding: 0.25rem;
+    border-radius: 4px;
+    transition: color 0.15s;
+  }
+
+  .copy-btn:hover {
+    color: var(--text);
+  }
+
+  .demo-btn {
+    background: var(--accent);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 0.75rem 1.5rem;
+    font-size: 1rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.15s;
+  }
+
+  .demo-btn:hover {
+    background: var(--accent-hover);
+  }
+</style>

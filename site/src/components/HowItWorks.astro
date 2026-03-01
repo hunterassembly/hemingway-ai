@@ -1,0 +1,87 @@
+<section class="how-it-works">
+  <div class="how-inner">
+    <h2 class="section-heading">How it works</h2>
+    <div class="steps">
+      <div class="step">
+        <span class="step-number">01</span>
+        <h3 class="step-title">Select text</h3>
+        <p class="step-desc">
+          Click any heading, paragraph, or button on your dev site.
+        </p>
+      </div>
+      <div class="step">
+        <span class="step-number">02</span>
+        <h3 class="step-title">See alternatives</h3>
+        <p class="step-desc">
+          Get three Claude-powered rewrites tailored to your page context.
+        </p>
+      </div>
+      <div class="step">
+        <span class="step-number">03</span>
+        <h3 class="step-title">Apply instantly</h3>
+        <p class="step-desc">
+          One click updates your source files. No copy-paste needed.
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .how-it-works {
+    padding: 6rem 1.5rem;
+  }
+
+  .how-inner {
+    max-width: var(--max-width);
+    margin: 0 auto;
+  }
+
+  .section-heading {
+    text-align: center;
+    font-size: 1.75rem;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    margin-bottom: 3rem;
+  }
+
+  .steps {
+    display: flex;
+    gap: 2rem;
+  }
+
+  .step {
+    flex: 1;
+  }
+
+  .step-number {
+    display: block;
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--text-muted);
+    margin-bottom: 0.75rem;
+    letter-spacing: -0.02em;
+  }
+
+  .step-title {
+    font-weight: 600;
+    font-size: 1.125rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .step-desc {
+    color: var(--text-muted);
+    font-size: 0.9375rem;
+    line-height: 1.5;
+  }
+
+  @media (max-width: 640px) {
+    .steps {
+      flex-wrap: wrap;
+    }
+
+    .step {
+      flex: 1 1 100%;
+    }
+  }
+</style>

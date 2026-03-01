@@ -1,0 +1,99 @@
+<section class="features">
+  <div class="features-inner">
+    <h2 class="section-heading">Features</h2>
+    <div class="features-grid">
+      <div class="feature-card">
+        <h3 class="feature-title">Local-first</h3>
+        <p class="feature-desc">
+          Runs on localhost. Your copy never leaves your machine.
+        </p>
+      </div>
+      <div class="feature-card">
+        <h3 class="feature-title">Framework-agnostic</h3>
+        <p class="feature-desc">
+          One script tag works with React, Vue, Astro, or plain HTML.
+        </p>
+      </div>
+      <div class="feature-card">
+        <h3 class="feature-title">Writes to source</h3>
+        <p class="feature-desc">
+          Changes go back to your actual source files, not just the DOM.
+        </p>
+      </div>
+      <div class="feature-card">
+        <h3 class="feature-title">Learns your style</h3>
+        <p class="feature-desc">
+          Tracks which alternatives you pick and adapts future suggestions.
+        </p>
+      </div>
+      <div class="feature-card">
+        <h3 class="feature-title">Claude-powered</h3>
+        <p class="feature-desc">
+          Uses Anthropic's Claude for copy that actually sounds good.
+        </p>
+      </div>
+      <div class="feature-card">
+        <h3 class="feature-title">Zero dependencies</h3>
+        <p class="feature-desc">
+          No runtime deps. Just Node.js and your browser.
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .features {
+    padding: 6rem 1.5rem;
+  }
+
+  .features-inner {
+    max-width: var(--max-width);
+    margin: 0 auto;
+  }
+
+  .section-heading {
+    text-align: center;
+    font-size: 1.75rem;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    margin-bottom: 3rem;
+  }
+
+  .features-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.5rem;
+  }
+
+  .feature-card {
+    padding: 1.5rem;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    background: white;
+  }
+
+  .feature-title {
+    font-weight: 600;
+    font-size: 1rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .feature-desc {
+    color: var(--text-muted);
+    font-size: 0.9375rem;
+    line-height: 1.5;
+  }
+
+  @media (max-width: 768px) {
+    .features-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  @media (max-width: 480px) {
+    .features-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>
