@@ -5,6 +5,7 @@ Primary files:
 - `src/server/index.ts`
 - `src/server/generate.ts`
 - `src/server/write.ts`
+- `src/server/write-adapters.ts`
 - `src/server/config.ts`
 - `src/server/preferences.ts`
 - `src/server/briefings.ts`
@@ -12,10 +13,10 @@ Primary files:
 ## API Surface
 
 - `POST /generate`
-  - Input: `GenerateRequest` with selected text, element type, copy job, section context, user comment, optional rejected alternatives/feedback.
+  - Input: `GenerateRequest` with selected text, element type, copy job, section context, `pageBrief` narrative context, user comment, optional rejected alternatives/feedback.
   - Output: `{ alternatives: Array<{ label, text }> }`
 - `POST /generate-multi`
-  - Input: `MultiGenerateRequest` with 2+ related elements and shared section context.
+  - Input: `MultiGenerateRequest` with 2+ related elements, shared section context, and `pageBrief`.
   - Output: `{ alternatives: Array<{ label, texts: [{ index, text }] }> }`
 - `POST /write`
   - Input: `{ oldText, newText, context: { tagName, className, parentTag } }`
@@ -46,6 +47,7 @@ Primary files:
 5. Internal defaults
 
 Defaults include source scan patterns and exclusion folders for writeback.
+The writeback path also supports `writeAdapter` (`react` default, `generic` fallback).
 
 ## Prompt Pipeline
 
@@ -62,6 +64,7 @@ For both single and multi generation:
 3. Build system prompt with explicit tiering:
   - Instructions and JSON format constraints
   - Element briefing
+  - Page story brief (title, stage, goal, promise, audience, proof, section flow)
   - Learned style preferences
   - Style guide
   - Copy bible
@@ -72,6 +75,10 @@ For both single and multi generation:
   - Strips possible markdown fences
   - Extracts JSON object range
   - Validates expected array shape
+7. Normalize alternatives into strategy lanes:
+  - `[Clarity]`
+  - `[Specificity]`
+  - `[Conversion]`
 
 ## Preference Feedback Loop
 
@@ -86,15 +93,16 @@ Goal: map UI-selected text back to source code using heuristic matching.
 
 1. Expand source files from configured glob-like patterns.
 2. Recursively scan files, excluding known directories.
-3. For each file:
+3. Resolve configured write adapter (`react` or `generic`) and skip files the adapter does not support.
+4. For each candidate file:
   - Generate text variants for search (`raw`, entity-encoded, apostrophe variants, curly quotes).
   - Find exact and whitespace-normalized matches.
-  - Score each match via nearby HTML clues:
+  - Score each match via base HTML clues plus adapter-specific scoring.
     - Matching tag gets highest score boost
     - Class names add score
     - Parent tag adds score
-4. Pick top-scoring match and preserve encoding style (`&apos;`, `&quot;`, etc.) in replacement.
-5. Rewrite file as plain text splice and report location.
+5. Pick top-scoring match and normalize replacement text (entity/curlies preservation) via adapter.
+6. Rewrite file as plain text splice and report location.
 
 Important constraints:
 

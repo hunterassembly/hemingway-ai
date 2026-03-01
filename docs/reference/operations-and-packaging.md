@@ -65,6 +65,12 @@ Typical local setup:
 3. Inject script or React component.
 4. Use shortcut to activate.
 
+Recommended config for cross-React projects:
+
+- Broader `sourcePatterns` covering `components/`, `src/`, `app/`, `pages/`, and `packages/`
+- `writeAdapter: "react"` for JSX/TSX-focused scoring and filtering
+- Optional `writeAdapter: "generic"` for non-React fallback behavior
+
 ## Integration Modes
 
 - Framework-agnostic script tag:

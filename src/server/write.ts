@@ -1,5 +1,6 @@
 import { readdir, readFile, writeFile } from "node:fs/promises";
 import { join, relative } from "node:path";
+import { getWriteAdapter } from "./write-adapters.js";
 
 const PROJECT_ROOT = process.cwd();
 
@@ -298,6 +299,7 @@ export async function writeText(params: {
   context: { tagName: string; className: string; parentTag: string };
   sourcePatterns: string[];
   excludePatterns: string[];
+  writeAdapter?: string;
 }): Promise<{
   success: boolean;
   file?: string;
@@ -305,7 +307,8 @@ export async function writeText(params: {
   matchCount?: number;
   error?: string;
 }> {
-  const { oldText, newText, context, sourcePatterns, excludePatterns } = params;
+  const { oldText, newText, context, sourcePatterns, excludePatterns, writeAdapter } = params;
+  const adapter = getWriteAdapter(writeAdapter);
 
   if (!oldText || !newText || oldText === newText) {
     return {
@@ -330,6 +333,7 @@ export async function writeText(params: {
   for (const file of sourceFiles) {
     // Skip editor-related files
     if (file.includes("/editor/")) continue;
+    if (!adapter.supportsFile(file)) continue;
 
     let source: string;
     try {
@@ -348,7 +352,16 @@ export async function writeText(params: {
           index: m.index,
           line: getLineNumber(source, m.index),
           originalSpan: source.substring(m.index, m.index + m.length),
-          score: scoreMatch(source, m.index, context),
+          score:
+            scoreMatch(source, m.index, context) +
+            (adapter.scoreMatch
+              ? adapter.scoreMatch({
+                  filePath: file,
+                  source,
+                  matchIndex: m.index,
+                  context,
+                })
+              : 0),
         });
       }
     }
@@ -371,27 +384,13 @@ export async function writeText(params: {
     );
   }
 
-  // Determine replacement text — preserve entity encoding from the original
-  let replacement = newText;
-
-  if (best.originalSpan.includes("&apos;")) {
-    replacement = replacement.replace(/'/g, "&apos;");
-  }
-  if (best.originalSpan.includes("&quot;")) {
-    replacement = replacement.replace(/"/g, "&quot;");
-  }
-  if (best.originalSpan.includes("&amp;")) {
-    replacement = replacement.replace(/&/g, "&amp;");
-  }
-  if (best.originalSpan.includes("&lt;")) {
-    replacement = replacement.replace(/</g, "&lt;");
-  }
-  if (best.originalSpan.includes("&gt;")) {
-    replacement = replacement.replace(/>/g, "&gt;");
-  }
-  if (best.originalSpan.includes("\u2019")) {
-    replacement = replacement.replace(/'/g, "\u2019");
-  }
+  const replacement = adapter.normalizeReplacement
+    ? adapter.normalizeReplacement({
+        filePath: best.file,
+        originalSpan: best.originalSpan,
+        replacement: newText,
+      })
+    : newText;
 
   // Perform replacement
   const source = await readFile(best.file, "utf-8");

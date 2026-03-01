@@ -24,7 +24,7 @@ Primary design choice: keep integration friction near zero by using a script-inj
 3. Server exposes API routes and `/client.js`.
 4. User injects client via script tag or `<Hemingway />`.
 5. Overlay toggles with keyboard shortcut, discovers editable text nodes, and opens popup on selection.
-6. Overlay sends context-rich generation requests to server.
+6. Overlay sends context-rich generation requests to server, including a compact page-story brief.
 7. User applies an option (or custom text); overlay updates DOM and calls `/write`.
 8. Server finds best source match and rewrites file contents.
 
@@ -32,12 +32,13 @@ Primary design choice: keep integration friction near zero by using a script-inj
 
 - Generation:
   - Client `POST /generate` or `POST /generate-multi`
-  - Server loads style docs + user preferences + contextual briefing
+  - Server loads style docs + user preferences + contextual briefing + page story brief
+  - Server requests lane-diversified outputs (`Clarity`, `Specificity`, `Conversion`)
   - Server calls Anthropic Messages API
   - Server parses strict JSON alternatives and returns them
 - Persistence:
   - Client `POST /write` with `oldText`, `newText`, and tag/class/parent context
-  - Server scans configured source patterns, scores candidates, writes best match
+  - Server scans configured source patterns, applies adapter scoring/filtering, writes best match
 - Preference loop:
   - Client `POST /preferences` with chosen label
   - Server stores counts in `.hemingway/preferences.json`

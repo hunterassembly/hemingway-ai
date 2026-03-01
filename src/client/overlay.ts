@@ -624,6 +624,7 @@ export class HemingwayOverlay {
         pagePosition: context.pagePosition,
         sectionRole: context.sectionRole,
         surroundingSections: context.surroundingSections,
+        pageBrief: context.pageBrief,
         userComment: comment,
       };
 
@@ -739,6 +740,7 @@ export class HemingwayOverlay {
         pagePosition: context.pagePosition,
         sectionRole: context.sectionRole,
         surroundingSections: context.surroundingSections,
+        pageBrief: context.pageBrief,
         userComment: comment,
       };
 

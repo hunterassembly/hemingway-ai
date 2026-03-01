@@ -49,7 +49,7 @@ import { Hemingway } from 'hemingway-ai/react'
 
 ### 6. Activate
 
-Press **Cmd+Shift+C** (or your configured shortcut) on your dev site.
+Press **Cmd/Ctrl+Shift+H** (or your configured shortcut) on your dev site.
 
 ## Config
 
@@ -60,9 +60,19 @@ const config = {
   model: 'claude-sonnet-4-6',
   styleGuide: './docs/style-guide.md',
   copyBible: './docs/copy-bible.md',
-  sourcePatterns: ['components/**/*.tsx', 'src/**/*.tsx', 'app/**/*.tsx'],
+  sourcePatterns: [
+    'components/**/*.tsx',
+    'components/**/*.jsx',
+    'src/**/*.tsx',
+    'src/**/*.jsx',
+    'app/**/*.tsx',
+    'app/**/*.jsx',
+    'pages/**/*.tsx',
+    'pages/**/*.jsx',
+  ],
   excludePatterns: ['node_modules', '.next', 'dist', 'build'],
-  shortcut: 'meta+shift+c',
+  writeAdapter: 'react', // 'react' | 'generic'
+  shortcut: 'ctrl+shift+h',
   accentColor: '#3b82f6',
 };
 

@@ -9,6 +9,18 @@ export interface PageContext {
   surroundingSections: string[]; // text summaries of prev/next sections
   elementType: string; // e.g. "h2", "p", "button"
   copyJob: string; // e.g. "primary-headline", "cta-label", "body-copy"
+  pageBrief: PageStoryBrief;
+}
+
+export interface PageStoryBrief {
+  pageTitle: string;
+  narrativeStage: "opening" | "middle" | "closing";
+  primaryGoal: string;
+  corePromise: string;
+  primaryAudience: string[];
+  primaryCta: string;
+  keyProofPoints: string[];
+  sectionFlow: string[];
 }
 
 // Keywords used to detect section roles from class names, data attributes, or
@@ -157,6 +169,7 @@ export function gatherContext(el: HTMLElement): PageContext {
 
   // Classify the element's copy job
   const copyJob = classifyCopyJob(el);
+  const pageBrief = buildPageStoryBrief(allSections, sectionIndex);
 
   return {
     sectionHtml,
@@ -165,6 +178,7 @@ export function gatherContext(el: HTMLElement): PageContext {
     surroundingSections,
     elementType: el.tagName.toLowerCase(),
     copyJob,
+    pageBrief,
   };
 }
 
@@ -253,4 +267,164 @@ function getCleanHtml(section: HTMLElement): string {
     el.remove();
   }
   return clone.innerHTML.slice(0, 5000); // Cap at 5000 chars to stay reasonable
+}
+
+function buildPageStoryBrief(
+  allSections: HTMLElement[],
+  currentSectionIndex: number
+): PageStoryBrief {
+  const pageText = document.body?.innerText?.trim() || "";
+  const title = document.title?.trim() || "";
+  const firstHeading =
+    (document.querySelector("h1") as HTMLElement | null)?.innerText?.trim() || "";
+  const corePromise = compactText(firstHeading || title || pageText, 140);
+  const sectionCount = allSections.length || 1;
+  const safeIndex = currentSectionIndex >= 0 ? currentSectionIndex : 0;
+
+  return {
+    pageTitle: compactText(title || firstHeading || "Untitled page", 80),
+    narrativeStage: getNarrativeStage(safeIndex, sectionCount),
+    primaryGoal: inferPrimaryGoal(pageText),
+    corePromise,
+    primaryAudience: inferAudience(pageText),
+    primaryCta: findPrimaryCta(allSections),
+    keyProofPoints: extractProofPoints(pageText),
+    sectionFlow: summarizeSectionFlow(allSections),
+  };
+}
+
+function getNarrativeStage(
+  index: number,
+  total: number
+): "opening" | "middle" | "closing" {
+  if (index <= 0) return "opening";
+  if (index >= total - 2) return "closing";
+  return "middle";
+}
+
+function inferPrimaryGoal(pageText: string): string {
+  const lower = pageText.toLowerCase();
+
+  if (
+    /get started|start for free|book demo|request demo|contact sales|buy now|pricing/.test(
+      lower
+    )
+  ) {
+    return "Drive conversion to trial, demo, or purchase";
+  }
+
+  if (/how it works|features|compare|integrations|documentation|learn more/.test(lower)) {
+    return "Educate and persuade with product clarity";
+  }
+
+  return "Communicate the value proposition and build trust";
+}
+
+function inferAudience(pageText: string): string[] {
+  const lower = pageText.toLowerCase();
+  const matches: string[] = [];
+
+  const audienceMap: Array<{ label: string; pattern: RegExp }> = [
+    { label: "Developers", pattern: /developer|engineering|api|sdk|ship|deploy|code/ },
+    { label: "Product teams", pattern: /product team|pm|roadmap|backlog|sprint|feature/ },
+    { label: "Marketing teams", pattern: /marketing|campaign|conversion|lead|pipeline/ },
+    { label: "Sales teams", pattern: /sales|revenue|pipeline|prospect|close deals/ },
+    { label: "Enterprise buyers", pattern: /enterprise|security|compliance|governance|soc 2/ },
+    { label: "Startups", pattern: /startup|founder|launch|early-stage/ },
+  ];
+
+  for (const audience of audienceMap) {
+    if (audience.pattern.test(lower)) {
+      matches.push(audience.label);
+    }
+    if (matches.length >= 3) break;
+  }
+
+  if (matches.length === 0) {
+    matches.push("General B2B buyers");
+  }
+
+  return matches;
+}
+
+function findPrimaryCta(allSections: HTMLElement[]): string {
+  const scope = allSections.length > 0 ? allSections[0] : document.body;
+  const ctas = Array.from(scope.querySelectorAll("a, button")) as HTMLElement[];
+
+  for (const cta of ctas) {
+    const text = compactText(cta.innerText || cta.getAttribute("aria-label") || "", 50);
+    if (!text) continue;
+    if (/get started|start|book|try|request|contact|demo|free|signup|sign up/i.test(text)) {
+      return text;
+    }
+  }
+
+  for (const cta of ctas) {
+    const text = compactText(cta.innerText || cta.getAttribute("aria-label") || "", 50);
+    if (text) return text;
+  }
+
+  return "None detected";
+}
+
+function extractProofPoints(pageText: string): string[] {
+  const normalized = pageText.replace(/\s+/g, " ").trim();
+  const points: string[] = [];
+
+  const numericMatches =
+    normalized.match(
+      /\b\d+(?:\.\d+)?(?:%|x|X|k|K|m|M|b|B)?(?:\s?(?:customers|users|teams|faster|reduction|increase|hours|days|weeks))?\b/g
+    ) ?? [];
+  for (const value of numericMatches) {
+    if (points.length >= 3) break;
+    const cleaned = compactText(value, 60);
+    if (cleaned && !points.includes(cleaned)) {
+      points.push(cleaned);
+    }
+  }
+
+  const trustSignals = [
+    "Trusted by",
+    "Case study",
+    "Testimonials",
+    "SOC 2",
+    "GDPR",
+    "CCPA",
+  ];
+  for (const signal of trustSignals) {
+    if (points.length >= 4) break;
+    if (new RegExp(signal, "i").test(normalized) && !points.includes(signal)) {
+      points.push(signal);
+    }
+  }
+
+  if (points.length === 0) {
+    points.push("No explicit proof points detected");
+  }
+
+  return points;
+}
+
+function summarizeSectionFlow(allSections: HTMLElement[]): string[] {
+  const summaries: string[] = [];
+  const total = allSections.length;
+
+  for (let i = 0; i < allSections.length; i++) {
+    if (summaries.length >= 6) break;
+    const section = allSections[i];
+    const role = detectRole(section, i, total);
+    const heading =
+      compactText((section.querySelector("h1, h2, h3") as HTMLElement | null)?.innerText || "", 80) ||
+      compactText(section.innerText || "", 80);
+    summaries.push(`${i + 1}. ${role}: ${heading}`);
+  }
+
+  return summaries;
+}
+
+function compactText(value: string, maxLen: number): string {
+  const cleaned = value.replace(/\s+/g, " ").trim();
+  if (!cleaned) return "";
+  if (cleaned.length <= maxLen) return cleaned;
+  return `${cleaned.slice(0, maxLen - 1)}…`;
 }

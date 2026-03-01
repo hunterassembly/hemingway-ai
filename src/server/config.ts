@@ -11,6 +11,7 @@ export interface HemingwayConfig {
   referenceGuide: string;
   sourcePatterns: string[];
   excludePatterns: string[];
+  writeAdapter: "react" | "generic";
   shortcut: string;
   accentColor: string;
 }
@@ -22,8 +23,30 @@ const DEFAULTS: HemingwayConfig = {
   styleGuide: "./docs/style-guide.md",
   copyBible: "./docs/copy-bible.md",
   referenceGuide: "./packages/hemingway/reference/saas-and-services-copy-guide.md",
-  sourcePatterns: ["components/**/*.tsx", "src/**/*.tsx", "src/**/*.ts", "app/**/*.tsx"],
+  sourcePatterns: [
+    "components/**/*.tsx",
+    "components/**/*.jsx",
+    "components/**/*.ts",
+    "components/**/*.js",
+    "src/**/*.tsx",
+    "src/**/*.jsx",
+    "src/**/*.ts",
+    "src/**/*.js",
+    "app/**/*.tsx",
+    "app/**/*.jsx",
+    "app/**/*.ts",
+    "app/**/*.js",
+    "pages/**/*.tsx",
+    "pages/**/*.jsx",
+    "pages/**/*.ts",
+    "pages/**/*.js",
+    "packages/**/*.tsx",
+    "packages/**/*.jsx",
+    "packages/**/*.ts",
+    "packages/**/*.js",
+  ],
   excludePatterns: ["node_modules", ".next", "dist", "build"],
+  writeAdapter: "react",
   shortcut: "ctrl+shift+h",
   accentColor: "#3b82f6",
 };

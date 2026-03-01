@@ -182,6 +182,7 @@ async function handleWrite(
       context: data.context ?? { tagName: "", className: "", parentTag: "" },
       sourcePatterns: config.sourcePatterns,
       excludePatterns: config.excludePatterns,
+      writeAdapter: config.writeAdapter,
     });
 
     const statusCode = result.success ? 200 : result.error?.includes("not found") ? 404 : 500;

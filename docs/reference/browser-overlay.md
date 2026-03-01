@@ -66,6 +66,15 @@ For selected elements, overlay sends:
 - `surroundingSections` summaries
 - `elementType`
 - `copyJob` classification (e.g. `primary-headline`, `cta-label`, `section-opener`)
+- `pageBrief` narrative object:
+  - `pageTitle`
+  - `narrativeStage` (`opening`/`middle`/`closing`)
+  - `primaryGoal`
+  - `corePromise`
+  - `primaryAudience` (up to 3 inferred segments)
+  - `primaryCta`
+  - `keyProofPoints`
+  - `sectionFlow` (compact map of section role + heading)
 
 This context is core to prompt quality.
 

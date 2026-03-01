@@ -16,6 +16,7 @@ export interface GenerateRequest {
   pagePosition: string;
   sectionRole: string;
   surroundingSections: string[];
+  pageBrief?: PageStoryBrief;
   userComment: string;
   previousAlternatives?: Alternative[];
   feedback?: string;
@@ -32,6 +33,7 @@ export interface MultiGenerateRequest {
   pagePosition: string;
   sectionRole: string;
   surroundingSections: string[];
+  pageBrief?: PageStoryBrief;
   userComment: string;
   previousAlternatives?: MultiAlternative[];
   feedback?: string;
@@ -40,6 +42,17 @@ export interface MultiGenerateRequest {
 export interface MultiAlternative {
   label: string;
   texts: { index: number; text: string }[];
+}
+
+export interface PageStoryBrief {
+  pageTitle: string;
+  narrativeStage: "opening" | "middle" | "closing";
+  primaryGoal: string;
+  corePromise: string;
+  primaryAudience: string[];
+  primaryCta: string;
+  keyProofPoints: string[];
+  sectionFlow: string[];
 }
 
 // ---------------------------------------------------------------------------
@@ -120,6 +133,8 @@ async function safeReadFile(filePath: string): Promise<string> {
 // Prompt construction
 // ---------------------------------------------------------------------------
 
+const STRATEGY_LANES = ["Clarity", "Specificity", "Conversion"] as const;
+
 function buildBriefingBlock(copyJob: string, sectionRole: string, pagePosition: string): string {
   const briefing = getElementBriefing(copyJob || "general", sectionRole || "body");
   const parts: string[] = [];
@@ -140,11 +155,48 @@ function buildBriefingBlock(copyJob: string, sectionRole: string, pagePosition: 
   return parts.join("\n");
 }
 
+function buildStoryBriefBlock(pageBrief?: PageStoryBrief): string {
+  if (!pageBrief) return "";
+
+  const parts: string[] = [];
+  parts.push(`Page title: ${pageBrief.pageTitle || "Unknown"}`);
+  parts.push(`Narrative stage: ${pageBrief.narrativeStage || "middle"}`);
+  parts.push(`Primary goal: ${pageBrief.primaryGoal || "Communicate value and convert qualified visitors"}`);
+  parts.push(`Core promise: ${pageBrief.corePromise || "Not provided"}`);
+  parts.push(
+    `Audience: ${
+      Array.isArray(pageBrief.primaryAudience) && pageBrief.primaryAudience.length > 0
+        ? pageBrief.primaryAudience.join(", ")
+        : "General buyers"
+    }`
+  );
+  parts.push(`Primary CTA: ${pageBrief.primaryCta || "Not provided"}`);
+
+  if (Array.isArray(pageBrief.keyProofPoints) && pageBrief.keyProofPoints.length > 0) {
+    parts.push("");
+    parts.push("Proof signals:");
+    for (const proof of pageBrief.keyProofPoints.slice(0, 4)) {
+      parts.push(`- ${proof}`);
+    }
+  }
+
+  if (Array.isArray(pageBrief.sectionFlow) && pageBrief.sectionFlow.length > 0) {
+    parts.push("");
+    parts.push("Section flow:");
+    for (const section of pageBrief.sectionFlow.slice(0, 6)) {
+      parts.push(`- ${section}`);
+    }
+  }
+
+  return parts.join("\n");
+}
+
 function buildSystemPrompt(opts: {
   copyBible: string;
   styleGuide: string;
   referenceGuide: string;
   briefingBlock: string;
+  narrativeBrief: string;
   preferences: string;
 }): string {
   const parts: string[] = [];
@@ -159,16 +211,18 @@ function buildSystemPrompt(opts: {
     "accomplish based on its role on the page. Follow that briefing closely — it is",
     "your primary directive for shaping the alternatives.",
     "",
-    "Given the selected text, its briefing, and its context, generate exactly 3 alternatives.",
-    "Each alternative should apply a different copywriting principle while respecting the briefing.",
+    "Given the selected text, the ELEMENT BRIEFING, and the PAGE STORY BRIEF, generate exactly 3 alternatives.",
+    "Each alternative must align to one strategy lane in this exact order:",
+    "1) Clarity — plainspoken and instantly understandable",
+    "2) Specificity — concrete detail, proof, or precision",
+    "3) Conversion — benefit-led and action-oriented",
     "",
     "Guidelines:",
     "- Keep the same approximate length as the original (unless the user asks otherwise)",
     "- Match the existing tone and voice described in the style guide",
-    "- One alternative should apply a principle from the style guide",
-    "- One alternative should be optimized for conversion (benefit-led, specific, urgent)",
-    "- One alternative should combine both the style guide voice and conversion optimization",
-    "- Labels should name the specific principle applied (e.g. \"Specifics over adjectives\", \"Benefit-led\", \"Mirror, then move\")",
+    "- Keep all alternatives consistent with the page's narrative stage and section flow",
+    "- Labels MUST start with lane tags: [Clarity], [Specificity], [Conversion]",
+    "- After each lane tag, name the specific principle used",
     "",
     "You MUST respond with ONLY valid JSON in this exact format — no markdown, no code fences, no explanation:",
     '{"alternatives": [{"label": "...", "text": "..."}, {"label": "...", "text": "..."}, {"label": "...", "text": "..."}]}',
@@ -182,6 +236,15 @@ function buildSystemPrompt(opts: {
       "<element-briefing>",
       opts.briefingBlock,
       "</element-briefing>",
+      ""
+    );
+  }
+
+  if (opts.narrativeBrief) {
+    parts.push(
+      "<page-story-brief>",
+      opts.narrativeBrief,
+      "</page-story-brief>",
       ""
     );
   }
@@ -338,6 +401,7 @@ function buildMultiSystemPrompt(opts: {
   styleGuide: string;
   referenceGuide: string;
   briefingBlock: string;
+  narrativeBrief: string;
   preferences: string;
 }): string {
   const parts: string[] = [];
@@ -353,16 +417,16 @@ function buildMultiSystemPrompt(opts: {
     "",
     "Generate exactly 3 alternatives. Each alternative must include replacement text for",
     "EVERY element in the selection. The elements are numbered — preserve those numbers in",
-    "your response.",
+    "your response. Use one lane per alternative in this exact order:",
+    "1) Clarity, 2) Specificity, 3) Conversion.",
     "",
     "Guidelines:",
     "- Keep each element at approximately the same length as its original",
     "- Maintain narrative flow between elements (the heading sets up what the paragraphs deliver)",
     "- Match the existing tone and voice described in the style guide",
-    "- One alternative should apply a principle from the style guide",
-    "- One alternative should be optimized for conversion (benefit-led, specific, urgent)",
-    "- One alternative should combine both the style guide voice and conversion optimization",
-    "- Labels should name the specific principle applied",
+    "- Keep all alternatives consistent with the page's narrative stage and section flow",
+    "- Labels MUST start with lane tags: [Clarity], [Specificity], [Conversion]",
+    "- After each lane tag, name the principle used",
     "",
     "You MUST respond with ONLY valid JSON in this exact format — no markdown, no code fences, no explanation:",
     '{"alternatives": [{"label": "...", "texts": [{"index": 1, "text": "..."}, {"index": 2, "text": "..."}]}, ...]}',
@@ -372,6 +436,9 @@ function buildMultiSystemPrompt(opts: {
 
   if (opts.briefingBlock) {
     parts.push("<element-briefing>", opts.briefingBlock, "</element-briefing>", "");
+  }
+  if (opts.narrativeBrief) {
+    parts.push("<page-story-brief>", opts.narrativeBrief, "</page-story-brief>", "");
   }
   if (opts.preferences) {
     parts.push("<style-preferences>", opts.preferences, "</style-preferences>", "");
@@ -534,6 +601,33 @@ function parseAlternatives(raw: string): Alternative[] {
   return valid;
 }
 
+function normalizeLaneLabel(label: string, lane: (typeof STRATEGY_LANES)[number]): string {
+  if (/^\[(clarity|specificity|conversion)\]/i.test(label)) {
+    return label;
+  }
+  return `[${lane}] ${label}`;
+}
+
+function applyStrategyLanesToAlternatives(alternatives: Alternative[]): Alternative[] {
+  if (alternatives.length === 0) return alternatives;
+
+  return alternatives.slice(0, 3).map((alt, index) => ({
+    ...alt,
+    label: normalizeLaneLabel(alt.label, STRATEGY_LANES[index % STRATEGY_LANES.length]),
+  }));
+}
+
+function applyStrategyLanesToMultiAlternatives(
+  alternatives: MultiAlternative[]
+): MultiAlternative[] {
+  if (alternatives.length === 0) return alternatives;
+
+  return alternatives.slice(0, 3).map((alt, index) => ({
+    ...alt,
+    label: normalizeLaneLabel(alt.label, STRATEGY_LANES[index % STRATEGY_LANES.length]),
+  }));
+}
+
 // ---------------------------------------------------------------------------
 // Main export
 // ---------------------------------------------------------------------------
@@ -556,6 +650,7 @@ export async function generateAlternatives(
     req.sectionRole || "body",
     req.pagePosition || ""
   );
+  const narrativeBrief = buildStoryBriefBlock(req.pageBrief);
 
   // Build prompts
   const systemPrompt = buildSystemPrompt({
@@ -563,6 +658,7 @@ export async function generateAlternatives(
     styleGuide,
     referenceGuide,
     briefingBlock,
+    narrativeBrief,
     preferences: preferences ?? "",
   });
   const userPrompt = buildUserPrompt(req);
@@ -571,7 +667,7 @@ export async function generateAlternatives(
   const rawResponse = await callClaude(systemPrompt, userPrompt, config);
 
   // Parse and return alternatives
-  return parseAlternatives(rawResponse);
+  return applyStrategyLanesToAlternatives(parseAlternatives(rawResponse));
 }
 
 export async function generateMultiAlternatives(
@@ -601,17 +697,21 @@ export async function generateMultiAlternatives(
       briefingParts.push(modifier);
     }
   }
+  const narrativeBrief = buildStoryBriefBlock(req.pageBrief);
 
   const systemPrompt = buildMultiSystemPrompt({
     copyBible,
     styleGuide,
     referenceGuide,
     briefingBlock: briefingParts.join("\n"),
+    narrativeBrief,
     preferences: preferences ?? "",
   });
   const userPrompt = buildMultiUserPrompt(req);
 
   const rawResponse = await callClaude(systemPrompt, userPrompt, config);
 
-  return parseMultiAlternatives(rawResponse, req.elements.length);
+  return applyStrategyLanesToMultiAlternatives(
+    parseMultiAlternatives(rawResponse, req.elements.length)
+  );
 }
