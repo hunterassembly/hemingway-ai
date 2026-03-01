@@ -87,6 +87,15 @@ export default config;
 - **Framework agnostic** — works with any dev server via script tag or React component
 - **Source mapping** — writes changes back to your source files
 
+## Documentation
+
+- [Docs Home](./docs/README.md)
+- [Quickstart](./docs/getting-started/quickstart.md)
+- [Framework Setup Guides](./docs/getting-started)
+- [Configuration Reference](./docs/configuration.md)
+- [API Reference](./docs/api-reference.md)
+- [Troubleshooting](./docs/troubleshooting.md)
+
 ## Agent Reference Docs
 
 Detailed, agent-oriented system docs live in:
@@ -97,6 +106,12 @@ Detailed, agent-oriented system docs live in:
 - `docs/reference/browser-overlay.md`
 - `docs/reference/copy-intelligence.md`
 - `docs/reference/operations-and-packaging.md`
+
+## Contributing
+
+- [Contributing Guide](./CONTRIBUTING.md)
+- [Code of Conduct](./CODE_OF_CONDUCT.md)
+- [Security Policy](./SECURITY.md)
 
 ## License
 

@@ -2,9 +2,9 @@
 
 > **For Claude:** REQUIRED SUB-SKILL: Use superpowers:executing-plans to implement this plan task-by-task.
 
-**Goal:** Build a single-page Astro marketing site in `site/` that demos hemingway-ai using the real client overlay with a fetch interceptor serving pre-generated alternatives.
+**Goal:** Build an Astro marketing site + docs in `site/` that demos hemingway-ai using the real client overlay with a fetch interceptor. Includes homepage with interactive demo, plus /install, /features, /changelog, and /faq pages.
 
-**Architecture:** Astro static site loads the real hemingway IIFE client bundle (`dist/client/overlay.iife.js`). A fetch interceptor installed before the client loads intercepts all requests to `localhost:4800` and returns pre-generated alternatives from a JSON map. Session edits persist in sessionStorage.
+**Architecture:** Astro static site loads the real hemingway IIFE client bundle (`dist/client/overlay.iife.js`). A fetch interceptor installed before the client loads intercepts all requests to `localhost:4800` and returns pre-generated alternatives from a JSON map. Session edits persist in sessionStorage. Docs pages use a shared DocsLayout with consistent nav.
 
 **Tech Stack:** Astro 5, TypeScript, Vercel adapter, hemingway-ai client IIFE bundle
 
@@ -53,101 +53,29 @@ export default defineConfig({
 
 **Step 4: Create base layout**
 
-Create `site/src/layouts/Layout.astro`:
-
-```astro
----
-interface Props {
-  title: string;
-}
-const { title } = Astro.props;
----
-<!doctype html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="description" content="AI-powered copy alternatives for your marketing site. Click any text, see better options, apply with one click." />
-    <title>{title}</title>
-    <link rel="stylesheet" href="/styles/global.css" />
-  </head>
-  <body>
-    <slot />
-  </body>
-</html>
-```
+Create `site/src/layouts/Layout.astro` — base HTML shell with meta tags, global styles, and slot for content.
 
 **Step 5: Create global styles**
 
-Create `site/src/styles/global.css`:
-
-```css
-*,
-*::before,
-*::after {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
-
-:root {
-  --bg: #faf9f7;
-  --text: #1a1a1a;
-  --text-muted: #6b7280;
-  --accent: #3b82f6;
-  --accent-hover: #2563eb;
-  --code-bg: #f3f4f6;
-  --border: #e5e7eb;
-  --max-width: 1080px;
-  --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-  --font-mono: "SF Mono", SFMono-Regular, Consolas, "Liberation Mono", Menlo, monospace;
-}
-
-html {
-  font-family: var(--font-sans);
-  background: var(--bg);
-  color: var(--text);
-  -webkit-font-smoothing: antialiased;
-}
-
-body {
-  min-height: 100vh;
-}
-
-a {
-  color: inherit;
-  text-decoration: none;
-}
-
-code {
-  font-family: var(--font-mono);
-}
-```
+Create `site/src/styles/global.css` with CSS custom properties:
+- `--bg: #faf9f7` (cream)
+- `--text: #1a1a1a`
+- `--text-muted: #6b7280`
+- `--accent: #3b82f6`
+- `--border: #e5e7eb`
+- `--max-width: 1080px`
+- System font stack + monospace for code
+- Reset (box-sizing, margin/padding)
 
 **Step 6: Create placeholder index page**
-
-Create `site/src/pages/index.astro`:
-
-```astro
----
-import Layout from "../layouts/Layout.astro";
----
-<Layout title="hemingway-ai — AI-powered copy for your marketing site">
-  <main>
-    <h1>hemingway-ai</h1>
-    <p>Coming soon.</p>
-  </main>
-</Layout>
-```
 
 **Step 7: Verify dev server starts**
 
 ```bash
-cd /Users/hunter/Documents/GitHub/hemingway-ai/site
-npm run dev
+cd /Users/hunter/Documents/GitHub/hemingway-ai/site && npm run dev
 ```
 
-Expected: Astro dev server starts on `localhost:4321`, page renders placeholder.
+Expected: Astro dev server on `localhost:4321`.
 
 **Step 8: Commit**
 
@@ -158,239 +86,79 @@ git commit -m "feat(site): scaffold Astro marketing site with Vercel adapter"
 
 ---
 
-### Task 2: Build page sections — Nav and Hero
+### Task 2: Build Nav and Footer (shared across all pages)
 
 **Files:**
 - Create: `site/src/components/Nav.astro`
-- Create: `site/src/components/Hero.astro`
-- Modify: `site/src/pages/index.astro`
+- Create: `site/src/components/Footer.astro`
+- Modify: `site/src/layouts/Layout.astro`
 
-**Step 1: Build Nav component**
+**Nav design** — modeled after agentation.dev's flat structure:
 
-Create `site/src/components/Nav.astro`:
-
-```astro
-<nav class="nav">
-  <div class="nav-inner">
-    <a href="/" class="nav-logo">hemingway</a>
-    <div class="nav-links">
-      <a href="https://github.com/hunterassembly/hemingway-ai" target="_blank" rel="noopener">GitHub</a>
-      <a href="https://www.npmjs.com/package/hemingway-ai" target="_blank" rel="noopener">npm</a>
-    </div>
-  </div>
-</nav>
-
-<style>
-  .nav {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    z-index: 100;
-    background: rgba(250, 249, 247, 0.8);
-    backdrop-filter: blur(12px);
-    border-bottom: 1px solid var(--border);
-  }
-
-  .nav-inner {
-    max-width: var(--max-width);
-    margin: 0 auto;
-    padding: 0.75rem 1.5rem;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-  }
-
-  .nav-logo {
-    font-weight: 600;
-    font-size: 1.125rem;
-    letter-spacing: -0.01em;
-  }
-
-  .nav-links {
-    display: flex;
-    gap: 1.5rem;
-    font-size: 0.875rem;
-    color: var(--text-muted);
-  }
-
-  .nav-links a:hover {
-    color: var(--text);
-  }
-</style>
+```
+[hemingway]   Overview   Install   Features   Changelog   FAQ   [GitHub icon]
 ```
 
-**Step 2: Build Hero component**
+- Fixed on scroll with blur backdrop
+- Current page highlighted (pass `currentPath` prop from Layout)
+- GitHub links to repo
+- Responsive: on mobile, links collapse to a menu or wrap
 
-Create `site/src/components/Hero.astro`:
+**Footer design:**
+- GitHub link, npm link, "MIT License", "Made by Hunter Assembly"
+- Consistent across all pages
 
-```astro
-<section class="hero">
-  <h1 class="hero-headline">Better copy, one click at a time</h1>
-  <p class="hero-sub">
-    AI-powered copy alternatives for your marketing site.
-    Select any text, see better options, apply instantly.
-  </p>
-  <div class="hero-actions">
-    <div class="hero-install">
-      <code>npm install hemingway-ai</code>
-      <button class="copy-btn" aria-label="Copy install command">
-        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
-          <rect x="5.5" y="5.5" width="8" height="8" rx="1.5" />
-          <path d="M10.5 5.5V3.5a1.5 1.5 0 00-1.5-1.5H3.5A1.5 1.5 0 002 3.5V9a1.5 1.5 0 001.5 1.5h2" />
-        </svg>
-      </button>
-    </div>
-    <button class="hero-demo-btn" id="demo-toggle">
-      Try it on this page
-    </button>
-  </div>
-</section>
+**Step 1: Build Nav.astro**
 
-<style>
-  .hero {
-    max-width: var(--max-width);
-    margin: 0 auto;
-    padding: 10rem 1.5rem 6rem;
-    text-align: center;
-  }
+Nav accepts a `currentPath` prop. Links: `/` (Overview), `/install`, `/features`, `/changelog`, `/faq`, plus GitHub icon. Current page link gets `aria-current="page"` and active styling.
 
-  .hero-headline {
-    font-size: clamp(2.5rem, 6vw, 3.75rem);
-    font-weight: 700;
-    letter-spacing: -0.03em;
-    line-height: 1.1;
-    max-width: 720px;
-    margin: 0 auto;
-  }
+**Step 2: Build Footer.astro**
 
-  .hero-sub {
-    margin-top: 1.25rem;
-    font-size: 1.125rem;
-    color: var(--text-muted);
-    max-width: 520px;
-    margin-left: auto;
-    margin-right: auto;
-    line-height: 1.6;
-  }
+Minimal footer with links and attribution.
 
-  .hero-actions {
-    margin-top: 2.5rem;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 1rem;
-  }
+**Step 3: Wire Nav and Footer into Layout.astro**
 
-  .hero-install {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.5rem;
-    background: var(--code-bg);
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    padding: 0.625rem 1rem;
-    font-family: var(--font-mono);
-    font-size: 0.875rem;
-  }
+Layout includes Nav at top and Footer at bottom, wrapping the `<slot />`.
 
-  .copy-btn {
-    background: none;
-    border: none;
-    cursor: pointer;
-    color: var(--text-muted);
-    padding: 2px;
-    border-radius: 4px;
-    display: flex;
-    align-items: center;
-  }
-
-  .copy-btn:hover {
-    color: var(--text);
-    background: var(--border);
-  }
-
-  .hero-demo-btn {
-    background: var(--accent);
-    color: white;
-    border: none;
-    border-radius: 8px;
-    padding: 0.75rem 1.5rem;
-    font-size: 0.9375rem;
-    font-weight: 500;
-    cursor: pointer;
-    transition: background 0.15s;
-  }
-
-  .hero-demo-btn:hover {
-    background: var(--accent-hover);
-  }
-</style>
-
-<script>
-  const copyBtn = document.querySelector(".copy-btn");
-  copyBtn?.addEventListener("click", () => {
-    navigator.clipboard.writeText("npm install hemingway-ai");
-  });
-</script>
-```
-
-**Step 3: Wire into index page**
-
-Update `site/src/pages/index.astro`:
-
-```astro
----
-import Layout from "../layouts/Layout.astro";
-import Nav from "../components/Nav.astro";
-import Hero from "../components/Hero.astro";
----
-<Layout title="hemingway-ai — AI-powered copy for your marketing site">
-  <Nav />
-  <main>
-    <Hero />
-  </main>
-</Layout>
-```
-
-**Step 4: Verify in browser**
-
-```bash
-cd /Users/hunter/Documents/GitHub/hemingway-ai/site
-npm run dev
-```
-
-Expected: Clean hero section with headline, subhead, install command, and demo button on cream background.
+**Step 4: Verify nav renders and highlights current page**
 
 **Step 5: Commit**
 
 ```bash
-git add site/src/components/Nav.astro site/src/components/Hero.astro site/src/pages/index.astro
-git commit -m "feat(site): add Nav and Hero sections"
+git add site/src/components/Nav.astro site/src/components/Footer.astro site/src/layouts/Layout.astro
+git commit -m "feat(site): add shared Nav and Footer components"
 ```
 
 ---
 
-### Task 3: Build page sections — HowItWorks, Features, Install, Footer
+### Task 3: Build homepage sections — Hero, HowItWorks, Features, QuickStart
 
 **Files:**
+- Create: `site/src/components/Hero.astro`
 - Create: `site/src/components/HowItWorks.astro`
 - Create: `site/src/components/Features.astro`
-- Create: `site/src/components/Install.astro`
-- Create: `site/src/components/Footer.astro`
+- Create: `site/src/components/QuickStart.astro`
 - Modify: `site/src/pages/index.astro`
 
-**Step 1: Build HowItWorks component**
+**Step 1: Build Hero.astro**
 
-Create `site/src/components/HowItWorks.astro`:
+- Large headline: "Better copy, one click at a time"
+- Subhead: 1-2 line description
+- `npm install hemingway-ai` with copy button
+- "Try it on this page" demo toggle button (wired up in Task 6)
 
-3-step horizontal layout: "Select text" → "See alternatives" → "Apply with one click". Each step has a number, heading, and one-line description. Simple, no illustrations — just clean typography.
+**Step 2: Build HowItWorks.astro**
 
-**Step 2: Build Features component**
+3-step horizontal layout:
+1. **Select text** — Click any heading, paragraph, or button
+2. **See alternatives** — Get three Claude-powered rewrites
+3. **Apply instantly** — One click writes to your source files
 
-Create `site/src/components/Features.astro`:
+Each step: number, heading, one-line description. Clean typography, no illustrations.
 
-Grid of 4-6 feature cards. Each has a short title and 1-2 sentence description:
+**Step 3: Build Features.astro**
+
+Grid of 6 feature cards:
 - **Local-first** — Runs on localhost. Your copy never leaves your machine.
 - **Framework-agnostic** — One script tag works with React, Vue, Astro, or plain HTML.
 - **Writes to source** — Changes go back to your actual source files, not just the DOM.
@@ -398,243 +166,193 @@ Grid of 4-6 feature cards. Each has a short title and 1-2 sentence description:
 - **Claude-powered** — Uses Anthropic's Claude for copy that actually sounds good.
 - **Zero dependencies** — No runtime deps. Just Node.js and your browser.
 
-**Step 3: Build Install component**
+3-column grid on desktop → 2 on tablet → 1 on mobile.
 
-Create `site/src/components/Install.astro`:
+**Step 4: Build QuickStart.astro**
 
-Code block showing the quick start:
+Compact code block with the 4-step setup. Links to `/install` for the full guide.
 
 ```bash
-# Install
 npm install hemingway-ai
-
-# Start the server
 npx hemingway-ai
-
-# Add to your site
-<script src="http://localhost:4800/client.js"></script>
-
+# Add to your site: <script src="http://localhost:4800/client.js"></script>
 # Press Cmd+Shift+C to activate
 ```
 
-**Step 4: Build Footer component**
+**Step 5: Wire all components into index.astro**
 
-Create `site/src/components/Footer.astro`:
-
-Minimal footer: GitHub link, npm link, "MIT License", "Made by Hunter Assembly".
-
-**Step 5: Wire all components into index page**
-
-Update `site/src/pages/index.astro` to include all sections in order: Nav, Hero, HowItWorks, Features, Install, Footer.
+Order: Hero → HowItWorks → Features → QuickStart (Nav and Footer come from Layout).
 
 **Step 6: Verify in browser**
 
-```bash
-cd /Users/hunter/Documents/GitHub/hemingway-ai/site
-npm run dev
-```
-
-Expected: Full single-page marketing site scrolls through all sections. Clean cream background, good typography hierarchy, consistent spacing.
+Expected: Full homepage scrolls through all sections. Cream background, good typography, consistent spacing.
 
 **Step 7: Commit**
 
 ```bash
 git add site/src/components/ site/src/pages/index.astro
-git commit -m "feat(site): add HowItWorks, Features, Install, and Footer sections"
+git commit -m "feat(site): build homepage with Hero, HowItWorks, Features, QuickStart"
 ```
 
 ---
 
-### Task 4: Build the demo adapter (fetch interceptor)
+### Task 4: Build docs pages — Install, Features, Changelog, FAQ
+
+**Files:**
+- Create: `site/src/layouts/DocsLayout.astro`
+- Create: `site/src/pages/install.astro`
+- Create: `site/src/pages/features.astro`
+- Create: `site/src/pages/changelog.astro`
+- Create: `site/src/pages/faq.astro`
+
+**Step 1: Build DocsLayout.astro**
+
+Extends Layout. Adds:
+- A page title/heading at the top
+- Prose styling for long-form content (max-width ~720px, good line-height, spacing for headings/paragraphs/lists/code blocks)
+- Consistent with the marketing page's visual design
+
+```astro
+---
+import Layout from "./Layout.astro";
+interface Props {
+  title: string;
+  heading: string;
+}
+const { title, heading } = Astro.props;
+---
+<Layout title={title}>
+  <article class="docs">
+    <h1>{heading}</h1>
+    <slot />
+  </article>
+</Layout>
+```
+
+**Step 2: Build install.astro**
+
+Content sourced from README, expanded. Sections:
+
+- **Install** — `npm install hemingway-ai` (with yarn/pnpm/bun variants)
+- **Initialize** — `npx hemingway-ai init` creates config file
+- **Configuration** — table of config options: `port`, `model`, `styleGuide`, `copyBible`, `sourcePatterns`, `excludePatterns`, `shortcut`, `accentColor`
+- **Start the server** — `npx hemingway-ai`
+- **Add to your site** — Script tag: `<script src="http://localhost:4800/client.js"></script>`
+- **React component** — `import { Hemingway } from 'hemingway-ai/react'` with props table
+- **Environment variables** — `ANTHROPIC_API_KEY`, `HEMINGWAY_PORT`
+
+All code blocks should have copy buttons.
+
+**Step 3: Build features.astro**
+
+Deep dive on how hemingway works. Sections:
+
+- **Text discovery** — TreeWalker finds H1-6, P, SPAN, A, BUTTON, LI, LABEL, TD, TH
+- **Copy job classification** — primary-headline, cta-label, section-opener, body-copy, feature-point, eyebrow, testimonial
+- **Section role detection** — hero, problem, solution, features, social-proof, cta
+- **Page brief** — how hemingway builds full-page context for better suggestions
+- **Multi-select** — Cmd/Ctrl+Click to select 2-5 elements for cohesive rewrites
+- **Inline editing** — Double-click to edit directly, commits on Enter/blur
+- **Write-back** — heuristic source file matching with encoding-aware variants
+- **Style learning** — preference tracking from picks, top 3 labels influence future generations
+- **Style guide & copy bible** — configuring brand voice files
+
+**Step 4: Build changelog.astro**
+
+Reverse-chronological. Follows Keep a Changelog format. For now, just the initial release:
+
+```
+## v0.1.0 — 2026
+
+### Added
+- CLI server with AI-powered copy generation
+- Browser overlay with text discovery and selection
+- React component wrapper
+- Source file write-back
+- Multi-element selection (2-5 elements)
+- Inline editing with double-click
+- Style preference learning
+- Copy job and section role classification
+- Page brief generation for full-page context
+- Style guide and copy bible support
+- Built-in demo page
+```
+
+**Step 5: Build faq.astro**
+
+Q&A pairs organized by category using `<details>` / `<summary>` for expand/collapse:
+
+**General:**
+- What is hemingway? → AI copy editing overlay for marketing sites
+- Who is it for? → Developers and marketing teams iterating on copy
+- Is it free? → Yes, MIT licensed. You need your own Anthropic API key.
+
+**Setup:**
+- What frameworks does it work with? → Any — React, Vue, Astro, plain HTML, etc.
+- What AI models does it support? → Claude models via Anthropic API (default: claude-sonnet-4-6)
+- Do I need an API key? → Yes, an Anthropic API key. Set as `ANTHROPIC_API_KEY` env var.
+
+**Usage:**
+- How does write-back work? → Heuristic text matching in your source files with encoding-aware variants
+- What if it picks the wrong file? → Configure `sourcePatterns` to narrow the search scope
+- Can I use it in production? → No, it's a dev tool. Server warns if NODE_ENV=production.
+- Does it support inline editing? → Yes, double-click any text element to edit directly.
+
+**Privacy & Security:**
+- Does my copy leave my machine? → Only to Anthropic's API for generation. No other external calls.
+- Is it safe to use with client code? → Yes, runs on localhost with no external data storage.
+
+**Step 6: Add prose/docs styles to global.css**
+
+Add styles for the docs layout: heading spacing, paragraph line-height, list styling, code block styling, `<details>/<summary>` styling for FAQ, table styling for config options.
+
+**Step 7: Verify all pages render and nav links work**
+
+Visit `/install`, `/features`, `/changelog`, `/faq`. Check nav highlights correct page. Check content reads well.
+
+**Step 8: Commit**
+
+```bash
+git add site/src/layouts/DocsLayout.astro site/src/pages/ site/src/styles/global.css
+git commit -m "feat(site): add Install, Features, Changelog, and FAQ docs pages"
+```
+
+---
+
+### Task 5: Build the demo adapter (fetch interceptor)
 
 **Files:**
 - Create: `site/src/scripts/demo-adapter.ts`
 - Create: `site/src/scripts/demo-alternatives.json`
 
-**Context:** The hemingway client IIFE bundle (`dist/client/overlay.iife.js`) auto-initializes when loaded and makes fetch calls to `http://localhost:4800`. We need to intercept these before the client loads.
+**Context:** The hemingway client IIFE bundle (`dist/client/overlay.iife.js`) auto-initializes when loaded and makes fetch calls to `http://localhost:4800`. We intercept these before the client loads.
 
 **Step 1: Create the pre-generated alternatives JSON**
 
-Create `site/src/scripts/demo-alternatives.json`:
+Create `site/src/scripts/demo-alternatives.json` — a map keyed by normalized (lowercase, trimmed) element text. Each entry has 3 alternatives matching `{ label, text }`.
 
-A map keyed by normalized element text. Each entry has an array of alternative objects matching the `{ label, text }` shape the client expects. Cover every text element on the marketing page — headings, subheads, body text, CTAs, feature titles, feature descriptions, etc.
+Cover every text element on the homepage: hero headline, hero subhead, hero CTA, each how-it-works step title + description, each feature card title + description, quick start heading.
 
-Example structure:
-
-```json
-{
-  "better copy, one click at a time": [
-    { "label": "[Clarity] Direct Benefit", "text": "Rewrite your marketing copy in seconds" },
-    { "label": "[Punch] Short & Sharp", "text": "Your copy, but better" },
-    { "label": "[Authority] Expert Voice", "text": "AI copywriting that writes back to your codebase" }
-  ],
-  "ai-powered copy alternatives for your marketing site. select any text, see better options, apply instantly.": [
-    { "label": "[Clarity] Benefit-Led", "text": "Click any headline, paragraph, or button on your site. Get three Claude-powered rewrites. Apply your favorite with one click — it writes directly to your source files." },
-    { "label": "[Punch] Compressed", "text": "Select text. See alternatives. Ship better copy. Hemingway writes changes straight to your codebase." },
-    { "label": "[Conversational] Friendly", "text": "Stop rewriting copy in spreadsheets. Just click the text on your live site, pick the version you like, and hemingway handles the rest." }
-  ]
-}
-```
-
-Include entries for ALL text elements on the page — every heading, paragraph, feature card title, feature card description, CTA button, install step, and footer text.
+Use hemingway's copy style labels: `[Clarity]`, `[Punch]`, `[Conversational]`, `[Authority]`, etc.
 
 **Step 2: Create the fetch interceptor**
 
-Create `site/src/scripts/demo-adapter.ts`:
+Create `site/src/scripts/demo-adapter.ts` — monkey-patches `window.fetch`:
 
-```typescript
-import alternatives from "./demo-alternatives.json";
-
-const HEMINGWAY_URL = "http://localhost:4800";
-const PREFERENCES_KEY = "hemingway-demo-preferences";
-
-const realFetch = window.fetch.bind(window);
-
-function getPreferences(): { picks: Record<string, number>; totalPicks: number } {
-  try {
-    const stored = sessionStorage.getItem(PREFERENCES_KEY);
-    if (stored) return JSON.parse(stored);
-  } catch {}
-  return { picks: {}, totalPicks: 0 };
-}
-
-function savePreferences(prefs: { picks: Record<string, number>; totalPicks: number }) {
-  sessionStorage.setItem(PREFERENCES_KEY, JSON.stringify(prefs));
-}
-
-function findAlternatives(text: string): Array<{ label: string; text: string }> | null {
-  const normalized = text.trim().toLowerCase();
-  const alts = (alternatives as Record<string, Array<{ label: string; text: string }>>)[normalized];
-  if (alts) return alts;
-
-  // Fuzzy: check if any key is a substring or vice versa
-  for (const [key, value] of Object.entries(alternatives as Record<string, Array<{ label: string; text: string }>>)) {
-    if (normalized.includes(key) || key.includes(normalized)) {
-      return value;
-    }
-  }
-  return null;
-}
-
-function mockResponse(body: unknown, status = 200): Response {
-  return new Response(JSON.stringify(body), {
-    status,
-    headers: { "Content-Type": "application/json" },
-  });
-}
-
-window.fetch = async (input: RequestInfo | URL, init?: RequestInit): Promise<Response> => {
-  const url = typeof input === "string" ? input : input instanceof URL ? input.href : input.url;
-
-  if (!url.startsWith(HEMINGWAY_URL)) {
-    return realFetch(input, init);
-  }
-
-  const path = url.replace(HEMINGWAY_URL, "");
-  const method = init?.method?.toUpperCase() || "GET";
-
-  // GET /config
-  if (path === "/config" && method === "GET") {
-    return mockResponse({
-      model: "claude-sonnet-4-6",
-      shortcut: "meta+shift+c",
-      styleGuide: "",
-      copyBible: "",
-    });
-  }
-
-  // POST /config
-  if (path === "/config" && method === "POST") {
-    return mockResponse({
-      model: "claude-sonnet-4-6",
-      shortcut: "meta+shift+c",
-      styleGuide: "",
-      copyBible: "",
-    });
-  }
-
-  // POST /generate
-  if (path === "/generate" && method === "POST") {
-    const body = JSON.parse(init?.body as string);
-    const alts = findAlternatives(body.text);
-    if (alts) {
-      // Simulate a brief delay to feel realistic
-      await new Promise((r) => setTimeout(r, 600 + Math.random() * 400));
-      return mockResponse({ alternatives: alts });
-    }
-    // Fallback: return generic alternatives
-    await new Promise((r) => setTimeout(r, 600 + Math.random() * 400));
-    return mockResponse({
-      alternatives: [
-        { label: "[Clarity] Rewrite", text: body.text + " — rewritten" },
-        { label: "[Punch] Shorter", text: body.text.split(" ").slice(0, 5).join(" ") },
-        { label: "[Conversational] Friendly", text: body.text },
-      ],
-    });
-  }
-
-  // POST /generate-multi
-  if (path === "/generate-multi" && method === "POST") {
-    const body = JSON.parse(init?.body as string);
-    await new Promise((r) => setTimeout(r, 800 + Math.random() * 400));
-    const altSets = body.elements.map((el: { text: string }, i: number) => {
-      const alts = findAlternatives(el.text);
-      return { index: i, text: alts ? alts[0].text : el.text };
-    });
-    return mockResponse({
-      alternatives: [
-        { label: "[Clarity] Cohesive Rewrite", texts: altSets },
-        {
-          label: "[Punch] Tighter",
-          texts: body.elements.map((el: { text: string }, i: number) => {
-            const alts = findAlternatives(el.text);
-            return { index: i, text: alts && alts[1] ? alts[1].text : el.text };
-          }),
-        },
-        {
-          label: "[Conversational] Warmer",
-          texts: body.elements.map((el: { text: string }, i: number) => {
-            const alts = findAlternatives(el.text);
-            return { index: i, text: alts && alts[2] ? alts[2].text : el.text };
-          }),
-        },
-      ],
-    });
-  }
-
-  // POST /write
-  if (path === "/write" && method === "POST") {
-    return mockResponse({ success: true, file: "demo", line: 1 });
-  }
-
-  // GET /preferences
-  if (path === "/preferences" && method === "GET") {
-    return mockResponse(getPreferences());
-  }
-
-  // POST /preferences
-  if (path === "/preferences" && method === "POST") {
-    const body = JSON.parse(init?.body as string);
-    const prefs = getPreferences();
-    prefs.picks[body.label] = (prefs.picks[body.label] || 0) + 1;
-    prefs.totalPicks += 1;
-    savePreferences(prefs);
-    return mockResponse(prefs);
-  }
-
-  // Fallback
-  return mockResponse({ error: "Demo mode — endpoint not mocked" }, 404);
-};
-```
+- Intercepts all requests to `http://localhost:4800/*`
+- Routes: `/generate`, `/generate-multi`, `/write`, `/config` (GET/POST), `/preferences` (GET/POST)
+- `/generate`: lookup text in JSON map, simulate 600-1000ms delay, return alternatives
+- `/write`: save `{ oldText, newText }` to sessionStorage, return `{ success: true }`
+- `/preferences`: accumulate in sessionStorage
+- `/config`: return static config
+- Fallback for unmatched text: return generic alternatives
+- All other URLs pass through to real fetch
 
 **Step 3: Verify adapter compiles**
 
 ```bash
-cd /Users/hunter/Documents/GitHub/hemingway-ai/site
-npx astro check
+cd /Users/hunter/Documents/GitHub/hemingway-ai/site && npx astro check
 ```
-
-Expected: No TypeScript errors.
 
 **Step 4: Commit**
 
@@ -645,136 +363,57 @@ git commit -m "feat(site): add demo fetch adapter and pre-generated alternatives
 
 ---
 
-### Task 5: Wire up the demo toggle
+### Task 6: Wire up the demo toggle
 
 **Files:**
+- Create: `site/src/scripts/demo-toggle.ts`
 - Modify: `site/src/layouts/Layout.astro`
 - Modify: `site/src/components/Hero.astro`
-- Create: `site/src/scripts/demo-toggle.ts`
+- Modify: `site/package.json`
 
-**Context:** The hemingway IIFE bundle (`dist/client/overlay.iife.js`) auto-initializes when loaded, creating `window.__hemingway`. The overlay activates when the user presses the configured shortcut. We need to:
-1. Load the demo adapter FIRST (installs fetch interceptor)
-2. Load the IIFE bundle (auto-initializes, calls `GET /config` which the adapter intercepts)
-3. On "Try it" button click, programmatically trigger the overlay activation
+**Context:** The IIFE bundle auto-initializes when loaded (`window.__hemingway`). The overlay activates on the configured keyboard shortcut. We need to:
+1. Install the fetch interceptor on page load (only on homepage)
+2. On "Try it" button click, load the IIFE bundle
+3. Programmatically trigger overlay activation
 
-**Step 1: Copy the IIFE bundle to public/**
+**Step 1: Add prebuild/predev scripts to copy IIFE bundle**
 
-Add a build script that copies the client bundle. In `site/package.json`, add:
-
+In `site/package.json`:
 ```json
-"scripts": {
-  "prebuild": "cp ../dist/client/overlay.iife.js public/hemingway-client.js",
-  "predev": "cp ../dist/client/overlay.iife.js public/hemingway-client.js"
-}
+"prebuild": "cp ../dist/client/overlay.iife.js public/hemingway-client.js",
+"predev": "cp ../dist/client/overlay.iife.js public/hemingway-client.js"
 ```
 
-**Step 2: Create demo toggle script**
+**Step 2: Create demo-toggle.ts**
 
-Create `site/src/scripts/demo-toggle.ts`:
+- On first click: set button to "Loading...", inject `<script src="/hemingway-client.js">`, on load set button to "Hemingway is active" + green bg, trigger activation via simulated keyboard shortcut
+- On subsequent clicks: toggle overlay via simulated shortcut
+- On page load: if sessionStorage has edits, restore them by walking the DOM + auto-load the client
 
-```typescript
-let loaded = false;
+**Step 3: Update Layout.astro**
 
-export function initDemoToggle() {
-  const btn = document.getElementById("demo-toggle");
-  if (!btn) return;
+Load demo adapter + demo toggle scripts only on the homepage (check `Astro.url.pathname === "/"`). Docs pages should not load the demo scripts.
 
-  btn.addEventListener("click", async () => {
-    if (loaded) {
-      // Toggle overlay off/on by simulating shortcut
-      const event = new KeyboardEvent("keydown", {
-        key: "c",
-        metaKey: true,
-        shiftKey: true,
-        bubbles: true,
-      });
-      document.dispatchEvent(event);
-      return;
-    }
-
-    // First click: load the client bundle
-    btn.textContent = "Loading...";
-
-    const script = document.createElement("script");
-    script.src = "/hemingway-client.js";
-    script.onload = () => {
-      loaded = true;
-      btn.textContent = "Hemingway is active";
-      btn.classList.add("active");
-
-      // Trigger activation after a brief delay for init
-      setTimeout(() => {
-        const event = new KeyboardEvent("keydown", {
-          key: "c",
-          metaKey: true,
-          shiftKey: true,
-          bubbles: true,
-        });
-        document.dispatchEvent(event);
-      }, 200);
-    };
-    document.body.appendChild(script);
-  });
-}
-```
-
-**Step 3: Update Layout to load adapter first, then toggle**
-
-Update `site/src/layouts/Layout.astro` to include the demo adapter script in the `<head>` and the toggle init in the body:
-
-```astro
----
-interface Props {
-  title: string;
-}
-const { title } = Astro.props;
----
-<!doctype html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="description" content="AI-powered copy alternatives for your marketing site. Click any text, see better options, apply with one click." />
-    <title>{title}</title>
-  </head>
-  <body>
-    <slot />
-    <script>
-      import "../scripts/demo-adapter";
-      import { initDemoToggle } from "../scripts/demo-toggle";
-      initDemoToggle();
-    </script>
-  </body>
-</html>
-```
-
-**Step 4: Update Hero demo button styling for active state**
-
-Add to Hero.astro styles:
+**Step 4: Add active button styling to Hero.astro**
 
 ```css
-.hero-demo-btn.active {
-  background: #16a34a;
-}
+.hero-demo-btn.active { background: #16a34a; }
 ```
 
-**Step 5: Verify end-to-end in browser**
+**Step 5: Verify end-to-end demo loop**
 
 ```bash
-cd /Users/hunter/Documents/GitHub/hemingway-ai
-npm run build  # Build the hemingway client first
-cd site
-npm run dev
+cd /Users/hunter/Documents/GitHub/hemingway-ai && npm run build
+cd site && npm run dev
 ```
 
 1. Open `localhost:4321`
 2. Click "Try it on this page"
-3. Hemingway overlay should activate
-4. Click any heading or paragraph
-5. Pre-generated alternatives should appear in the popup
-6. Applying an alternative should update the DOM text
-
-Expected: Full demo loop works with no server running.
+3. Overlay activates
+4. Click any heading/paragraph → alternatives popup appears
+5. Apply an alternative → DOM text updates
+6. Refresh → edits persist
+7. Visit `/install` → demo is NOT active on docs pages
 
 **Step 6: Commit**
 
@@ -785,63 +424,63 @@ git commit -m "feat(site): wire up live demo with hemingway client and fetch int
 
 ---
 
-### Task 6: Populate complete alternatives JSON
+### Task 7: Populate complete alternatives JSON
 
 **Files:**
 - Modify: `site/src/scripts/demo-alternatives.json`
 
-**Step 1: Write alternatives for every text element on the page**
+**Step 1: Write alternatives for every text element**
 
-Go through every text element rendered by the marketing page components and add 3 high-quality alternatives for each. This includes:
+Go through every text element rendered on the homepage and add 3 high-quality alternatives. Keys must be the exact lowercase text content as it appears in the DOM.
 
+Elements to cover:
 - Hero headline
 - Hero subhead
-- Hero CTA button text
-- Each "How it works" step title and description
-- Each feature card title and description
-- Install section heading
-- Footer text
+- Hero CTA button text ("Try it on this page")
+- Each HowItWorks step title (3) and description (3)
+- Each Features card title (6) and description (6)
+- QuickStart section heading
+- Any other visible text elements
 
-Use the hemingway copy style labels: `[Clarity]`, `[Punch]`, `[Conversational]`, `[Authority]`, etc.
+**Step 2: Verify all elements return real alternatives (not fallback)**
 
-Keys must be the exact lowercase text content of each element as it appears in the DOM.
-
-**Step 2: Verify alternatives load for all elements**
-
-Activate the demo, click through every clickable text element on the page. Each should return 3 alternatives (not the generic fallback).
+Activate demo, click through every text element. None should return the generic fallback.
 
 **Step 3: Commit**
 
 ```bash
 git add site/src/scripts/demo-alternatives.json
-git commit -m "feat(site): complete pre-generated alternatives for all page elements"
+git commit -m "feat(site): complete pre-generated alternatives for all homepage elements"
 ```
 
 ---
 
-### Task 7: Visual polish and responsive design
+### Task 8: Visual polish and responsive design
 
 **Files:**
 - Modify: `site/src/styles/global.css`
-- Modify: All component `.astro` files as needed
+- Modify: component `.astro` files as needed
 
-**Step 1: Add responsive breakpoints**
+**Step 1: Responsive breakpoints**
 
-Ensure all sections work well at mobile (375px), tablet (768px), and desktop (1080px+). Key adjustments:
-- Hero headline scales down (`clamp()` already in place)
-- Feature grid goes from 3 columns → 2 → 1
-- Nav collapses gracefully
-- Code blocks scroll horizontally on mobile
+- Hero headline scales via `clamp()` (already planned)
+- Feature grid: 3 cols → 2 → 1
+- HowItWorks: horizontal → vertical on mobile
+- Nav: links wrap or show hamburger on mobile
+- Code blocks: horizontal scroll on mobile
+- Docs prose: full-width padding on mobile
 
-**Step 2: Add subtle scroll animations**
+**Step 2: Subtle scroll animations**
 
-Use CSS `@keyframes` and `IntersectionObserver` for fade-in-up on sections as they scroll into view. Keep it minimal — 0.3s opacity+transform transitions.
+CSS `@keyframes fadeInUp` + `IntersectionObserver` for sections. 0.3s opacity+transform. Keep minimal.
 
-**Step 3: Verify in browser at multiple widths**
+**Step 3: Code block styling**
 
-Check 375px, 768px, 1280px viewports.
+Consistent styling for all code blocks across homepage and docs: dark bg (#1a1a1a), light text, rounded corners, padding, horizontal scroll, optional copy button.
 
-**Step 4: Commit**
+**Step 4: Verify at 375px, 768px, 1280px**
+
+**Step 5: Commit**
 
 ```bash
 git add site/
@@ -850,15 +489,13 @@ git commit -m "feat(site): responsive design and scroll animations"
 
 ---
 
-### Task 8: Vercel deployment configuration
+### Task 9: Vercel deployment configuration
 
 **Files:**
 - Create: `site/vercel.json`
-- Modify: root `.gitignore` (if needed)
+- Modify: root `.gitignore`
 
 **Step 1: Create Vercel config**
-
-Create `site/vercel.json`:
 
 ```json
 {
@@ -868,84 +505,22 @@ Create `site/vercel.json`:
 }
 ```
 
-This ensures the hemingway client is built before the site build copies it to `public/`.
+**Step 2: Update .gitignore**
 
-**Step 2: Add site build artifacts to .gitignore**
-
-Ensure `site/dist/` and `site/.astro/` are in `.gitignore`.
+Add `site/dist/`, `site/.astro/`, `site/public/hemingway-client.js` (generated file).
 
 **Step 3: Test production build locally**
 
 ```bash
-cd /Users/hunter/Documents/GitHub/hemingway-ai
-npm run build
-cd site
-npm run build
-npx astro preview
+cd /Users/hunter/Documents/GitHub/hemingway-ai && npm run build
+cd site && npm run build && npx astro preview
 ```
 
-Expected: Production build serves correctly, demo works as expected.
+Expected: Production build works, demo functions, all pages render.
 
 **Step 4: Commit**
 
 ```bash
 git add site/vercel.json .gitignore
 git commit -m "feat(site): add Vercel deployment configuration"
-```
-
----
-
-### Task 9: Session persistence for edits
-
-**Files:**
-- Create: `site/src/scripts/session-restore.ts`
-- Modify: `site/src/scripts/demo-adapter.ts`
-
-**Step 1: Add session storage for text edits**
-
-When the demo adapter intercepts a `/write` call, store the `{ oldText, newText }` pair in sessionStorage. On page load (if the demo was previously active), restore all stored edits by walking the DOM and replacing text.
-
-```typescript
-const EDITS_KEY = "hemingway-demo-edits";
-
-function saveEdit(oldText: string, newText: string) {
-  const edits = JSON.parse(sessionStorage.getItem(EDITS_KEY) || "[]");
-  // Remove any existing edit for the same oldText
-  const filtered = edits.filter((e: { oldText: string }) => e.oldText !== oldText);
-  filtered.push({ oldText, newText });
-  sessionStorage.setItem(EDITS_KEY, JSON.stringify(filtered));
-}
-
-function restoreEdits() {
-  const edits = JSON.parse(sessionStorage.getItem(EDITS_KEY) || "[]");
-  if (edits.length === 0) return;
-
-  const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
-  while (walker.nextNode()) {
-    const node = walker.currentNode;
-    for (const edit of edits) {
-      if (node.textContent?.trim() === edit.oldText.trim()) {
-        node.textContent = edit.newText;
-      }
-    }
-  }
-}
-```
-
-**Step 2: Call restoreEdits on page load**
-
-In the demo toggle init, check if there are stored edits and restore them. Also auto-load the hemingway client if edits exist (so the demo stays active across refreshes).
-
-**Step 3: Verify session persistence**
-
-1. Activate demo, apply an alternative
-2. Refresh page
-3. Applied text should persist
-4. Close tab, reopen → edits should be gone
-
-**Step 4: Commit**
-
-```bash
-git add site/src/scripts/
-git commit -m "feat(site): persist demo edits in sessionStorage across refreshes"
 ```
