@@ -3,6 +3,8 @@
   "type": "module",
   "version": "0.0.1",
   "scripts": {
+    "predev": "cp ../dist/client/overlay.iife.js public/hemingway-client.js || echo 'Build hemingway first: npm run build'",
+    "prebuild": "cp ../dist/client/overlay.iife.js public/hemingway-client.js || echo 'Build hemingway first: npm run build'",
     "dev": "astro dev",
     "build": "astro build",
     "preview": "astro preview",

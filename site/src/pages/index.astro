@@ -12,3 +12,9 @@ import QuickStart from "../components/QuickStart.astro";
   <Features />
   <QuickStart />
 </Layout>
+
+<script>
+  import "../scripts/demo-adapter";
+  import { initDemoToggle } from "../scripts/demo-toggle";
+  initDemoToggle();
+</script>
