@@ -1,20 +1,326 @@
 ---
 import Layout from "../layouts/Layout.astro";
-import Hero from "../components/Hero.astro";
-import HowItWorks from "../components/HowItWorks.astro";
-import Features from "../components/Features.astro";
-import QuickStart from "../components/QuickStart.astro";
 ---
 
 <Layout title="hemingway-ai — AI-powered copy for your marketing site">
-  <Hero />
-  <HowItWorks />
-  <Features />
-  <QuickStart />
+  <article class="homepage">
+    <div class="hero-area">
+      <div class="hero-left">
+        <h1>Click any text.<br/>Get better copy.</h1>
+      </div>
+      <div class="hero-right">
+        <button class="install-btn" type="button">
+          <code>npm install hemingway-ai</code>
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+            <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+          </svg>
+        </button>
+      </div>
+    </div>
+
+    <p class="hero-desc">
+      Hemingway turns your dev site into a copy editing surface. Click any heading, paragraph, or button — get three Claude-powered alternatives calibrated to context and position. Apply one and it writes back to your source file.
+    </p>
+
+    <div class="hero-actions">
+      <button id="demo-toggle" class="pill-btn accent demo-btn" type="button">
+        Try it on this page
+        <svg width="10" height="10" viewBox="0 0 10 10" fill="none" aria-hidden="true">
+          <path d="M2 8L8 2M8 2H3M8 2V7" stroke="currentColor" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </button>
+    </div>
+
+    <section class="content-section">
+      <h2><span>How it works</span></h2>
+      <ol class="steps-list">
+        <li>
+          Click any heading, paragraph, button, or link on your dev site. Hemingway outlines everything that's editable.
+        </li>
+        <li>
+          Get three Claude-written alternatives. Each one is calibrated to its copy job — hero headline, section opener, CTA label — and to where it falls in your page's narrative arc.
+        </li>
+        <li>
+          One click updates the live page and writes the change back to your source file. No copy-paste. No round-trips.
+        </li>
+      </ol>
+    </section>
+
+    <section class="content-section">
+      <h2><span>Features</span></h2>
+      <ul class="features-list">
+        <li>
+          <strong>Local-first</strong> — Everything runs on localhost. Your copy goes to Anthropic's API and nowhere else.
+        </li>
+        <li>
+          <strong>Framework-agnostic</strong> — One script tag works with React, Vue, Svelte, Astro, or plain HTML.
+        </li>
+        <li>
+          <strong>Writes to source</strong> — Changes go back to your actual source files, not just the DOM.
+        </li>
+        <li>
+          <strong>Context-aware</strong> — Hemingway builds a page brief before every generation — narrative stage, section role, copy job. Claude gets a brief, not just a string.
+        </li>
+        <li>
+          <strong>Learns your preferences</strong> — Tracks which alternatives you pick and adapts future suggestions.
+        </li>
+        <li>
+          <strong>Style guide support</strong> — Point Hemingway at your brand voice doc. It's included in every generation request.
+        </li>
+      </ul>
+    </section>
+
+    <section class="content-section">
+      <h2><span>Quick start</span></h2>
+      <div class="code-block">
+        <pre><code><span class="comment"># Install</span>
+<span class="cmd">npm install hemingway-ai</span>
+
+<span class="comment"># Run the server</span>
+<span class="cmd">npx hemingway-ai</span>
+
+<span class="comment"># Add to your site</span>
+<span class="cmd">&lt;script src="http://localhost:4800/client.js"&gt;&lt;/script&gt;</span>
+
+<span class="comment"># Press Cmd+Shift+H to activate</span></code></pre>
+      </div>
+      <p class="section-note">
+        <a href="/install/" class="arrow-link">Full installation guide <span aria-hidden="true">&rarr;</span></a>
+      </p>
+    </section>
+
+    <section class="content-section links-section">
+      <p>
+        <a href="/features/" class="arrow-link">Deep dive into features <span aria-hidden="true">&rarr;</span></a>
+      </p>
+      <p>
+        <a href="/changelog/" class="arrow-link">View the changelog <span aria-hidden="true">&rarr;</span></a>
+      </p>
+      <p>
+        <a href="/faq/" class="arrow-link">Frequently asked questions <span aria-hidden="true">&rarr;</span></a>
+      </p>
+    </section>
+  </article>
 </Layout>
+
+<script>
+  // Copy install command
+  const installBtn = document.querySelector(".install-btn");
+  if (installBtn) {
+    installBtn.addEventListener("click", () => {
+      navigator.clipboard.writeText("npm install hemingway-ai");
+      const svg = installBtn.querySelector("svg");
+      if (svg) {
+        const original = svg.innerHTML;
+        svg.innerHTML =
+          '<polyline points="20 6 9 17 4 12" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"></polyline>';
+        setTimeout(() => {
+          svg.innerHTML = original;
+        }, 1500);
+      }
+    });
+  }
+</script>
 
 <script>
   import "../scripts/demo-adapter";
   import { initDemoToggle } from "../scripts/demo-toggle";
   initDemoToggle();
 </script>
+
+<style>
+  .homepage {
+    max-width: var(--content-max-width);
+  }
+
+  /* Hero area */
+  .hero-area {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 24px;
+    margin-bottom: 16px;
+  }
+
+  h1 {
+    font-size: 36px;
+    font-weight: 600;
+    letter-spacing: -0.035em;
+    line-height: 1.15;
+  }
+
+  .hero-right {
+    padding-top: 8px;
+    flex-shrink: 0;
+  }
+
+  .install-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: var(--text-muted);
+    font-family: inherit;
+    padding: 0;
+    transition: color 0.15s;
+  }
+
+  .install-btn:hover {
+    color: var(--text);
+  }
+
+  .install-btn code {
+    font-family: var(--font-mono);
+    font-size: 13px;
+    background: none;
+    padding: 0;
+    color: inherit;
+  }
+
+  /* Hero description */
+  .hero-desc {
+    color: var(--text-muted);
+    font-size: 15px;
+    line-height: 1.7;
+    margin-bottom: 24px;
+  }
+
+  .hero-actions {
+    margin-bottom: 64px;
+  }
+
+  .demo-btn {
+    font-size: 13px;
+    font-weight: 500;
+  }
+
+  .demo-btn.active {
+    background: var(--text);
+    border-color: var(--text);
+    color: #fff;
+  }
+
+  /* Content sections */
+  .content-section {
+    margin-bottom: 56px;
+  }
+
+  .content-section h2 {
+    font-size: 15px;
+    font-weight: 500;
+    letter-spacing: -0.01em;
+    margin-bottom: 20px;
+    color: var(--text);
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+
+  .content-section h2::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+  }
+
+  /* Steps */
+  .steps-list {
+    padding-left: 20px;
+  }
+
+  .steps-list li {
+    color: var(--text-muted);
+    font-size: 15px;
+    line-height: 1.7;
+    margin-bottom: 10px;
+  }
+
+  .steps-list li::marker {
+    color: var(--text-muted);
+    font-size: 14px;
+  }
+
+  /* Features */
+  .features-list {
+    list-style: disc;
+    padding-left: 18px;
+  }
+
+  .features-list li {
+    color: var(--text-muted);
+    font-size: 15px;
+    line-height: 1.7;
+    margin-bottom: 10px;
+  }
+
+  .features-list li strong {
+    color: var(--text);
+    font-weight: 500;
+  }
+
+  /* Code block */
+  .code-block {
+    background: var(--text);
+    color: rgb(212, 212, 212);
+    border-radius: 6px;
+    padding: 20px 24px;
+    overflow-x: auto;
+    margin-bottom: 16px;
+  }
+
+  .code-block pre {
+    margin: 0;
+  }
+
+  .code-block code {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    line-height: 1.9;
+    background: none;
+    padding: 0;
+    color: inherit;
+    border-radius: 0;
+  }
+
+  .code-block .comment {
+    color: rgba(255, 255, 255, 0.3);
+  }
+
+  .code-block .cmd {
+    color: rgb(212, 212, 212);
+  }
+
+  /* Notes & links */
+  .section-note {
+    margin: 0;
+  }
+
+  .arrow-link {
+    color: var(--accent);
+    font-size: 14px;
+    text-decoration: none;
+    transition: opacity 0.15s;
+  }
+
+  .arrow-link:hover {
+    color: var(--accent);
+    opacity: 0.8;
+  }
+
+  .links-section p {
+    margin-bottom: 6px;
+  }
+
+  @media (max-width: 640px) {
+    .hero-area {
+      flex-direction: column;
+    }
+
+    h1 {
+      font-size: 28px;
+    }
+  }
+</style>

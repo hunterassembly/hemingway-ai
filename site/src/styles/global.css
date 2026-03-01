@@ -3,14 +3,14 @@
 :root {
   --bg: #ffffff;
   --text: rgb(24, 24, 24);
-  --text-muted: rgb(130, 130, 130);
+  --text-muted: rgb(110, 110, 110);
   --text-dim: rgba(0, 0, 0, 0.35);
-  --border: rgb(210, 210, 210);
+  --border: rgb(230, 230, 230);
   --border-subtle: rgba(22, 36, 27, 0.06);
-  --accent: #1bffe3;
+  --accent: #3b82f6;
   --code-bg: rgb(245, 245, 245);
-  --max-width: 1100px;
-  --nav-height: 64px;
+  --sidebar-width: 200px;
+  --content-max-width: 700px;
 
   --font-sans: 'Geist', -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   --font-mono: 'Geist Mono', 'SF Mono', SFMono-Regular, Consolas, "Liberation Mono", Menlo, monospace;
@@ -28,7 +28,7 @@ html {
   font-family: var(--font-sans);
   background-color: var(--bg);
   color: var(--text);
-  line-height: 1.5;
+  line-height: 1.6;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   font-size: 14px;
@@ -53,6 +53,41 @@ code {
   background: var(--code-bg);
   padding: 0.15em 0.35em;
   border-radius: 3px;
+}
+
+/* ---- Page layout ---- */
+.page-content {
+  margin-left: var(--sidebar-width);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.page-content main {
+  flex: 1;
+  max-width: var(--content-max-width);
+  padding: 48px 48px 80px;
+}
+
+.site-footer {
+  padding: 32px 48px;
+  max-width: var(--content-max-width);
+}
+
+.site-footer p {
+  font-size: 13px;
+  color: var(--text-muted);
+}
+
+.site-footer a {
+  color: var(--text-muted);
+  text-decoration: underline;
+  text-decoration-color: var(--border);
+  text-underline-offset: 2px;
+}
+
+.site-footer a:hover {
+  color: var(--text);
 }
 
 /* ---- Label / eyebrow text ---- */
@@ -91,49 +126,23 @@ code {
 .pill-btn.accent {
   background: var(--accent);
   border-color: var(--accent);
-  color: var(--text);
+  color: #fff;
 }
 
 .pill-btn.accent:hover {
-  background: #00e6cc;
-  border-color: #00e6cc;
-}
-
-/* ---- Corner dots motif ---- */
-.corner-dots {
-  position: relative;
-}
-
-.corner-dots::before,
-.corner-dots::after {
-  content: '';
-  position: absolute;
-  width: 3px;
-  height: 3px;
-  border-radius: 100%;
-  background: var(--text);
-}
-
-.corner-dots::before {
-  top: -1.5px;
-  left: -1.5px;
-}
-
-.corner-dots::after {
-  top: -1.5px;
-  right: -1.5px;
+  background: #2563eb;
+  border-color: #2563eb;
 }
 
 /* ---- Docs prose ---- */
 
 .docs-content {
-  max-width: var(--max-width);
-  margin: 0 auto;
-  padding: 8rem 1.5rem 6rem;
+  max-width: var(--content-max-width);
+  padding: 0;
 }
 
 .docs-content h1 {
-  font-size: 1.5rem;
+  font-size: 1.75rem;
   font-weight: 600;
   letter-spacing: -0.03em;
   line-height: 1.2;
@@ -144,7 +153,7 @@ code {
   font-size: 1rem;
   font-weight: 600;
   letter-spacing: -0.01em;
-  margin-top: 3rem;
+  margin-top: 2.5rem;
   margin-bottom: 0.75rem;
 }
 
@@ -179,7 +188,7 @@ code {
   background: var(--text);
   color: #d4d4d4;
   padding: 1.25rem 1.5rem;
-  border-radius: 4px;
+  border-radius: 6px;
   overflow-x: auto;
   margin-bottom: 1.25rem;
   line-height: 1.6;
@@ -241,9 +250,24 @@ code {
 }
 
 .docs-content details[open] summary::after {
-  content: "−";
+  content: "\2212";
 }
 
 .docs-content details p {
   padding-bottom: 1rem;
+}
+
+/* ---- Mobile ---- */
+@media (max-width: 768px) {
+  .page-content {
+    margin-left: 0;
+  }
+
+  .page-content main {
+    padding: 24px 20px 60px;
+  }
+
+  .site-footer {
+    padding: 24px 20px;
+  }
 }

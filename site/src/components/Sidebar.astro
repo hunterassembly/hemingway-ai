@@ -1,0 +1,193 @@
+---
+interface Props {
+  currentPath: string;
+}
+
+const { currentPath } = Astro.props;
+
+const navSections = [
+  {
+    links: [
+      { href: "/", label: "Overview" },
+      { href: "/install/", label: "Install" },
+      { href: "/features/", label: "Features" },
+    ],
+  },
+  {
+    title: "Resources",
+    links: [
+      { href: "/changelog/", label: "Changelog" },
+      { href: "/faq/", label: "FAQ" },
+    ],
+  },
+];
+
+function isActive(href: string, current: string): boolean {
+  if (href === "/") return current === "/";
+  return current.startsWith(href);
+}
+---
+
+<aside class="sidebar">
+  <div class="sidebar-inner">
+    <a href="/" class="sidebar-logo">
+      <img src="/hemingway.svg" alt="hemingway" height="18" />
+    </a>
+
+    <nav class="sidebar-nav">
+      {navSections.map((section) => (
+        <div class="nav-section">
+          {section.title && <span class="nav-section-title">{section.title}</span>}
+          {section.links.map((link) => (
+            <a
+              href={link.href}
+              class:list={["nav-link", { active: isActive(link.href, currentPath) }]}
+              aria-current={isActive(link.href, currentPath) ? "page" : undefined}
+            >
+              {link.label}
+            </a>
+          ))}
+        </div>
+      ))}
+    </nav>
+
+    <div class="sidebar-footer">
+      <a
+        href="https://www.npmjs.com/package/hemingway-ai"
+        class="version-link"
+        target="_blank"
+        rel="noopener noreferrer"
+      >v0.1.0</a>
+      <span class="sidebar-dot" aria-hidden="true">&middot;</span>
+      <a
+        href="https://github.com/hunterassembly/hemingway-ai"
+        class="github-link"
+        target="_blank"
+        rel="noopener noreferrer"
+      >
+        GitHub
+        <svg width="9" height="9" viewBox="0 0 10 10" fill="none" aria-hidden="true">
+          <path d="M2 8L8 2M8 2H3M8 2V7" stroke="currentColor" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </a>
+    </div>
+  </div>
+</aside>
+
+<style>
+  .sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    width: var(--sidebar-width);
+    border-right: 1px solid var(--border);
+    background: var(--bg);
+    z-index: 100;
+    overflow-y: auto;
+  }
+
+  .sidebar-inner {
+    display: flex;
+    flex-direction: column;
+    min-height: 100%;
+    padding: 28px 24px;
+  }
+
+  .sidebar-logo {
+    display: flex;
+    align-items: center;
+    text-decoration: none;
+    margin-bottom: 32px;
+    line-height: 1;
+  }
+
+  .sidebar-logo img {
+    height: 18px;
+    width: auto;
+  }
+
+  .sidebar-nav {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    flex: 1;
+  }
+
+  .nav-section {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  .nav-section-title {
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--text-muted);
+    margin-bottom: 4px;
+    padding: 4px 0;
+  }
+
+  .nav-link {
+    font-size: 13px;
+    color: var(--text-muted);
+    text-decoration: none;
+    padding: 4px 0;
+    transition: color 0.15s;
+    line-height: 1.4;
+  }
+
+  .nav-link:hover {
+    color: var(--text);
+  }
+
+  .nav-link.active {
+    color: var(--text);
+    font-weight: 500;
+  }
+
+  .sidebar-footer {
+    margin-top: auto;
+    padding-top: 24px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .sidebar-dot {
+    color: var(--text-muted);
+    font-size: 14px;
+  }
+
+  .github-link {
+    font-size: 13px;
+    color: var(--text-muted);
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    transition: color 0.15s;
+  }
+
+  .version-link {
+    font-size: 12px;
+    color: var(--text-muted);
+    text-decoration: none;
+    font-family: var(--font-mono);
+    transition: color 0.15s;
+  }
+
+  .version-link:hover {
+    color: var(--text);
+  }
+
+  .github-link:hover {
+    color: var(--text);
+  }
+
+  @media (max-width: 768px) {
+    .sidebar {
+      display: none;
+    }
+  }
+</style>

@@ -19,7 +19,9 @@ function isActive(href: string, current: string): boolean {
 
 <nav>
   <div class="nav-inner">
-    <a href="/" class="logo">HEMINGWAY.</a>
+    <a href="/" class="logo">
+      <img src="/hemingway.svg" alt="hemingway" height="20" />
+    </a>
     <div class="nav-right">
       {links.map((link) => (
         <a
@@ -68,17 +70,16 @@ function isActive(href: string, current: string): boolean {
   }
 
   .logo {
-    font-size: 12px;
-    font-weight: 500;
-    color: var(--text);
+    display: flex;
+    align-items: center;
     text-decoration: none;
-    letter-spacing: 0;
     flex-shrink: 0;
     line-height: 1;
   }
 
-  .logo:hover {
-    color: var(--text);
+  .logo img {
+    height: 20px;
+    width: auto;
   }
 
   .nav-right {

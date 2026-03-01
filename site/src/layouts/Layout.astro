@@ -1,6 +1,5 @@
 ---
-import Nav from "../components/Nav.astro";
-import Footer from "../components/Footer.astro";
+import Sidebar from "../components/Sidebar.astro";
 
 interface Props {
   title: string;
@@ -27,11 +26,17 @@ const currentPath = Astro.url.pathname;
     <title>{title}</title>
   </head>
   <body>
-    <Nav currentPath={currentPath} />
-    <main>
-      <slot />
-    </main>
-    <Footer />
+    <Sidebar currentPath={currentPath} />
+    <div class="page-content">
+      <main>
+        <slot />
+      </main>
+      <footer class="site-footer">
+        <p>
+          Made by <a href="https://github.com/hunterassembly" target="_blank" rel="noopener noreferrer">Hunter Assembly</a>
+        </p>
+      </footer>
+    </div>
   </body>
 </html>
 
