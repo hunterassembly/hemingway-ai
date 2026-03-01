@@ -1,0 +1,165 @@
+---
+import DocsLayout from "../layouts/DocsLayout.astro";
+---
+
+<DocsLayout title="Installation — hemingway-ai" heading="Installation">
+  <p class="lede">Hemingway runs as a local server alongside your dev environment. You'll be up in five minutes.</p>
+
+  <h2>Step 1 — Install</h2>
+  <pre><code>npm install hemingway-ai</code></pre>
+  <p>Or use your preferred package manager:</p>
+  <pre><code>yarn add hemingway-ai
+pnpm add hemingway-ai
+bun add hemingway-ai</code></pre>
+
+  <h2>Step 2 — Init</h2>
+  <pre><code>npx hemingway-ai init</code></pre>
+  <p>
+    This creates a <code>hemingway.config.mjs</code> file in your project root with sensible defaults. Open it and set <code>sourcePatterns</code> to glob patterns that match your component files — this is what Hemingway uses to find files when writing changes back.
+  </p>
+
+  <h2>Step 3 — API key</h2>
+  <pre><code>export ANTHROPIC_API_KEY=sk-ant-...</code></pre>
+  <p>
+    Add this to your shell profile (<code>~/.zshrc</code>, <code>~/.bashrc</code>, etc.) so it's available every session. The server won't error on startup without it, but generation requests will fail.
+  </p>
+
+  <h2>Step 4 — Start</h2>
+  <pre><code>npx hemingway-ai</code></pre>
+  <p>
+    The server starts on port 4800 by default: <code>http://localhost:4800</code>. Set the <code>HEMINGWAY_PORT</code> environment variable to use a different port.
+  </p>
+
+  <h2>Step 5 — Add to your site</h2>
+  <p>Drop the client script into your HTML:</p>
+  <pre><code>&lt;script src="http://localhost:4800/client.js"&gt;&lt;/script&gt;</code></pre>
+  <p>For React projects, use the component instead and wrap it in a dev-only guard:</p>
+  <pre><code>import {"{"} Hemingway {"}"} from 'hemingway-ai/react';
+
+function App() {"{"}
+  return (
+    &lt;&gt;
+      &lt;YourApp /&gt;
+      {"{"}process.env.NODE_ENV === 'development' && &lt;Hemingway port={"{"}4800{"}"} /&gt;{"}"}
+    &lt;/&gt;
+  );
+{"}"}</code></pre>
+
+  <h2>Step 6 — Activate</h2>
+  <p>
+    Open your dev site in the browser and press <strong>Cmd+Shift+H</strong> (Mac) or <strong>Ctrl+Shift+H</strong> (Windows/Linux) to toggle the Hemingway overlay.
+  </p>
+
+  <h2>Configuration</h2>
+  <p>All options in <code>hemingway.config.mjs</code>:</p>
+  <table>
+    <thead>
+      <tr>
+        <th>Option</th>
+        <th>Default</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><code>port</code></td>
+        <td><code>4800</code></td>
+        <td>Server port</td>
+      </tr>
+      <tr>
+        <td><code>model</code></td>
+        <td><code>"claude-sonnet-4-6"</code></td>
+        <td>Claude model to use for generation</td>
+      </tr>
+      <tr>
+        <td><code>styleGuide</code></td>
+        <td><code>""</code></td>
+        <td>Path to your brand voice / style guide markdown</td>
+      </tr>
+      <tr>
+        <td><code>copyBible</code></td>
+        <td><code>""</code></td>
+        <td>Path to your copy bible markdown</td>
+      </tr>
+      <tr>
+        <td><code>referenceGuide</code></td>
+        <td><code>""</code></td>
+        <td>Path to any additional reference doc for generation</td>
+      </tr>
+      <tr>
+        <td><code>sourcePatterns</code></td>
+        <td><code>["src/**/*.{"{"}tsx,astro,vue{"}"}"]</code></td>
+        <td>Glob patterns for source files to search during write-back</td>
+      </tr>
+      <tr>
+        <td><code>excludePatterns</code></td>
+        <td><code>["node_modules", "dist"]</code></td>
+        <td>Patterns to exclude from write-back search</td>
+      </tr>
+      <tr>
+        <td><code>writeAdapter</code></td>
+        <td><code>"auto"</code></td>
+        <td>Write-back strategy (<code>auto</code>, <code>heuristic</code>, or <code>exact</code>)</td>
+      </tr>
+      <tr>
+        <td><code>shortcut</code></td>
+        <td><code>"meta+shift+h"</code></td>
+        <td>Keyboard shortcut to toggle the overlay</td>
+      </tr>
+      <tr>
+        <td><code>accentColor</code></td>
+        <td><code>"#3b82f6"</code></td>
+        <td>Accent color for the overlay UI</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h2>Full config example</h2>
+  <pre><code>// hemingway.config.mjs
+export default {"{"}
+  port: 4800,
+  model: "claude-sonnet-4-6",
+  styleGuide: "./docs/brand-voice.md",
+  copyBible: "./docs/copy-bible.md",
+  referenceGuide: "",
+  sourcePatterns: ["src/**/*.{"{"}{"{"}tsx,astro,vue{"}"}{"}"}"],
+  excludePatterns: ["node_modules", "dist"],
+  writeAdapter: "auto",
+  shortcut: "meta+shift+h",
+  accentColor: "#3b82f6",
+{"}"}</code></pre>
+
+  <h2>Environment variables</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>Variable</th>
+        <th>Required</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><code>ANTHROPIC_API_KEY</code></td>
+        <td>Required</td>
+        <td>Your Anthropic API key. Get one at console.anthropic.com.</td>
+      </tr>
+      <tr>
+        <td><code>HEMINGWAY_PORT</code></td>
+        <td>Optional</td>
+        <td>Override the server port. Takes precedence over the config file value.</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h2>Verify it's working</h2>
+  <ol>
+    <li>The Hemingway server is running and shows a startup message in your terminal.</li>
+    <li><code>http://localhost:4800/health</code> returns <code>{"{"}"ok": true{"}"}</code>.</li>
+    <li>The client script is loading without errors in the browser console.</li>
+    <li>Pressing Cmd+Shift+H toggles the overlay on your dev site.</li>
+    <li>Clicking a text element outlines it and shows the Hemingway panel.</li>
+  </ol>
+
+  <p>You're ready. Questions? <a href="/faq/">Check the FAQ</a> or <a href="https://github.com/hunterassembly/hemingway-ai/issues" target="_blank" rel="noopener noreferrer">open an issue on GitHub</a>.</p>
+</DocsLayout>

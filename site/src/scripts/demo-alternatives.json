@@ -1,0 +1,127 @@
+{
+  "better copy, one click at a time": [
+    { "label": "[Clarity]", "text": "Rewrite any line of copy in seconds" },
+    { "label": "[Punch]", "text": "Ship sharper copy, faster" },
+    { "label": "[Conversational]", "text": "Your copy deserves a second opinion" }
+  ],
+  "ai-powered copy alternatives for your marketing site. select any text, see better options, apply instantly.": [
+    { "label": "[Clarity]", "text": "Highlight any heading, paragraph, or button on your site. Get three AI-generated rewrites and apply your favorite with one click." },
+    { "label": "[Punch]", "text": "Select. Rewrite. Ship. Claude generates copy alternatives tuned to your brand and page context." },
+    { "label": "[Conversational]", "text": "Think of it as a writing partner that lives in your browser. Pick any text, get smarter options, and update your source files instantly." }
+  ],
+  "try it on this page": [
+    { "label": "[Clarity]", "text": "See it in action" },
+    { "label": "[Punch]", "text": "Launch the demo" },
+    { "label": "[Conversational]", "text": "Give it a spin" }
+  ],
+  "how it works": [
+    { "label": "[Clarity]", "text": "Three simple steps" },
+    { "label": "[Punch]", "text": "Dead-simple workflow" },
+    { "label": "[Authority]", "text": "The hemingway workflow" }
+  ],
+  "select text": [
+    { "label": "[Clarity]", "text": "Highlight any element" },
+    { "label": "[Punch]", "text": "Click to target" },
+    { "label": "[Conversational]", "text": "Pick your copy" }
+  ],
+  "click any heading, paragraph, or button on your dev site.": [
+    { "label": "[Clarity]", "text": "Click any text element on your local dev server to select it for rewriting." },
+    { "label": "[Punch]", "text": "Headlines, body copy, CTAs -- everything is fair game." },
+    { "label": "[Conversational]", "text": "Just click on whatever text you want to improve. Headings, paragraphs, buttons -- all work." }
+  ],
+  "see alternatives": [
+    { "label": "[Clarity]", "text": "Review AI rewrites" },
+    { "label": "[Punch]", "text": "Get instant options" },
+    { "label": "[Conversational]", "text": "Browse your rewrites" }
+  ],
+  "get three claude-powered rewrites tailored to your page context.": [
+    { "label": "[Clarity]", "text": "Claude generates three alternatives based on your surrounding copy and brand voice." },
+    { "label": "[Punch]", "text": "Three context-aware rewrites appear instantly, each with a different angle." },
+    { "label": "[Conversational]", "text": "You will see three options from Claude, each written to fit the rest of your page." }
+  ],
+  "apply instantly": [
+    { "label": "[Clarity]", "text": "Update your source" },
+    { "label": "[Punch]", "text": "One-click publish" },
+    { "label": "[Conversational]", "text": "Ship it live" }
+  ],
+  "one click updates your source files. no copy-paste needed.": [
+    { "label": "[Clarity]", "text": "Click apply and the change writes directly to your source file. No manual editing required." },
+    { "label": "[Punch]", "text": "Pick a winner and it lands in your codebase. Done." },
+    { "label": "[Conversational]", "text": "Hit apply and your actual source file updates. No clipboard, no switching tabs." }
+  ],
+  "features": [
+    { "label": "[Clarity]", "text": "What you get" },
+    { "label": "[Punch]", "text": "Built for real workflows" },
+    { "label": "[Authority]", "text": "Core capabilities" }
+  ],
+  "local-first": [
+    { "label": "[Clarity]", "text": "Runs on your machine" },
+    { "label": "[Punch]", "text": "Privacy by default" },
+    { "label": "[Authority]", "text": "Fully local" }
+  ],
+  "runs on localhost. your copy never leaves your machine.": [
+    { "label": "[Clarity]", "text": "Everything runs on your local dev server. Your content stays on your machine." },
+    { "label": "[Punch]", "text": "No cloud. No data sharing. Just you, your machine, and better copy." },
+    { "label": "[Conversational]", "text": "Your copy never gets sent anywhere. It all stays right on your laptop." }
+  ],
+  "framework-agnostic": [
+    { "label": "[Clarity]", "text": "Works with any stack" },
+    { "label": "[Punch]", "text": "One tag, every framework" },
+    { "label": "[Authority]", "text": "Universal compatibility" }
+  ],
+  "one script tag works with react, vue, astro, or plain html.": [
+    { "label": "[Clarity]", "text": "A single script tag integrates with any framework -- React, Vue, Svelte, Astro, or static HTML." },
+    { "label": "[Punch]", "text": "React? Vue? Astro? Plain HTML? One line of code. That is it." },
+    { "label": "[Conversational]", "text": "Drop in one script tag and it works no matter what you are building with." }
+  ],
+  "writes to source": [
+    { "label": "[Clarity]", "text": "Edits your actual files" },
+    { "label": "[Punch]", "text": "Real file updates" },
+    { "label": "[Authority]", "text": "Source-level changes" }
+  ],
+  "changes go back to your actual source files, not just the dom.": [
+    { "label": "[Clarity]", "text": "Every edit writes directly to your source code, not just the browser preview." },
+    { "label": "[Punch]", "text": "No DOM hacks. Your source files get the update, ready to commit." },
+    { "label": "[Conversational]", "text": "When you apply a change, it goes straight into your actual files. Not just the page." }
+  ],
+  "learns your style": [
+    { "label": "[Clarity]", "text": "Adapts to your voice" },
+    { "label": "[Punch]", "text": "Gets smarter over time" },
+    { "label": "[Conversational]", "text": "Knows what you like" }
+  ],
+  "tracks which alternatives you pick and adapts future suggestions.": [
+    { "label": "[Clarity]", "text": "Remembers your preferences and adjusts future rewrites to match your brand voice." },
+    { "label": "[Punch]", "text": "Every pick trains the next suggestion. Your taste becomes the model." },
+    { "label": "[Conversational]", "text": "The more you use it, the better it gets at writing the way you want." }
+  ],
+  "claude-powered": [
+    { "label": "[Clarity]", "text": "Powered by Anthropic" },
+    { "label": "[Punch]", "text": "Best-in-class AI" },
+    { "label": "[Authority]", "text": "Anthropic Claude inside" }
+  ],
+  "uses anthropic's claude for copy that actually sounds good.": [
+    { "label": "[Clarity]", "text": "Backed by Anthropic's Claude, so every rewrite reads naturally and on-brand." },
+    { "label": "[Punch]", "text": "Claude writes copy that sounds human. Because the best AI copy is the kind nobody questions." },
+    { "label": "[Conversational]", "text": "Under the hood it is Claude, so the suggestions actually sound like a real person wrote them." }
+  ],
+  "zero dependencies": [
+    { "label": "[Clarity]", "text": "Nothing extra to install" },
+    { "label": "[Punch]", "text": "Lean and clean" },
+    { "label": "[Authority]", "text": "Dependency-free" }
+  ],
+  "no runtime deps. just node.js and your browser.": [
+    { "label": "[Clarity]", "text": "No extra libraries required. All you need is Node.js and a browser." },
+    { "label": "[Punch]", "text": "Zero bloat. Node, a browser, and you are shipping." },
+    { "label": "[Conversational]", "text": "There is nothing else to install. If you have Node and a browser, you are good to go." }
+  ],
+  "get started in 30 seconds": [
+    { "label": "[Clarity]", "text": "Quick setup guide" },
+    { "label": "[Punch]", "text": "Up and running in four lines" },
+    { "label": "[Conversational]", "text": "Ready in half a minute" }
+  ],
+  "npm install hemingway-ai": [
+    { "label": "[Clarity]", "text": "npm install hemingway-ai" },
+    { "label": "[Punch]", "text": "npm install hemingway-ai" },
+    { "label": "[Conversational]", "text": "npm install hemingway-ai" }
+  ]
+}

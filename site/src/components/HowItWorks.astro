@@ -1,0 +1,124 @@
+<section class="how-it-works">
+  <div class="how-inner">
+    <div class="section-header">
+      <span class="label">HOW IT WORKS</span>
+      <div class="header-line" aria-hidden="true"></div>
+    </div>
+    <h2 class="section-title">Three steps. No friction.</h2>
+    <ol class="steps">
+      <li class="step">
+        <span class="step-num">01</span>
+        <div class="step-content">
+          <span class="step-title">Select</span>
+          <p class="step-desc">
+            Click any heading, paragraph, button, or link on your dev site. Hemingway outlines everything that's editable.
+          </p>
+        </div>
+      </li>
+      <li class="step">
+        <span class="step-num">02</span>
+        <div class="step-content">
+          <span class="step-title">Generate</span>
+          <p class="step-desc">
+            Get three Claude-written alternatives. Each one is calibrated to its copy job — hero headline, section opener, CTA label — and to where it falls in your page's narrative arc.
+          </p>
+        </div>
+      </li>
+      <li class="step">
+        <span class="step-num">03</span>
+        <div class="step-content">
+          <span class="step-title">Apply</span>
+          <p class="step-desc">
+            One click updates the live page and writes the change back to your source file. No copy-paste. No round-trips.
+          </p>
+        </div>
+      </li>
+    </ol>
+  </div>
+</section>
+
+<style>
+  .how-it-works {
+    padding: 4rem 24px;
+    border-top: 1px solid var(--border);
+  }
+
+  .how-inner {
+    max-width: var(--max-width);
+    margin: 0 auto;
+  }
+
+  .section-header {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 28px;
+  }
+
+  .label {
+    color: var(--text);
+    font-size: 12px;
+    font-weight: 500;
+    letter-spacing: 0;
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+
+  .header-line {
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+  }
+
+  .section-title {
+    font-size: 20px;
+    font-weight: 400;
+    letter-spacing: -0.02em;
+    line-height: 1.4;
+    color: var(--text);
+    margin-bottom: 24px;
+  }
+
+  .steps {
+    list-style: none;
+  }
+
+  .step {
+    display: flex;
+    gap: 24px;
+    padding: 20px 0;
+    border-bottom: 1px solid var(--border);
+    align-items: flex-start;
+  }
+
+  .step:first-child {
+    border-top: 1px solid var(--border);
+  }
+
+  .step-num {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    color: var(--text-muted);
+    min-width: 24px;
+    padding-top: 2px;
+    flex-shrink: 0;
+  }
+
+  .step-content {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .step-title {
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--text);
+  }
+
+  .step-desc {
+    font-size: 14px;
+    color: var(--text-muted);
+    line-height: 1.6;
+  }
+</style>

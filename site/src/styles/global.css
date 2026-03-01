@@ -1,17 +1,19 @@
-:root {
-  --bg: #faf9f7;
-  --text: #1a1a1a;
-  --text-muted: #6b7280;
-  --accent: #3b82f6;
-  --accent-hover: #2563eb;
-  --code-bg: #f3f4f6;
-  --border: #e5e7eb;
-  --max-width: 1080px;
+@import url('https://fonts.googleapis.com/css2?family=Geist:wght@100..900&family=Geist+Mono:wght@100..900&display=swap');
 
-  --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
-    "Helvetica Neue", Arial, sans-serif;
-  --font-mono: "SF Mono", SFMono-Regular, Consolas, "Liberation Mono", Menlo,
-    monospace;
+:root {
+  --bg: #ffffff;
+  --text: rgb(24, 24, 24);
+  --text-muted: rgb(130, 130, 130);
+  --text-dim: rgba(0, 0, 0, 0.35);
+  --border: rgb(210, 210, 210);
+  --border-subtle: rgba(22, 36, 27, 0.06);
+  --accent: #1bffe3;
+  --code-bg: rgb(245, 245, 245);
+  --max-width: 1100px;
+  --nav-height: 64px;
+
+  --font-sans: 'Geist', -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --font-mono: 'Geist Mono', 'SF Mono', SFMono-Regular, Consolas, "Liberation Mono", Menlo, monospace;
 }
 
 *,
@@ -26,9 +28,10 @@ html {
   font-family: var(--font-sans);
   background-color: var(--bg);
   color: var(--text);
-  line-height: 1.6;
+  line-height: 1.5;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  font-size: 14px;
 }
 
 body {
@@ -36,19 +39,211 @@ body {
 }
 
 a {
-  color: var(--accent);
+  color: var(--text);
   text-decoration: none;
 }
 
 a:hover {
-  color: var(--accent-hover);
-  text-decoration: underline;
+  color: var(--text);
 }
 
 code {
   font-family: var(--font-mono);
-  font-size: 0.9em;
-  background-color: var(--code-bg);
+  font-size: 0.875em;
+  background: var(--code-bg);
   padding: 0.15em 0.35em;
+  border-radius: 3px;
+}
+
+/* ---- Label / eyebrow text ---- */
+.label {
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  line-height: 20px;
+}
+
+/* ---- Pill button ---- */
+.pill-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 76px;
+  padding: 6px 14px;
+  font-family: var(--font-sans);
+  font-size: 12px;
+  font-weight: 450;
+  color: var(--text);
+  cursor: pointer;
+  text-decoration: none;
+  line-height: 20px;
+  transition: border-color 0.15s, background 0.15s;
+}
+
+.pill-btn:hover {
+  border-color: var(--text);
+}
+
+.pill-btn.accent {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--text);
+}
+
+.pill-btn.accent:hover {
+  background: #00e6cc;
+  border-color: #00e6cc;
+}
+
+/* ---- Corner dots motif ---- */
+.corner-dots {
+  position: relative;
+}
+
+.corner-dots::before,
+.corner-dots::after {
+  content: '';
+  position: absolute;
+  width: 3px;
+  height: 3px;
+  border-radius: 100%;
+  background: var(--text);
+}
+
+.corner-dots::before {
+  top: -1.5px;
+  left: -1.5px;
+}
+
+.corner-dots::after {
+  top: -1.5px;
+  right: -1.5px;
+}
+
+/* ---- Docs prose ---- */
+
+.docs-content {
+  max-width: var(--max-width);
+  margin: 0 auto;
+  padding: 8rem 1.5rem 6rem;
+}
+
+.docs-content h1 {
+  font-size: 1.5rem;
+  font-weight: 600;
+  letter-spacing: -0.03em;
+  line-height: 1.2;
+  margin-bottom: 1.5rem;
+}
+
+.docs-content h2 {
+  font-size: 1rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  margin-top: 3rem;
+  margin-bottom: 0.75rem;
+}
+
+.docs-content h3 {
+  font-size: 0.9375rem;
+  font-weight: 600;
+  margin-top: 2rem;
+  margin-bottom: 0.5rem;
+}
+
+.docs-content p {
+  color: var(--text-muted);
+  line-height: 1.7;
+  margin-bottom: 1rem;
+  font-size: 0.9375rem;
+}
+
+.docs-content ul,
+.docs-content ol {
+  padding-left: 1.5rem;
+  margin-bottom: 1rem;
+  color: var(--text-muted);
+}
+
+.docs-content li {
+  margin-bottom: 0.35rem;
+  line-height: 1.7;
+  font-size: 0.9375rem;
+}
+
+.docs-content pre {
+  background: var(--text);
+  color: #d4d4d4;
+  padding: 1.25rem 1.5rem;
   border-radius: 4px;
+  overflow-x: auto;
+  margin-bottom: 1.25rem;
+  line-height: 1.6;
+}
+
+.docs-content pre code {
+  background: none;
+  padding: 0;
+  font-size: 0.875rem;
+  color: inherit;
+  border-radius: 0;
+}
+
+.docs-content table {
+  width: 100%;
+  text-align: left;
+  border-collapse: collapse;
+  margin-bottom: 1.5rem;
+  font-size: 0.875rem;
+}
+
+.docs-content th,
+.docs-content td {
+  border: 1px solid var(--border);
+  padding: 0.5rem 0.75rem;
+}
+
+.docs-content th {
+  font-weight: 600;
+  background: var(--code-bg);
+}
+
+.docs-content details {
+  border-bottom: 1px solid var(--border);
+}
+
+.docs-content details summary {
+  cursor: pointer;
+  font-weight: 500;
+  padding: 1rem 0;
+  list-style: none;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  font-size: 0.9375rem;
+}
+
+.docs-content details summary::-webkit-details-marker {
+  display: none;
+}
+
+.docs-content details summary::after {
+  content: "+";
+  font-size: 1rem;
+  font-weight: 300;
+  color: var(--text-muted);
+  flex-shrink: 0;
+}
+
+.docs-content details[open] summary::after {
+  content: "−";
+}
+
+.docs-content details p {
+  padding-bottom: 1rem;
 }
