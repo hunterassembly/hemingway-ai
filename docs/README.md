@@ -11,6 +11,7 @@ If you are evaluating Hemingway:
 
 If you are integrating Hemingway into a project:
 
+- [Integration Modes](./getting-started/integration-modes.md)
 - [Next.js Setup](./getting-started/nextjs.md)
 - [Vite React Setup](./getting-started/vite-react.md)
 - [Remix Setup](./getting-started/remix.md)
@@ -33,6 +34,6 @@ If you need deep implementation details:
 ## Recommended Reading Order
 
 1. Quickstart
-2. Framework-specific setup
+2. Integration modes + framework-specific setup
 3. Configuration and API reference
 4. Troubleshooting

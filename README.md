@@ -32,6 +32,11 @@ npx hemingway-ai
 
 For Next.js, you can skip this extra process by using the same-app route adapter.
 
+Quick mode selection:
+
+- Next.js App Router: use one-process mode (`hemingway-ai/next` + `<Hemingway endpoint="/api/hemingway" />`)
+- Everything else: use standalone mode (`npx hemingway-ai` + script tag or `<Hemingway />`)
+
 ### 5. Add the client to your site
 
 **Script tag** (any framework):
@@ -103,6 +108,7 @@ export default config;
 
 - [Docs Home](./docs/README.md)
 - [Quickstart](./docs/getting-started/quickstart.md)
+- [Integration Modes](./docs/getting-started/integration-modes.md)
 - [Framework Setup Guides](./docs/getting-started)
 - [Configuration Reference](./docs/configuration.md)
 - [API Reference](./docs/api-reference.md)

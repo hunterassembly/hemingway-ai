@@ -23,8 +23,35 @@ curl http://localhost:3000/api/hemingway/health
 ```sh
 curl -I http://localhost:4800/client.js
 ```
+   - If you are using Next one-process mode, check:
+```sh
+curl -I http://localhost:3000/api/hemingway/client.js
+```
 3. Verify shortcut config in `hemingway.config.mjs`.
 4. Ensure overlay is injected only in dev environment.
+
+## Endpoint/Port Mismatch
+
+Symptoms:
+
+- App runs, but shortcut does nothing.
+- Browser console shows failed `client.js` or API requests.
+
+Checks:
+
+1. If using Next one-process mode, mount:
+```tsx
+<Hemingway endpoint="/api/hemingway" />
+```
+2. If using standalone mode, mount:
+```tsx
+<Hemingway port={4800} />
+```
+or use:
+```html
+<script src="http://localhost:4800/client.js"></script>
+```
+3. Do not mix endpoint mode and standalone port assumptions in the same app shell.
 
 ## `/client.js` Returns 404
 

@@ -1,6 +1,7 @@
 # Next.js Setup
 
 Use this guide for Next.js App Router or Pages Router projects.
+For mode comparison, see [Integration Modes](./integration-modes.md).
 
 ## Install
 

@@ -1,6 +1,8 @@
 # Script-Tag Setup (Any Framework)
 
 Use this when you do not want the React wrapper or are integrating into non-React stacks.
+This setup uses standalone Hemingway mode.
+If you need setup comparison, see [Integration Modes](./integration-modes.md).
 
 ## 1. Start Hemingway Server
 
@@ -25,4 +27,3 @@ Press `Cmd/Ctrl + Shift + H`.
 - Keep the script disabled in production.
 - Configure `sourcePatterns` so writeback only scans real source directories.
 - Start with `writeAdapter: "generic"` for non-React templates if React adapter matching is too narrow.
-

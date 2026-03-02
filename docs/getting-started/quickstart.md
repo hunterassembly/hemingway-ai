@@ -22,7 +22,21 @@ This creates `hemingway.config.mjs` in your project root.
 export ANTHROPIC_API_KEY=sk-ant-...
 ```
 
-## 4. Start Hemingway Server
+## 4. Choose Integration Mode
+
+If you are on Next.js App Router, use one-process mode and run only your app:
+
+```sh
+npm run dev
+```
+
+Then use route handlers from `hemingway-ai/next` and mount:
+
+```tsx
+<Hemingway endpoint="/api/hemingway" />
+```
+
+If you are on any other framework, use standalone mode:
 
 ```sh
 npx hemingway-ai
@@ -30,7 +44,7 @@ npx hemingway-ai
 
 Server should start on `http://localhost:4800` by default.
 
-If you are in Next.js and using route handlers from `hemingway-ai/next`, you can skip this step and run only `npm run dev`.
+See full comparison: [Integration Modes](./integration-modes.md)
 
 ## 5. Add Hemingway To Your App
 
@@ -52,6 +66,11 @@ export function AppShell() {
     </>
   );
 }
+```
+
+- React component (Next.js one-process mode):
+```tsx
+<Hemingway endpoint="/api/hemingway" />
 ```
 
 ## 6. Activate Overlay

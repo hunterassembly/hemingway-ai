@@ -2,6 +2,9 @@
 
 Use this guide for React apps created with Vite.
 
+Vite currently uses standalone Hemingway mode (two local processes).
+If you need setup comparison, see [Integration Modes](./integration-modes.md).
+
 ## Install And Start Hemingway
 
 ```sh
@@ -48,4 +51,3 @@ export default {
 1. Open your Vite dev URL.
 2. Press `Cmd/Ctrl + Shift + H`.
 3. Select copy and apply an alternative.
-

@@ -2,6 +2,9 @@
 
 Use this guide for Remix applications.
 
+Remix currently uses standalone Hemingway mode (two local processes).
+If you need setup comparison, see [Integration Modes](./integration-modes.md).
+
 ## Install And Start Hemingway
 
 ```sh
@@ -51,4 +54,3 @@ export default {
 1. Open your Remix dev site.
 2. Press `Cmd/Ctrl + Shift + H`.
 3. Generate and apply an alternative on visible copy.
-
