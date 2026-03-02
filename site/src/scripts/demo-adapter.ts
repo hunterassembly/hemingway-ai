@@ -148,7 +148,7 @@ function appendEdit(edit: { oldText: string; newText: string }): void {
 async function handleGetConfig(): Promise<Response> {
   return mockResponse({
     model: "claude-sonnet-4-6",
-    shortcut: "meta+shift+c",
+    shortcut: "ctrl+shift+h",
     styleGuide: "",
     copyBible: "",
   });

@@ -123,6 +123,14 @@ import Layout from "../layouts/Layout.astro";
 
 <script>
   import "../scripts/demo-adapter";
+
+  // Load hemingway client after demo-adapter intercepts are in place
+  const hemingwayScript = document.createElement("script");
+  hemingwayScript.src = "/hemingway-client.js";
+  hemingwayScript.onerror = () => {
+    console.warn("[hemingway demo] Failed to load client bundle.");
+  };
+  document.body.appendChild(hemingwayScript);
 </script>
 
 <style>
