@@ -185,8 +185,8 @@ code {
 }
 
 .docs-content pre {
-  background: var(--text);
-  color: #d4d4d4;
+  background: #f0f0ee;
+  color: #2a2a2a;
   padding: 1.25rem 1.5rem;
   border-radius: 6px;
   overflow-x: auto;
@@ -200,6 +200,38 @@ code {
   font-size: 0.875rem;
   color: inherit;
   border-radius: 0;
+}
+
+/* ---- Code block (shared) ---- */
+.code-block {
+  background: #f0f0ee;
+  color: #2a2a2a;
+  border-radius: 6px;
+  padding: 20px 24px;
+  overflow-x: auto;
+  margin-bottom: 16px;
+}
+
+.code-block pre {
+  margin: 0;
+}
+
+.code-block code {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  line-height: 1.9;
+  background: none;
+  padding: 0;
+  color: inherit;
+  border-radius: 0;
+}
+
+.code-block .comment {
+  color: #999;
+}
+
+.code-block .cmd {
+  color: #2a2a2a;
 }
 
 .docs-content table {

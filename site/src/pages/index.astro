@@ -24,12 +24,10 @@ import Layout from "../layouts/Layout.astro";
     </p>
 
     <div class="hero-actions">
-      <button id="demo-toggle" class="pill-btn accent demo-btn" type="button">
-        Try it on this page
-        <svg width="10" height="10" viewBox="0 0 10 10" fill="none" aria-hidden="true">
-          <path d="M2 8L8 2M8 2H3M8 2V7" stroke="currentColor" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round"/>
-        </svg>
-      </button>
+      <span class="shortcut-hint" aria-label="Press Command Shift H to toggle Hemingway">
+        <kbd>⌘</kbd><kbd>⇧</kbd><kbd>H</kbd>
+        <span class="shortcut-label">to toggle</span>
+      </span>
     </div>
 
     <section class="content-section">
@@ -125,8 +123,6 @@ import Layout from "../layouts/Layout.astro";
 
 <script>
   import "../scripts/demo-adapter";
-  import { initDemoToggle } from "../scripts/demo-toggle";
-  initDemoToggle();
 </script>
 
 <style>
@@ -192,15 +188,36 @@ import Layout from "../layouts/Layout.astro";
     margin-bottom: 64px;
   }
 
-  .demo-btn {
+  .shortcut-hint {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    color: var(--text-muted);
     font-size: 13px;
-    font-weight: 500;
   }
 
-  .demo-btn.active {
-    background: var(--text);
-    border-color: var(--text);
-    color: #fff;
+  .shortcut-hint kbd {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--font-mono);
+    font-size: 13px;
+    font-weight: 500;
+    line-height: 1;
+    background: var(--surface, #f5f5f5);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 5px 8px;
+    color: var(--text);
+    box-shadow: 0 2px 0 var(--border);
+    min-width: 28px;
+    text-align: center;
+  }
+
+  .shortcut-label {
+    margin-left: 4px;
+    font-size: 13px;
+    color: var(--text-muted);
   }
 
   /* Content sections */
@@ -262,36 +279,6 @@ import Layout from "../layouts/Layout.astro";
   }
 
   /* Code block */
-  .code-block {
-    background: var(--text);
-    color: rgb(212, 212, 212);
-    border-radius: 6px;
-    padding: 20px 24px;
-    overflow-x: auto;
-    margin-bottom: 16px;
-  }
-
-  .code-block pre {
-    margin: 0;
-  }
-
-  .code-block code {
-    font-family: var(--font-mono);
-    font-size: 12px;
-    line-height: 1.9;
-    background: none;
-    padding: 0;
-    color: inherit;
-    border-radius: 0;
-  }
-
-  .code-block .comment {
-    color: rgba(255, 255, 255, 0.3);
-  }
-
-  .code-block .cmd {
-    color: rgb(212, 212, 212);
-  }
 
   /* Notes & links */
   .section-note {
