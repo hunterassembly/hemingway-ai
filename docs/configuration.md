@@ -81,3 +81,23 @@ export default {
 - `HEMINGWAY_PORT`:
   - Overrides `port`
 
+## React Component Connection Options
+
+`Hemingway` from `hemingway-ai/react` supports both standalone and same-app modes:
+
+```tsx
+import { Hemingway } from "hemingway-ai/react";
+
+// Standalone mode (default server)
+<Hemingway port={4800} />
+
+// Same-process mode (for Next route handlers, etc.)
+<Hemingway endpoint="/api/hemingway" />
+```
+
+Optional props:
+
+- `endpoint`: base route for Hemingway APIs (`/api/hemingway`)
+- `port`: standalone server port (used when `endpoint` is not provided)
+- `shortcut`: override shortcut at client bootstrap
+- `accentColor`: override overlay accent at client bootstrap

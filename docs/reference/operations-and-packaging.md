@@ -6,6 +6,7 @@ Primary files:
 - `tsup.config.ts`
 - `package.json`
 - `src/react.tsx`
+- `src/next.ts`
 
 ## CLI Behavior (`bin/hemingway.mjs`)
 
@@ -24,7 +25,7 @@ Supported commands:
 
 ## Build Outputs (`tsup.config.ts`)
 
-Three bundles are produced:
+Four bundles are produced:
 
 1. Server bundle
   - Entry: `src/server/index.ts`
@@ -38,6 +39,10 @@ Three bundles are produced:
   - Entry: `src/react.tsx`
   - Output: `dist/react.js`
   - `react` marked external
+4. Next.js adapter
+  - Entry: `src/next.ts`
+  - Output: `dist/next.js`
+  - Exposes route handlers for same-process mode (`/api/hemingway/*`)
 
 ## Package Exports
 
@@ -46,6 +51,7 @@ From `package.json`:
 - `hemingway-ai` -> `dist/server/index.js`
 - `hemingway-ai/react` -> `dist/react.js`
 - `hemingway-ai/client` -> `dist/client/overlay.js`
+- `hemingway-ai/next` -> `dist/next.js`
 
 CLI binary:
 
@@ -73,9 +79,12 @@ Recommended config for cross-React projects:
 
 ## Integration Modes
 
+- Next.js one-process mode:
+  - Mount `createNextRouteHandlers()` under `app/api/hemingway/[...path]/route.ts`
+  - Use `<Hemingway endpoint="/api/hemingway" />`
 - Framework-agnostic script tag:
   - `<script src="http://localhost:4800/client.js"></script>`
-- React:
+- React standalone:
   - `<Hemingway port={4800} />`
   - Component is no-op in SSR/production and cleans up on unmount.
 

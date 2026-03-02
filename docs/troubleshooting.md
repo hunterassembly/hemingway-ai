@@ -15,6 +15,10 @@ Checks:
 ```sh
 curl http://localhost:4800/health
 ```
+   - If you are using Next one-process mode, check:
+```sh
+curl http://localhost:3000/api/hemingway/health
+```
 2. Confirm client script loads:
 ```sh
 curl -I http://localhost:4800/client.js
@@ -32,6 +36,12 @@ Fix:
 
 ```sh
 npm run build
+```
+
+For Next one-process mode, verify route handler path exists at `app/api/hemingway/[...path]/route.ts` and test:
+
+```sh
+curl -I http://localhost:3000/api/hemingway/client.js
 ```
 
 ## Generate Fails With API Error
@@ -100,4 +110,3 @@ export default {
   port: 4810,
 };
 ```
-

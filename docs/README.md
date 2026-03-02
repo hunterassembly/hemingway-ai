@@ -18,6 +18,8 @@ If you are integrating Hemingway into a project:
 - [Configuration Reference](./configuration.md)
 - [API Reference](./api-reference.md)
 
+For easiest setup in Next.js, use one-process mode via `/api/hemingway/*` route handlers.
+
 If you want to contribute:
 
 - [Contributing Guide](../CONTRIBUTING.md)

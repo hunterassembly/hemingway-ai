@@ -30,6 +30,8 @@ export ANTHROPIC_API_KEY=sk-ant-...
 npx hemingway-ai
 ```
 
+For Next.js, you can skip this extra process by using the same-app route adapter.
+
 ### 5. Add the client to your site
 
 **Script tag** (any framework):
@@ -45,6 +47,15 @@ import { Hemingway } from 'hemingway-ai/react'
 
 // Add inside your app (dev mode only)
 <Hemingway />
+```
+
+**React component (Next.js same-process mode):**
+
+```jsx
+import { Hemingway } from "hemingway-ai/react";
+
+// Use Next route handlers under /api/hemingway/*
+<Hemingway endpoint="/api/hemingway" />
 ```
 
 ### 6. Activate

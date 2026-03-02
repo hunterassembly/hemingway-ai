@@ -2,6 +2,8 @@
 
 Hemingway runs a local HTTP server and exposes these routes.
 
+When using Next.js one-process mode with `createNextRouteHandlers`, mount them under `/api/hemingway/*` and use the same route paths below (for example `/api/hemingway/generate`).
+
 ## `POST /generate`
 
 Generate alternatives for one selected element.
@@ -162,4 +164,3 @@ Records selected alternative label:
 ```json
 { "label": "[Clarity] Plainspoken claim" }
 ```
-

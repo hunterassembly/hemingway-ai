@@ -41,6 +41,12 @@ interface HemingwayConfig {
   accentColor: string;
 }
 
+interface HemingwayBootstrapConfig {
+  serverUrl?: string;
+  shortcut?: string;
+  accentColor?: string;
+}
+
 const DEFAULTS: HemingwayConfig = {
   serverUrl: "http://localhost:4800",
   shortcut: "ctrl+shift+h",
@@ -86,6 +92,7 @@ export class HemingwayOverlay {
 
   constructor(config?: Partial<HemingwayConfig>) {
     this.config = { ...DEFAULTS, ...config };
+    this.config.serverUrl = normalizeBaseUrl(this.config.serverUrl);
 
     // Create a top-level container for Hemingway UI
     this.shadowHost = document.createElement("div");
@@ -993,6 +1000,14 @@ export class HemingwayOverlay {
   }
 }
 
+function normalizeBaseUrl(value: string): string {
+  if (!value) return value;
+  if (value.length > 1 && value.endsWith("/")) {
+    return value.replace(/\/+$/, "");
+  }
+  return value;
+}
+
 // --- Shortcut matching ---
 
 function matchesShortcut(e: KeyboardEvent, shortcut: string): boolean {
@@ -1027,8 +1042,10 @@ function matchesShortcut(e: KeyboardEvent, shortcut: string): boolean {
 // --- Auto-init when loaded as IIFE (from /client.js endpoint) ---
 
 if (typeof window !== "undefined") {
-  const instance = new HemingwayOverlay();
-  (window as unknown as Record<string, unknown>).__hemingway = instance;
+  const win = window as unknown as Record<string, unknown>;
+  const bootstrap = (win.__HEMINGWAY_CONFIG as HemingwayBootstrapConfig | undefined) ?? {};
+  const instance = new HemingwayOverlay(bootstrap);
+  win.__hemingway = instance;
 }
 
 export type { Alternative, MultiAlternative } from "./popup";

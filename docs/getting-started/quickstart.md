@@ -30,6 +30,8 @@ npx hemingway-ai
 
 Server should start on `http://localhost:4800` by default.
 
+If you are in Next.js and using route handlers from `hemingway-ai/next`, you can skip this step and run only `npm run dev`.
+
 ## 5. Add Hemingway To Your App
 
 Use one of these:

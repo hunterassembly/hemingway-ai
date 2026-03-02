@@ -2,17 +2,39 @@
 
 Use this guide for Next.js App Router or Pages Router projects.
 
-## Install And Start
+## Install
 
 ```sh
 npm install hemingway-ai
 npx hemingway-ai init
-npx hemingway-ai
 ```
 
-## App Router (`app/`)
+## Option A: One-Process Mode (Recommended)
 
-Add Hemingway in your root layout in development:
+Run only your Next app dev server:
+
+```sh
+npm run dev
+```
+
+Create a catch-all route handler:
+
+`app/api/hemingway/[...path]/route.ts`
+
+```ts
+import { createNextRouteHandlers } from "hemingway-ai/next";
+
+export const runtime = "nodejs";
+export const dynamic = "force-dynamic";
+
+const handlers = createNextRouteHandlers();
+
+export const GET = handlers.GET;
+export const POST = handlers.POST;
+export const OPTIONS = handlers.OPTIONS;
+```
+
+Mount Hemingway in your app layout and point it at the same-origin endpoint:
 
 ```tsx
 import { Hemingway } from "hemingway-ai/react";
@@ -22,29 +44,29 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="en">
       <body>
         {children}
-        {process.env.NODE_ENV !== "production" ? <Hemingway /> : null}
+        {process.env.NODE_ENV !== "production" ? <Hemingway endpoint="/api/hemingway" /> : null}
       </body>
     </html>
   );
 }
 ```
 
-## Pages Router (`pages/`)
+This mode removes the separate `npx hemingway-ai` process.
 
-Add Hemingway in `_app.tsx`:
+## Option B: Standalone Mode (Works Everywhere)
+
+If you prefer the old approach, run the companion server separately:
+
+```sh
+npx hemingway-ai
+```
+
+Then mount:
 
 ```tsx
-import type { AppProps } from "next/app";
 import { Hemingway } from "hemingway-ai/react";
 
-export default function App({ Component, pageProps }: AppProps) {
-  return (
-    <>
-      <Component {...pageProps} />
-      {process.env.NODE_ENV !== "production" ? <Hemingway /> : null}
-    </>
-  );
-}
+<Hemingway port={4800} />
 ```
 
 ## Recommended Config
@@ -63,4 +85,3 @@ export default {
 1. Open your local Next.js site.
 2. Press `Cmd/Ctrl + Shift + H`.
 3. Click a heading or paragraph and generate alternatives.
-

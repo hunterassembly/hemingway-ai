@@ -13,11 +13,15 @@ Primary design choice: keep integration friction near zero by using a script-inj
 - `src/client/*`
   - DOM discovery, interaction model (single/multi select + inline edit), popup and settings UI, API calls to server.
 - `src/react.tsx`
-  - Thin React wrapper that injects/removes `http://localhost:{port}/client.js`.
+  - Thin React wrapper that injects/removes client script and supports either localhost or same-origin endpoint mode.
+- `src/next.ts`
+  - Next.js route adapter for same-process integration (`/api/hemingway/*`).
 - `bin/hemingway.mjs`
   - CLI entrypoint (`init`, `--help`, and server start).
 
 ## Runtime Lifecycle
+
+Standalone mode:
 
 1. User runs `npx hemingway-ai`.
 2. CLI loads `dist/server/index.js` and calls `startServer()`.
@@ -27,6 +31,12 @@ Primary design choice: keep integration friction near zero by using a script-inj
 6. Overlay sends context-rich generation requests to server, including a compact page-story brief.
 7. User applies an option (or custom text); overlay updates DOM and calls `/write`.
 8. Server finds best source match and rewrites file contents.
+
+Same-process mode (Next.js):
+
+1. App mounts `createNextRouteHandlers()` under `/api/hemingway/*`.
+2. User injects `<Hemingway endpoint="/api/hemingway" />`.
+3. Overlay uses same-origin API routes (no second process).
 
 ## Request/Response Topology
 
@@ -69,7 +79,9 @@ Primary design choice: keep integration friction near zero by using a script-inj
   - `dist/server/index.js` (Node ESM)
   - `dist/client/overlay.iife.js` + ESM output
   - `dist/react.js`
+  - `dist/next.js`
 - `package.json` exports:
   - `hemingway-ai` (server module exports)
   - `hemingway-ai/react` (React injector component)
   - `hemingway-ai/client` (client overlay module)
+  - `hemingway-ai/next` (Next.js route handlers)

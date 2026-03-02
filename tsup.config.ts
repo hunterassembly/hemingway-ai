@@ -38,4 +38,13 @@ export default defineConfig([
     external: ["react"],
     platform: "browser",
   },
+  // Next.js adapter (route handlers for same-process mode)
+  {
+    entry: ["src/next.ts"],
+    outDir: "dist",
+    format: ["esm"],
+    dts: true,
+    platform: "node",
+    target: "node20",
+  },
 ]);

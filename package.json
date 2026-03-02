@@ -38,6 +38,10 @@
     "./client": {
       "import": "./dist/client/overlay.js",
       "types": "./dist/client/overlay.d.ts"
+    },
+    "./next": {
+      "import": "./dist/next.js",
+      "types": "./dist/next.d.ts"
     }
   },
   "files": [
