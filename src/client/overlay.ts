@@ -82,6 +82,7 @@ export class HemingwayOverlay {
   // Bound handlers stored for removal
   private _handleShortcut: (e: KeyboardEvent) => void;
   private _blockNavigation: (e: Event) => void;
+  private _handleOutsideClick: (e: MouseEvent) => void;
 
   constructor(config?: Partial<HemingwayConfig>) {
     this.config = { ...DEFAULTS, ...config };
@@ -153,6 +154,9 @@ export class HemingwayOverlay {
 
     // Navigation blocker
     this._blockNavigation = this.blockNavigation.bind(this);
+
+    // Dismiss popup on outside click
+    this._handleOutsideClick = this.handleOutsideClick.bind(this);
   }
 
   // --- Public API ---
@@ -166,6 +170,9 @@ export class HemingwayOverlay {
 
     // Block navigation clicks while active
     document.addEventListener("click", this._blockNavigation, true);
+
+    // Dismiss popup on outside click
+    document.addEventListener("mousedown", this._handleOutsideClick, true);
 
     // Watch for DOM changes and re-discover
     this.discovery.observe(() => this.runDiscovery());
@@ -186,6 +193,7 @@ export class HemingwayOverlay {
     this.discovery = new ElementDiscovery();
 
     document.removeEventListener("click", this._blockNavigation, true);
+    document.removeEventListener("mousedown", this._handleOutsideClick, true);
   }
 
   toggle(): void {
@@ -891,6 +899,33 @@ export class HemingwayOverlay {
 
   private handleDismiss(): void {
     this.clearSelection();
+  }
+
+  private handleOutsideClick(e: MouseEvent): void {
+    const target = e.target as HTMLElement;
+
+    // Ignore clicks inside Hemingway UI (popup, indicator, badges)
+    if (target.closest("[data-hemingway-ui]")) return;
+
+    // Ignore clicks on tracked/selected elements (those have their own handlers)
+    if (this.discovery.getTrackedElements().has(target)) return;
+    if (this.isInsideTrackedElement(target)) return;
+
+    // Something outside was clicked — dismiss popup and clear selection
+    if (this.selection.length > 0) {
+      this.popup.hide();
+      this.clearSelection();
+    }
+  }
+
+  private isInsideTrackedElement(target: HTMLElement): boolean {
+    const tracked = this.discovery.getTrackedElements();
+    let el: HTMLElement | null = target;
+    while (el) {
+      if (tracked.has(el)) return true;
+      el = el.parentElement;
+    }
+    return false;
   }
 
   // --- Settings ---
