@@ -38,6 +38,5 @@ Hemingway is a dev-time copy editing tool for marketing sites:
 
 - Source-writeback still relies on text/context heuristics (not AST transforms), even with adapter scoring.
 - Multi-framework expansion is scaffolded through `writeAdapter` (`react` and `generic`), but non-React stacks still need dedicated adapters for best reliability.
-- `referenceGuide` default points to `./packages/hemingway/reference/...`, but this repo currently uses `./reference/...`.
 
 If you change defaults, update `src/server/config.ts`, `README.md`, and `bin/hemingway.mjs` template together.

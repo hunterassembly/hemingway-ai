@@ -7,7 +7,7 @@
   "author": "Hunter Assembly",
   "repository": {
     "type": "git",
-    "url": "https://github.com/hunterassembly/hemingway-ai.git"
+    "url": "git+https://github.com/hunterassembly/hemingway-ai.git"
   },
   "homepage": "https://github.com/hunterassembly/hemingway-ai",
   "bugs": {
@@ -24,7 +24,7 @@
     "overlay"
   ],
   "bin": {
-    "hemingway-ai": "./bin/hemingway.mjs"
+    "hemingway-ai": "bin/hemingway.mjs"
   },
   "exports": {
     ".": {

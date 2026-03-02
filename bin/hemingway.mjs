@@ -59,6 +59,7 @@ const config = {
   model: 'claude-sonnet-4-6',
   styleGuide: './docs/style-guide.md',
   copyBible: './docs/copy-bible.md',
+  referenceGuide: './reference/saas-and-services-copy-guide.md',
   sourcePatterns: [
     'components/**/*.tsx',
     'components/**/*.jsx',

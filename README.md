@@ -60,6 +60,7 @@ const config = {
   model: 'claude-sonnet-4-6',
   styleGuide: './docs/style-guide.md',
   copyBible: './docs/copy-bible.md',
+  referenceGuide: './reference/saas-and-services-copy-guide.md',
   sourcePatterns: [
     'components/**/*.tsx',
     'components/**/*.jsx',
@@ -95,6 +96,7 @@ export default config;
 - [Configuration Reference](./docs/configuration.md)
 - [API Reference](./docs/api-reference.md)
 - [Troubleshooting](./docs/troubleshooting.md)
+- [Changelog](./CHANGELOG.md)
 
 ## Agent Reference Docs
 

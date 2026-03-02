@@ -22,7 +22,7 @@ const DEFAULTS: HemingwayConfig = {
   model: "claude-sonnet-4-6",
   styleGuide: "./docs/style-guide.md",
   copyBible: "./docs/copy-bible.md",
-  referenceGuide: "./packages/hemingway/reference/saas-and-services-copy-guide.md",
+  referenceGuide: "./reference/saas-and-services-copy-guide.md",
   sourcePatterns: [
     "components/**/*.tsx",
     "components/**/*.jsx",
