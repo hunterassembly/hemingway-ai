@@ -1,5 +1,6 @@
 node_modules/
 dist/
 .hemingway/
+.playwright-mcp/
 *.tsbuildinfo
 .env
