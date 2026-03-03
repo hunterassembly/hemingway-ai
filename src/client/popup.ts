@@ -2,7 +2,7 @@
 // Renders the Hemingway popup inside a Shadow DOM root for complete style
 // isolation. Vanilla DOM — no React.
 
-export type PopupPhase = "input" | "loading" | "alternatives" | "done";
+export type PopupPhase = "input" | "loading" | "alternatives" | "notepad" | "done";
 
 export interface Alternative {
   label: string;
@@ -21,6 +21,7 @@ export interface DoneResult {
   canUndo?: boolean;
   reverted?: boolean;
   multiCount?: number;
+  undoRemaining?: number;
 }
 
 // --- Inline SVG icons ---
@@ -445,6 +446,202 @@ const STYLES = /* css */ `
   .hw-done-text { font-size: 12px; color: #a3a3a3; font-weight: 500; }
   .hw-done-subtitle { font-size: 11px; color: #a3a3a3; text-align: center; max-width: 260px; }
   .hw-undo-btn { margin-top: 4px; width: auto; padding: 6px 16px; }
+
+  /* --- Notepad phase --- */
+  .hw-popup.hw-popup-notepad {
+    position: fixed;
+    top: 16px !important;
+    right: 16px;
+    left: auto !important;
+    width: min(480px, calc(100vw - 24px));
+    max-height: calc(100vh - 32px);
+  }
+  .hw-notepad-phase {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding: 10px;
+  }
+  .hw-notepad-title {
+    font-size: 14px;
+    font-weight: 600;
+    color: #262626;
+    letter-spacing: -0.09px;
+    line-height: 16px;
+  }
+  .hw-notepad-subtitle {
+    font-size: 11px;
+    color: #737373;
+    line-height: 14px;
+  }
+  .hw-notepad-topbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+  }
+  .hw-notepad-view-toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: 2px;
+    background: rgba(0,0,0,0.05);
+    border-radius: 8px;
+    padding: 2px;
+  }
+  .hw-notepad-view-btn {
+    border: none;
+    border-radius: 6px;
+    font-family: inherit;
+    font-size: 11px;
+    font-weight: 600;
+    padding: 5px 8px;
+    color: #737373;
+    background: transparent;
+    cursor: pointer;
+  }
+  .hw-notepad-view-btn.active {
+    color: #262626;
+    background: rgba(255,255,255,0.9);
+    box-shadow: 0 0 0 1px rgba(0,0,0,0.04);
+  }
+  .hw-notepad-body {
+    min-height: min(58vh, 520px);
+    max-height: min(58vh, 520px);
+    overflow-y: auto;
+    overflow-x: hidden;
+  }
+  .hw-notepad-textarea-wrap {
+    background: rgba(255,255,255,0.8);
+    backdrop-filter: blur(60px);
+    -webkit-backdrop-filter: blur(60px);
+    border-radius: 12px;
+    box-shadow: 0 0 0 1px rgba(0,0,0,0.05), 0 1px 1px rgba(0,0,0,0.05);
+    padding: 6px;
+  }
+  .hw-notepad-textarea {
+    width: 100%;
+    min-height: min(58vh, 520px);
+    padding: 8px;
+    background: transparent;
+    border: none;
+    color: #262626;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+    font-size: 12px;
+    line-height: 1.55;
+    resize: none;
+    outline: none;
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+    overflow-x: hidden;
+    overflow-y: auto;
+  }
+  .hw-notepad-preview {
+    background: rgba(255,255,255,0.8);
+    backdrop-filter: blur(60px);
+    -webkit-backdrop-filter: blur(60px);
+    border-radius: 12px;
+    box-shadow: 0 0 0 1px rgba(0,0,0,0.05), 0 1px 1px rgba(0,0,0,0.05);
+    padding: 10px 12px;
+    color: #262626;
+    font-size: 12px;
+    line-height: 1.6;
+    overflow-wrap: anywhere;
+  }
+  .hw-md-h1 {
+    font-size: 17px;
+    line-height: 1.3;
+    font-weight: 700;
+    margin: 4px 0 10px;
+  }
+  .hw-md-h2 {
+    font-size: 14px;
+    line-height: 1.35;
+    font-weight: 700;
+    margin: 14px 0 8px;
+  }
+  .hw-md-h3 {
+    font-size: 13px;
+    line-height: 1.35;
+    font-weight: 700;
+    margin: 12px 0 8px;
+  }
+  .hw-md-p {
+    margin: 0 0 8px;
+    color: #262626;
+  }
+  .hw-md-ul {
+    margin: 0 0 8px 18px;
+    padding: 0;
+  }
+  .hw-md-li {
+    margin: 0 0 6px;
+  }
+  .hw-md-code {
+    background: rgba(0,0,0,0.05);
+    border-radius: 6px;
+    padding: 1px 5px;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+    font-size: 11px;
+  }
+  .hw-md-pre {
+    margin: 0 0 10px;
+    background: rgba(0,0,0,0.05);
+    border-radius: 10px;
+    padding: 8px 10px;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+    font-size: 11px;
+    line-height: 1.5;
+    white-space: pre-wrap;
+  }
+  .hw-md-marker {
+    margin: 0 0 6px;
+    padding: 6px 8px;
+    border-radius: 8px;
+    background: rgba(37,99,235,0.08);
+    color: #1d4ed8;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+    font-size: 10px;
+    line-height: 1.4;
+  }
+  .hw-md-empty {
+    color: #737373;
+    font-size: 12px;
+  }
+  .hw-notepad-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+  }
+  .hw-notepad-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .hw-notepad-btn {
+    border: none;
+    border-radius: 8px;
+    font-family: inherit;
+    font-size: 12px;
+    font-weight: 500;
+    padding: 8px 12px;
+    cursor: pointer;
+    transition: background 0.15s;
+  }
+  .hw-notepad-btn-copy {
+    background: rgba(0,0,0,0.05);
+    color: #262626;
+  }
+  .hw-notepad-btn-copy:hover {
+    background: rgba(0,0,0,0.08);
+  }
+  .hw-notepad-btn-apply {
+    background: #2563EB;
+    color: #fff;
+  }
+  .hw-notepad-btn-apply:hover {
+    background: #1d4ed8;
+  }
 `;
 
 // --- Gear icon (separate for readability) ---
@@ -470,6 +667,8 @@ export class HemingwayPopup {
   private customText: string = "";
   private doneResult: DoneResult = {};
   private currentModel: string = "";
+  private notepadMarkdown: string = "";
+  private notepadView: "preview" | "edit" = "preview";
 
   // Callbacks set by the overlay controller
   onGenerate: ((comment: string) => void) | null = null;
@@ -478,6 +677,8 @@ export class HemingwayPopup {
   onCustomText: ((text: string) => void) | null = null;
   onRegenerate: ((feedback: string) => void) | null = null;
   onUndo: (() => void) | null = null;
+  onNotepadApply: ((markdown: string) => void) | null = null;
+  onNotepadCopy: ((markdown: string) => void) | null = null;
   onDismiss: (() => void) | null = null;
 
   constructor(host: HTMLElement) {
@@ -540,8 +741,30 @@ export class HemingwayPopup {
     this.render();
   }
 
+  showNotepad(position: { top: number; left: number }, markdown: string): void {
+    this.multiMode = false;
+    this.currentText = "";
+    this.comment = "";
+    this.customText = "";
+    this.alternatives = [];
+    this.multiItems = [];
+    this.multiAlternatives = [];
+    this.notepadMarkdown = markdown;
+    this.notepadView = "preview";
+    this.phase = "notepad";
+
+    this.container.style.top = `${position.top}px`;
+    this.container.style.left = `${position.left}px`;
+    this.container.classList.add("visible");
+    this.render();
+  }
+
   hide(): void {
     this.container.classList.remove("visible");
+  }
+
+  isVisible(): boolean {
+    return this.container.classList.contains("visible");
   }
 
   setPhase(phase: PopupPhase): void {
@@ -590,6 +813,7 @@ export class HemingwayPopup {
 
   private render(): void {
     this.container.innerHTML = "";
+    this.container.classList.remove("hw-popup-notepad");
 
     // Header (logo + model)
     this.container.appendChild(this.renderHeader());
@@ -623,6 +847,10 @@ export class HemingwayPopup {
         } else {
           this.container.appendChild(this.renderAlternativesPhase());
         }
+        return;
+      case "notepad":
+        this.container.classList.add("hw-popup-notepad");
+        this.container.appendChild(this.renderNotepadPhase());
         return;
       case "done":
         this.container.appendChild(this.renderDonePhase());
@@ -1084,6 +1312,9 @@ export class HemingwayPopup {
     if (this.doneResult.reverted) {
       icon.innerHTML = `<svg viewBox="0 0 18 18" fill="none"><path d="M4 8L2 6L4 4" stroke="#a3a3a3" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M2 6H11C13.76 6 16 8.24 16 11C16 13.76 13.76 16 11 16H6" stroke="#a3a3a3" stroke-width="1.5" stroke-linecap="round"/></svg>`;
       text.textContent = "Reverted";
+      if (this.doneResult.undoRemaining && this.doneResult.undoRemaining > 0) {
+        subtitle.textContent = `${this.doneResult.undoRemaining} more undo step${this.doneResult.undoRemaining === 1 ? "" : "s"} available`;
+      }
     } else if (this.doneResult.clipboard) {
       icon.innerHTML = `<svg viewBox="0 0 18 18" fill="none"><rect x="6" y="2" width="9" height="11" rx="1.5" stroke="#2563EB" stroke-width="1.5"/><path d="M3 6.5V14.5C3 15.33 3.67 16 4.5 16H10.5" stroke="#2563EB" stroke-width="1.5" stroke-linecap="round"/></svg>`;
       text.textContent = "Copied to clipboard";
@@ -1106,13 +1337,118 @@ export class HemingwayPopup {
     phase.appendChild(text);
     if (subtitle.textContent) phase.appendChild(subtitle);
 
-    if (this.doneResult.canUndo && !this.doneResult.reverted) {
+    const canUndoAgain =
+      this.doneResult.canUndo &&
+      (!this.doneResult.reverted || (this.doneResult.undoRemaining ?? 0) > 0);
+    if (canUndoAgain) {
       const undoBtn = document.createElement("button");
       undoBtn.className = "hw-ghost-btn hw-undo-btn";
       undoBtn.textContent = "Undo";
       undoBtn.addEventListener("click", () => this.onUndo?.());
       phase.appendChild(undoBtn);
     }
+
+    return phase;
+  }
+
+  private renderNotepadPhase(): HTMLElement {
+    const phase = document.createElement("div");
+    phase.className = "hw-notepad-phase";
+
+    const top = document.createElement("div");
+    top.className = "hw-notepad-topbar";
+
+    const titleWrap = document.createElement("div");
+
+    const title = document.createElement("div");
+    title.className = "hw-notepad-title";
+    title.textContent = "Notepad";
+    titleWrap.appendChild(title);
+
+    const subtitle = document.createElement("div");
+    subtitle.className = "hw-notepad-subtitle";
+    subtitle.textContent = "Preview rich markdown or edit raw markdown. Keep hw:id markers.";
+    titleWrap.appendChild(subtitle);
+    top.appendChild(titleWrap);
+
+    const toggle = document.createElement("div");
+    toggle.className = "hw-notepad-view-toggle";
+
+    const previewBtn = document.createElement("button");
+    previewBtn.className = `hw-notepad-view-btn${this.notepadView === "preview" ? " active" : ""}`;
+    previewBtn.textContent = "Preview";
+    previewBtn.addEventListener("click", () => {
+      this.notepadView = "preview";
+      this.render();
+    });
+    toggle.appendChild(previewBtn);
+
+    const editBtn = document.createElement("button");
+    editBtn.className = `hw-notepad-view-btn${this.notepadView === "edit" ? " active" : ""}`;
+    editBtn.textContent = "Edit";
+    editBtn.addEventListener("click", () => {
+      this.notepadView = "edit";
+      this.render();
+    });
+    toggle.appendChild(editBtn);
+
+    top.appendChild(toggle);
+    phase.appendChild(top);
+
+    const body = document.createElement("div");
+    body.className = "hw-notepad-body";
+
+    if (this.notepadView === "edit") {
+      const wrap = document.createElement("div");
+      wrap.className = "hw-notepad-textarea-wrap";
+
+      const textarea = document.createElement("textarea");
+      textarea.className = "hw-notepad-textarea";
+      textarea.value = this.notepadMarkdown;
+      textarea.spellcheck = false;
+      textarea.addEventListener("input", () => {
+        this.notepadMarkdown = textarea.value;
+      });
+      wrap.appendChild(textarea);
+      body.appendChild(wrap);
+    } else {
+      const preview = document.createElement("div");
+      preview.className = "hw-notepad-preview";
+      preview.innerHTML = renderMarkdownHtml(this.notepadMarkdown);
+      body.appendChild(preview);
+    }
+
+    phase.appendChild(body);
+
+    const footer = document.createElement("div");
+    footer.className = "hw-notepad-footer";
+
+    const closeBtn = document.createElement("button");
+    closeBtn.className = "hw-notepad-btn hw-notepad-btn-copy";
+    closeBtn.textContent = "Close";
+    closeBtn.addEventListener("click", () => {
+      this.hide();
+      this.onDismiss?.();
+    });
+    footer.appendChild(closeBtn);
+
+    const actions = document.createElement("div");
+    actions.className = "hw-notepad-actions";
+
+    const copyBtn = document.createElement("button");
+    copyBtn.className = "hw-notepad-btn hw-notepad-btn-copy";
+    copyBtn.textContent = "Copy Markdown";
+    copyBtn.addEventListener("click", () => this.onNotepadCopy?.(this.notepadMarkdown));
+    actions.appendChild(copyBtn);
+
+    const applyBtn = document.createElement("button");
+    applyBtn.className = "hw-notepad-btn hw-notepad-btn-apply";
+    applyBtn.textContent = "Apply";
+    applyBtn.addEventListener("click", () => this.onNotepadApply?.(this.notepadMarkdown));
+    actions.appendChild(applyBtn);
+
+    footer.appendChild(actions);
+    phase.appendChild(footer);
 
     return phase;
   }
@@ -1147,4 +1483,103 @@ function formatModelName(model: string): string {
   if (m.includes("opus")) return "Opus 4";
   // Truncate long model IDs
   return model.length > 16 ? model.substring(0, 13) + "\u2026" : model;
+}
+
+function renderMarkdownHtml(markdown: string): string {
+  const lines = markdown.replace(/\r\n/g, "\n").split("\n");
+  const html: string[] = [];
+
+  let inCodeFence = false;
+  let codeBuffer: string[] = [];
+  let inList = false;
+
+  const closeList = () => {
+    if (inList) {
+      html.push(`</ul>`);
+      inList = false;
+    }
+  };
+
+  for (const rawLine of lines) {
+    const line = rawLine ?? "";
+
+    if (line.trim().startsWith("```")) {
+      closeList();
+      if (!inCodeFence) {
+        inCodeFence = true;
+        codeBuffer = [];
+      } else {
+        html.push(`<pre class="hw-md-pre">${escapeHtml(codeBuffer.join("\n"))}</pre>`);
+        inCodeFence = false;
+        codeBuffer = [];
+      }
+      continue;
+    }
+
+    if (inCodeFence) {
+      codeBuffer.push(line);
+      continue;
+    }
+
+    if (!line.trim()) {
+      closeList();
+      continue;
+    }
+
+    if (/^\s*<!--\s*hw:id:\d+\b.*-->$/.test(line)) {
+      closeList();
+      html.push(`<div class="hw-md-marker">${escapeHtml(line.trim())}</div>`);
+      continue;
+    }
+
+    const hMatch = line.match(/^(#{1,3})\s+(.+)$/);
+    if (hMatch) {
+      closeList();
+      const level = hMatch[1].length;
+      const text = renderInlineMarkdown(hMatch[2]);
+      html.push(`<h${level} class="hw-md-h${level}">${text}</h${level}>`);
+      continue;
+    }
+
+    const listMatch = line.match(/^\s*[-*+]\s+(.+)$/);
+    if (listMatch) {
+      if (!inList) {
+        html.push(`<ul class="hw-md-ul">`);
+        inList = true;
+      }
+      html.push(`<li class="hw-md-li">${renderInlineMarkdown(listMatch[1])}</li>`);
+      continue;
+    }
+
+    closeList();
+    html.push(`<p class="hw-md-p">${renderInlineMarkdown(line)}</p>`);
+  }
+
+  if (inCodeFence) {
+    html.push(`<pre class="hw-md-pre">${escapeHtml(codeBuffer.join("\n"))}</pre>`);
+  }
+  closeList();
+
+  if (html.length === 0) {
+    return `<div class="hw-md-empty">No markdown to preview.</div>`;
+  }
+
+  return html.join("");
+}
+
+function renderInlineMarkdown(input: string): string {
+  const text = escapeHtml(input);
+  return text
+    .replace(/`([^`]+)`/g, `<code class="hw-md-code">$1</code>`)
+    .replace(/\*\*([^*]+)\*\*/g, `<strong>$1</strong>`)
+    .replace(/\*([^*]+)\*/g, `<em>$1</em>`);
+}
+
+function escapeHtml(input: string): string {
+  return input
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll("\"", "&quot;")
+    .replaceAll("'", "&#39;");
 }

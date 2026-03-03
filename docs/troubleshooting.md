@@ -92,11 +92,17 @@ Cause:
 
 Fix:
 
-1. Expand `sourcePatterns` to include your real source folders.
+1. Use brace globs for concise coverage, for example:
+```js
+sourcePatterns: ["app/**/*.{tsx,jsx,ts,js,mdx,md,html,htm}", "content/**/*.{md,mdx}"];
+```
 2. Check `excludePatterns` are not over-filtering.
 3. Use `writeAdapter: "react"` for JSX/TSX projects.
 4. Use `writeAdapter: "generic"` for non-React templates.
 5. Try on unique text first; repeated phrases are harder to map.
+6. Hemingway now performs a fallback scan across common app/content folders when primary patterns miss. If you still see misses, your copy may be rendered from fragmented expressions rather than a contiguous source string.
+7. In Next one-process mode, ensure `hemingway.config.mjs` is a plain `export default { ... }` object so custom `sourcePatterns` load reliably.
+8. For mixed/composite UI rows (for example title + subtitle rendered in one clickable card), edit the individual leaf text nodes instead of the parent wrapper.
 
 ## Wrong File Edited
 

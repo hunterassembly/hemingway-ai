@@ -43,7 +43,12 @@ export default function App() {
 ```js
 /** @type {import("hemingway-ai").HemingwayConfig} */
 export default {
-  sourcePatterns: ["app/**/*.{tsx,jsx,ts,js}", "components/**/*.{tsx,jsx,ts,js}"],
+  sourcePatterns: [
+    "app/**/*.{tsx,jsx,ts,js,mdx,md,html,htm}",
+    "components/**/*.{tsx,jsx,ts,js,mdx,md,html,htm}",
+    "content/**/*.{tsx,jsx,ts,js,mdx,md,html,htm}",
+    "site/**/*.{tsx,jsx,ts,js,mdx,md,html,htm}",
+  ],
   excludePatterns: ["node_modules", "build", "public/build", "dist"],
   writeAdapter: "react",
 };

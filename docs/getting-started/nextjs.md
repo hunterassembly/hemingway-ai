@@ -35,6 +35,11 @@ export const POST = handlers.POST;
 export const OPTIONS = handlers.OPTIONS;
 ```
 
+Config note:
+
+- Keep `hemingway.config.mjs` as a plain `export default { ... }` object for best compatibility in bundled Next route execution.
+- If you need dynamic/imported config values, mirror them in `package.json` under `hemingway`.
+
 Mount Hemingway in your app layout and point it at the same-origin endpoint:
 
 ```tsx
@@ -75,7 +80,13 @@ import { Hemingway } from "hemingway-ai/react";
 ```js
 /** @type {import("hemingway-ai").HemingwayConfig} */
 export default {
-  sourcePatterns: ["app/**/*.{tsx,jsx,ts,js}", "pages/**/*.{tsx,jsx,ts,js}", "components/**/*.{tsx,jsx,ts,js}"],
+  sourcePatterns: [
+    "app/**/*.{tsx,jsx,ts,js,mdx,md,html,htm}",
+    "pages/**/*.{tsx,jsx,ts,js,mdx,md,html,htm}",
+    "components/**/*.{tsx,jsx,ts,js,mdx,md,html,htm}",
+    "content/**/*.{tsx,jsx,ts,js,mdx,md,html,htm}",
+    "site/**/*.{tsx,jsx,ts,js,mdx,md,html,htm}",
+  ],
   excludePatterns: ["node_modules", ".next", "dist", "build"],
   writeAdapter: "react",
 };

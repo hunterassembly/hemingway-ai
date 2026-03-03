@@ -70,10 +70,11 @@ Typical local setup:
 2. Run target app dev server.
 3. Inject script or React component.
 4. Use shortcut to activate.
+5. Use notepad shortcut for page-wide markdown editing.
 
 Recommended config for cross-React projects:
 
-- Broader `sourcePatterns` covering `components/`, `src/`, `app/`, `pages/`, and `packages/`
+- Broader `sourcePatterns` covering `components/`, `src/`, `app/`, `pages/`, `content/`, `site/`, and `packages/`
 - `writeAdapter: "react"` for JSX/TSX-focused scoring and filtering
 - Optional `writeAdapter: "generic"` for non-React fallback behavior
 
@@ -95,9 +96,9 @@ Recommended config for cross-React projects:
 - Generate route errors with API messages
   - Missing/invalid `ANTHROPIC_API_KEY` or model/API issue.
 - Write route returns "Text not found"
-  - Source patterns too narrow, text changed post-selection, or ambiguous source content.
+  - Source patterns too narrow, text changed post-selection, ambiguous source content, or non-contiguous source strings.
 - Shortcut not matching user expectation
-  - Check configured shortcut and platform modifier semantics in `overlay.ts`.
+  - Check configured shortcuts (`shortcut`, `notepadShortcut`) and platform modifier semantics in `overlay.ts`.
 
 ## Consistency Checklist For Maintainers
 

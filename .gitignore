@@ -4,3 +4,4 @@ dist/
 .playwright-mcp/
 *.tsbuildinfo
 .env
+.hemingway.local.json

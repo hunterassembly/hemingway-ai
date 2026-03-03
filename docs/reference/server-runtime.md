@@ -28,9 +28,11 @@ Primary files:
 - `GET /demo`
   - Returns a built-in test marketing page.
 - `GET /config`
-  - Returns safe client settings (`model`, `styleGuide`, `copyBible`, `shortcut`).
+  - Returns safe client settings (`model`, `styleGuide`, `copyBible`, `shortcut`, `notepadShortcut`, `hasApiKey`, `connectionMode`, `projectRoot`).
 - `POST /config`
-  - Runtime mutable keys: `model`, `styleGuide`, `copyBible`.
+  - Runtime mutable keys: `model`, `styleGuide`, `copyBible`, `apiKey` (`apiKey` persists to local `.hemingway.local.json`).
+- `POST /styleguide/generate`
+  - Scaffolds a starter style guide file at configured `styleGuide` path if one does not already exist.
 - `GET /preferences`
   - Returns stored pick distribution.
 - `POST /preferences`
@@ -42,9 +44,15 @@ Primary files:
 
 1. Explicit overrides (`startServer(overrides)`)
 2. Env vars (`ANTHROPIC_API_KEY`, `HEMINGWAY_PORT`)
-3. `hemingway.config.mjs`
-4. `package.json` `hemingway` key
-5. Internal defaults
+3. Local saved settings (`.hemingway.local.json`)
+4. `hemingway.config.mjs`
+5. `package.json` `hemingway` key
+6. Internal defaults
+
+Notes:
+
+- Runtime first tries dynamic import of `hemingway.config.mjs`.
+- In bundled same-app environments where that import can fail, runtime falls back to evaluating simple `export default { ... }` modules (without imports).
 
 Defaults include source scan patterns and exclusion folders for writeback.
 The writeback path also supports `writeAdapter` (`react` default, `generic` fallback).
@@ -92,6 +100,7 @@ For both single and multi generation:
 Goal: map UI-selected text back to source code using heuristic matching.
 
 1. Expand source files from configured glob-like patterns.
+  - Supports brace expansion (`**/*.{tsx,jsx,mdx}`).
 2. Recursively scan files, excluding known directories.
 3. Resolve configured write adapter (`react` or `generic`) and skip files the adapter does not support.
 4. For each candidate file:
@@ -102,13 +111,16 @@ Goal: map UI-selected text back to source code using heuristic matching.
     - Class names add score
     - Parent tag adds score
 5. Pick top-scoring match and normalize replacement text (entity/curlies preservation) via adapter.
-6. Rewrite file as plain text splice and report location.
+6. If no primary match is found, run a one-time fallback scan across common app/content directories.
+7. Require a clear top score when fallback scan is used (to avoid ambiguous broad-scan edits).
+8. Rewrite file as plain text splice and report location.
 
 Important constraints:
 
 - Not AST-aware; can select wrong target if many similar strings exist.
+- Containers whose visible copy is assembled from multiple child literals are intentionally skipped by discovery to avoid non-deterministic writeback.
 - Multi-write happens as sequential calls from client.
-- If no match found, returns explicit "Text not found" error.
+- If no match found, returns explicit "Text not found" error with scanned file count.
 
 ## Error Handling
 

@@ -34,7 +34,8 @@ if (values.help) {
     2. Set \x1b[36mANTHROPIC_API_KEY\x1b[0m in your environment
     3. Run \x1b[36mnpx hemingway-ai\x1b[0m in one terminal
     4. Run your dev server in another terminal
-    5. Press \x1b[36mCmd/Ctrl+Shift+H\x1b[0m on your site to activate
+    5. Press \x1b[36mCmd/Ctrl+Shift+H\x1b[0m for overlay mode
+       Press \x1b[36mAlt+Shift+H\x1b[0m for notepad mode
 `);
   process.exit(0);
 }
@@ -61,30 +62,18 @@ const config = {
   copyBible: './docs/copy-bible.md',
   referenceGuide: './reference/saas-and-services-copy-guide.md',
   sourcePatterns: [
-    'components/**/*.tsx',
-    'components/**/*.jsx',
-    'components/**/*.ts',
-    'components/**/*.js',
-    'src/**/*.tsx',
-    'src/**/*.jsx',
-    'src/**/*.ts',
-    'src/**/*.js',
-    'app/**/*.tsx',
-    'app/**/*.jsx',
-    'app/**/*.ts',
-    'app/**/*.js',
-    'pages/**/*.tsx',
-    'pages/**/*.jsx',
-    'pages/**/*.ts',
-    'pages/**/*.js',
-    'packages/**/*.tsx',
-    'packages/**/*.jsx',
-    'packages/**/*.ts',
-    'packages/**/*.js',
+    'components/**/*.{tsx,jsx,ts,js,mdx,md,html,htm}',
+    'src/**/*.{tsx,jsx,ts,js,mdx,md,html,htm}',
+    'app/**/*.{tsx,jsx,ts,js,mdx,md,html,htm}',
+    'pages/**/*.{tsx,jsx,ts,js,mdx,md,html,htm}',
+    'content/**/*.{tsx,jsx,ts,js,mdx,md,html,htm}',
+    'site/**/*.{tsx,jsx,ts,js,mdx,md,html,htm}',
+    'packages/**/*.{tsx,jsx,ts,js,mdx,md,html,htm}',
   ],
   excludePatterns: ['node_modules', '.next', 'dist', 'build'],
   writeAdapter: 'react',
   shortcut: 'ctrl+shift+h',
+  notepadShortcut: 'alt+shift+h',
   accentColor: '#3b82f6',
 };
 

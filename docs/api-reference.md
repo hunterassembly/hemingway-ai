@@ -116,7 +116,9 @@ Attempt source writeback for changed copy.
   "success": true,
   "file": "src/components/Hero.tsx",
   "line": 14,
-  "matchCount": 2
+  "matchCount": 2,
+  "scannedFileCount": 127,
+  "usedFallbackScan": false
 }
 ```
 
@@ -125,7 +127,8 @@ Attempt source writeback for changed copy.
 ```json
 {
   "success": false,
-  "error": "Text not found in source files: \"...\""
+  "scannedFileCount": 214,
+  "error": "Text not found in source files after scanning 214 files: \"...\""
 }
 ```
 
@@ -147,11 +150,32 @@ Health check:
 
 ## `GET /config`
 
-Returns safe client-facing config subset.
+Returns safe client-facing config subset (`model`, `styleGuide`, `copyBible`, `shortcut`, `notepadShortcut`, `hasApiKey`, `connectionMode`, `projectRoot`).
 
 ## `POST /config`
 
-Updates runtime config keys allowed by server (`model`, `styleGuide`, `copyBible`).
+Updates runtime config keys allowed by server (`model`, `styleGuide`, `copyBible`, `apiKey`).
+
+`apiKey` is persisted locally to `.hemingway.local.json` and is never returned by `GET /config`.
+
+## `POST /styleguide/generate`
+
+Scaffolds a starter style guide markdown file at the configured `styleGuide` path.
+
+Behavior:
+
+- Creates parent directories if needed.
+- Does not overwrite existing files.
+
+Response:
+
+```json
+{
+  "success": true,
+  "file": "/abs/path/to/docs/style-guide.md",
+  "created": true
+}
+```
 
 ## `GET /preferences`
 

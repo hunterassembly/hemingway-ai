@@ -1,8 +1,8 @@
 import { createServer, type IncomingMessage, type ServerResponse } from "node:http";
 import { readFile } from "node:fs/promises";
-import { join, dirname } from "node:path";
+import { join, dirname, basename } from "node:path";
 import { fileURLToPath } from "node:url";
-import { loadConfig, type HemingwayConfig } from "./config.js";
+import { loadConfig, persistLocalConfig, type HemingwayConfig } from "./config.js";
 import {
   generateAlternatives,
   generateMultiAlternatives,
@@ -12,6 +12,7 @@ import {
 import { writeText } from "./write.js";
 import { loadPreferences, recordPick, getTopPreferences } from "./preferences.js";
 import { getDemoHtml } from "./demo.js";
+import { generateStyleGuideFile } from "./styleguide.js";
 
 // ---------------------------------------------------------------------------
 // Re-exports for consumer convenience
@@ -266,6 +267,15 @@ async function handlePostPreferences(
   sendJson(res, 200, prefs);
 }
 
+async function handleGenerateStyleGuide(
+  _req: IncomingMessage,
+  res: ServerResponse,
+  config: HemingwayConfig
+): Promise<void> {
+  const result = await generateStyleGuideFile(config.styleGuide);
+  sendJson(res, result.success ? 200 : 500, result);
+}
+
 /** Fields safe to expose to the client (no apiKey, port, etc). */
 function getClientConfig(config: HemingwayConfig) {
   return {
@@ -273,6 +283,10 @@ function getClientConfig(config: HemingwayConfig) {
     styleGuide: config.styleGuide,
     copyBible: config.copyBible,
     shortcut: config.shortcut,
+    notepadShortcut: config.notepadShortcut,
+    hasApiKey: Boolean(config.apiKey),
+    connectionMode: "standalone" as const,
+    projectRoot: basename(process.cwd()),
   };
 }
 
@@ -285,7 +299,7 @@ function handleGetConfig(
 }
 
 /** Keys the client is allowed to update at runtime. */
-const UPDATABLE_KEYS = new Set<string>(["model", "styleGuide", "copyBible"]);
+const UPDATABLE_KEYS = new Set<string>(["model", "styleGuide", "copyBible", "apiKey"]);
 
 async function handlePostConfig(
   req: IncomingMessage,
@@ -301,16 +315,25 @@ async function handlePostConfig(
   }
 
   const changedKeys: string[] = [];
+  let shouldPersistLocalConfig = false;
   const mutable = config as unknown as Record<string, unknown>;
 
   for (const key of Object.keys(data)) {
     if (!UPDATABLE_KEYS.has(key)) continue;
     const value = data[key];
     if (typeof value !== "string") continue;
-    if (mutable[key] !== value) {
-      mutable[key] = value;
+    const normalized = key === "apiKey" ? value.trim() : value;
+    if (mutable[key] !== normalized) {
+      mutable[key] = normalized;
       changedKeys.push(key);
+      if (key === "apiKey") {
+        shouldPersistLocalConfig = true;
+      }
     }
+  }
+
+  if (shouldPersistLocalConfig) {
+    await persistLocalConfig({ apiKey: String(config.apiKey ?? "") });
   }
 
   if (changedKeys.length > 0) {
@@ -371,6 +394,8 @@ export async function startServer(
         await handleGetPreferences(req, res);
       } else if (req.method === "POST" && pathname === "/preferences") {
         await handlePostPreferences(req, res);
+      } else if (req.method === "POST" && pathname === "/styleguide/generate") {
+        await handleGenerateStyleGuide(req, res, config);
       } else {
         sendJson(res, 404, { error: "Not found" });
       }
@@ -397,7 +422,8 @@ export async function startServer(
     console.log(`    GET  /demo        — Demo page with overlay`);
     console.log(`    GET  /health      — Health check`);
     console.log(`    GET  /config      — Read current config`);
-    console.log(`    POST /config      — Update config (model, styleGuide, copyBible)`);
+    console.log(`    POST /config      — Update config (model, styleGuide, copyBible, apiKey)`);
+    console.log(`    POST /styleguide/generate — Scaffold style guide file if missing`);
     console.log(`    GET  /preferences — Read style preferences`);
     console.log(`    POST /preferences — Record a style pick`);
     console.log("");

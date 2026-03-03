@@ -26,7 +26,16 @@ export interface WriteAdapter {
   normalizeReplacement?: (input: ReplacementInput) => string;
 }
 
-const REACT_EXTENSIONS = new Set([".tsx", ".jsx", ".ts", ".js", ".mdx", ".html", ".htm"]);
+const REACT_EXTENSIONS = new Set([
+  ".tsx",
+  ".jsx",
+  ".ts",
+  ".js",
+  ".mdx",
+  ".md",
+  ".html",
+  ".htm",
+]);
 
 function getSurrounding(source: string, matchIndex: number): string {
   return source.substring(Math.max(0, matchIndex - 220), matchIndex + 220);

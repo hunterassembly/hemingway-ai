@@ -24,6 +24,9 @@ This creates `hemingway.config.mjs` in your project root.
 export ANTHROPIC_API_KEY=sk-ant-...
 ```
 
+Or paste it in Hemingway settings (bottom-left pill) and click Save.
+It will be stored locally in `.hemingway.local.json` (gitignored).
+
 ### 4. Start the server
 
 ```sh
@@ -31,6 +34,8 @@ npx hemingway-ai
 ```
 
 For Next.js, you can skip this extra process by using the same-app route adapter.
+
+Note: Hemingway reads `process.env` directly and does not auto-load `.env` files on its own.
 
 Quick mode selection:
 
@@ -54,6 +59,8 @@ import { Hemingway } from 'hemingway-ai/react'
 <Hemingway />
 ```
 
+By default, the React wrapper tries same-app mode at `/api/hemingway` first, then falls back to `http://localhost:4800`.
+
 **React component (Next.js same-process mode):**
 
 ```jsx
@@ -65,7 +72,7 @@ import { Hemingway } from "hemingway-ai/react";
 
 ### 6. Activate
 
-Press **Cmd/Ctrl+Shift+H** (or your configured shortcut) on your dev site.
+Press **Cmd/Ctrl+Shift+H** for overlay mode and **Alt+Shift+H** for notepad mode (or your configured shortcuts).
 
 ## Config
 
@@ -78,28 +85,33 @@ const config = {
   copyBible: './docs/copy-bible.md',
   referenceGuide: './reference/saas-and-services-copy-guide.md',
   sourcePatterns: [
-    'components/**/*.tsx',
-    'components/**/*.jsx',
-    'src/**/*.tsx',
-    'src/**/*.jsx',
-    'app/**/*.tsx',
-    'app/**/*.jsx',
-    'pages/**/*.tsx',
-    'pages/**/*.jsx',
+    'components/**/*.{tsx,jsx,ts,js,mdx,md,html,htm}',
+    'src/**/*.{tsx,jsx,ts,js,mdx,md,html,htm}',
+    'app/**/*.{tsx,jsx,ts,js,mdx,md,html,htm}',
+    'pages/**/*.{tsx,jsx,ts,js,mdx,md,html,htm}',
+    'content/**/*.{tsx,jsx,ts,js,mdx,md,html,htm}',
+    'site/**/*.{tsx,jsx,ts,js,mdx,md,html,htm}',
   ],
   excludePatterns: ['node_modules', '.next', 'dist', 'build'],
   writeAdapter: 'react', // 'react' | 'generic'
   shortcut: 'ctrl+shift+h',
+  notepadShortcut: 'alt+shift+h',
   accentColor: '#3b82f6',
 };
 
 export default config;
 ```
 
+Next.js one-process note:
+
+- Prefer a plain `export default { ... }` `hemingway.config.mjs` object.
+- If you need imported/computed config values, mirror them in `package.json` under `hemingway`.
+
 ## Features
 
 - **Click any text** to get AI-generated copy alternatives
 - **Double-click** for inline editing with source file writes
+- **Page notepad mode** — edit all discovered copy at once in markdown
 - **Style guide aware** — feed it your brand voice docs
 - **Framework agnostic** — works with any dev server via script tag or React component
 - **Source mapping** — writes changes back to your source files

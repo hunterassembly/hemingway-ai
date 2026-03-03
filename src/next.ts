@@ -1,7 +1,7 @@
 import { readFile } from "node:fs/promises";
-import { dirname, join } from "node:path";
+import { dirname, join, basename } from "node:path";
 import { fileURLToPath } from "node:url";
-import { loadConfig, type HemingwayConfig } from "./server/config.js";
+import { loadConfig, persistLocalConfig, type HemingwayConfig } from "./server/config.js";
 import {
   generateAlternatives,
   generateMultiAlternatives,
@@ -11,6 +11,7 @@ import {
 import { writeText } from "./server/write.js";
 import { loadPreferences, recordPick, getTopPreferences } from "./server/preferences.js";
 import { getDemoHtml } from "./server/demo.js";
+import { generateStyleGuideFile } from "./server/styleguide.js";
 
 type MaybePromise<T> = T | Promise<T>;
 
@@ -76,6 +77,10 @@ function getClientConfig(config: HemingwayConfig) {
     styleGuide: config.styleGuide,
     copyBible: config.copyBible,
     shortcut: config.shortcut,
+    notepadShortcut: config.notepadShortcut,
+    hasApiKey: Boolean(config.apiKey),
+    connectionMode: "same-app" as const,
+    projectRoot: basename(process.cwd()),
   };
 }
 
@@ -166,6 +171,7 @@ export function createNextRouteHandlers(options: NextHemingwayOptions = {}) {
           "POST /api/hemingway/generate",
           "POST /api/hemingway/generate-multi",
           "POST /api/hemingway/write",
+          "POST /api/hemingway/styleguide/generate",
           "GET /api/hemingway/preferences",
           "POST /api/hemingway/preferences",
         ],
@@ -267,13 +273,23 @@ export function createNextRouteHandlers(options: NextHemingwayOptions = {}) {
         return jsonResponse(400, { error: error ?? "Invalid request body" });
       }
 
-      const updatableKeys = new Set<string>(["model", "styleGuide", "copyBible"]);
+      const updatableKeys = new Set<string>(["model", "styleGuide", "copyBible", "apiKey"]);
       const mutable = config as unknown as Record<string, unknown>;
+      let shouldPersistLocalConfig = false;
       for (const key of Object.keys(data)) {
         if (!updatableKeys.has(key)) continue;
         const value = data[key];
         if (typeof value !== "string") continue;
-        mutable[key] = value;
+        const normalized = key === "apiKey" ? value.trim() : value;
+        if (mutable[key] !== normalized) {
+          mutable[key] = normalized;
+          if (key === "apiKey") {
+            shouldPersistLocalConfig = true;
+          }
+        }
+      }
+      if (shouldPersistLocalConfig) {
+        await persistLocalConfig({ apiKey: String(config.apiKey ?? "") });
       }
       return jsonResponse(200, getClientConfig(config));
     }
@@ -285,6 +301,11 @@ export function createNextRouteHandlers(options: NextHemingwayOptions = {}) {
       }
       const prefs = await recordPick(data.label);
       return jsonResponse(200, prefs);
+    }
+
+    if (path === "styleguide/generate") {
+      const result = await generateStyleGuideFile(config.styleGuide);
+      return jsonResponse(result.success ? 200 : 500, result);
     }
 
     return jsonResponse(404, { error: "Not found" });

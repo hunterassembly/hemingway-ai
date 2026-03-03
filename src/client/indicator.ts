@@ -7,7 +7,15 @@ export interface HemingwaySettings {
   styleGuide: string;
   copyBible: string;
   shortcut: string;
+  notepadShortcut: string;
+  hasApiKey: boolean;
+  connectionMode: "same-app" | "standalone" | "unknown";
+  projectRoot: string;
+  serverUrl: string;
 }
+
+type ClientSettingKey = "model" | "styleGuide" | "copyBible" | "shortcut" | "notepadShortcut";
+type StyleGuideGenerateStatus = "created" | "exists" | "failed";
 
 const MODELS = [
   { value: "claude-sonnet-4-6", label: "Sonnet 4.6" },
@@ -19,8 +27,8 @@ const SVG_LOGO = `<svg width="360" height="86" viewBox="0 0 360 86" fill="none" 
 
 
 const SVG_PLUS = `<svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M7 2.625V11.375M2.625 7H11.375" stroke="#a3a3a3" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
-
-const SVG_TOKENS = `<svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="6" cy="8" r="4.5" stroke="#3B82F6" stroke-width="1.5"/><circle cx="10" cy="8" r="4.5" stroke="#3B82F6" stroke-width="1.5"/></svg>`;
+const SVG_UNDO = `<svg width="12" height="12" viewBox="0 0 16 16" fill="none"><path d="M5.25 5.25L2.75 7.75L5.25 10.25" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M3 7.75H9.25C11.4591 7.75 13.25 9.54086 13.25 11.75V12.25" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>`;
+const SVG_REDO = `<svg width="12" height="12" viewBox="0 0 16 16" fill="none"><path d="M10.75 5.25L13.25 7.75L10.75 10.25" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M13 7.75H6.75C4.54086 7.75 2.75 9.54086 2.75 11.75V12.25" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>`;
 
 const STYLES = /* css */ `
   @keyframes hwPulse {
@@ -46,26 +54,86 @@ const STYLES = /* css */ `
     z-index: 2147483646;
     display: none;
     align-items: center;
-    justify-content: center;
+    justify-content: flex-start;
     width: 40px;
     height: 40px;
     padding: 0;
     background: #2563EB;
-    border-radius: 50%;
+    border-radius: 20px;
     border: none;
     box-shadow: 0 2px 12px rgba(37,99,235,0.3);
     user-select: none;
-    cursor: pointer;
-    transition: box-shadow 0.15s ease, transform 0.15s ease;
+    transition: width 0.2s ease, box-shadow 0.15s ease, transform 0.15s ease;
+    overflow: hidden;
   }
 
   .hw-pill:hover {
     box-shadow: 0 4px 16px rgba(37,99,235,0.4);
-    transform: scale(1.05);
+    transform: translateY(-1px);
   }
 
   .hw-pill.visible {
     display: flex;
+  }
+  .hw-pill.has-history {
+    width: 198px;
+    padding-right: 12px;
+    border-radius: 999px;
+  }
+  .hw-pill-logo {
+    width: 40px;
+    height: 40px;
+    border: none;
+    border-radius: 50%;
+    background: transparent;
+    color: #fff;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    flex-shrink: 0;
+  }
+  .hw-pill-logo:hover {
+    background: rgba(255,255,255,0.12);
+  }
+  .hw-pill-actions {
+    display: none;
+    align-items: center;
+    gap: 4px;
+    margin-left: 6px;
+    min-width: 0;
+  }
+  .hw-pill.has-history .hw-pill-actions {
+    display: inline-flex;
+  }
+  .hw-pill-action {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    border: none;
+    border-radius: 999px;
+    background: transparent;
+    color: #fff;
+    font-family: inherit;
+    font-size: 11px;
+    font-weight: 600;
+    line-height: 1;
+    padding: 6px 9px;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: background 0.15s, color 0.15s;
+  }
+  .hw-pill-action:hover {
+    background: rgba(255,255,255,0.24);
+  }
+  .hw-pill-action:active {
+    transform: translateY(1px);
+  }
+  .hw-pill-action:disabled {
+    background: transparent;
+    color: rgba(255,255,255,0.55);
+    cursor: default;
+    pointer-events: none;
   }
 
   /* --- Settings panel --- */
@@ -105,7 +173,7 @@ const STYLES = /* css */ `
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 20px 20px 10px;
+    padding: 8px 20px 10px;
   }
   .hw-settings-logo svg {
     width: 100%;
@@ -267,21 +335,112 @@ const STYLES = /* css */ `
     background: rgba(96,165,250,0.2);
   }
 
+  /* --- Connection row --- */
+  .hw-connection-card {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    width: 100%;
+    border-radius: 8px;
+    padding: 8px 10px;
+    background: rgba(255,255,255,0.8);
+    box-shadow: 0 0 0 1px rgba(0,0,0,0.05), 0 1px 1px rgba(0,0,0,0.05);
+  }
+  .hw-connection-primary {
+    font-size: 12px;
+    line-height: 1.2;
+    color: #262626;
+    font-weight: 600;
+  }
+  .hw-connection-secondary {
+    font-size: 11px;
+    line-height: 1.2;
+    color: #737373;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  /* --- API key row --- */
+  .hw-api-key-header {
+    justify-content: space-between;
+  }
+  .hw-api-key-status {
+    font-size: 10px;
+    line-height: 1;
+    border-radius: 999px;
+    padding: 4px 7px;
+    letter-spacing: 0.03em;
+    text-transform: uppercase;
+    font-weight: 600;
+  }
+  .hw-api-key-status.configured {
+    background: rgba(34,197,94,0.12);
+    color: #166534;
+  }
+  .hw-api-key-status.missing {
+    background: rgba(245,158,11,0.15);
+    color: #92400e;
+  }
+  .hw-api-key-controls {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .hw-api-key-input {
+    flex: 1;
+    min-width: 0;
+    border: none;
+    border-radius: 8px;
+    padding: 8px 10px;
+    font-size: 12px;
+    font-family: inherit;
+    color: #262626;
+    background: rgba(255,255,255,0.9);
+    box-shadow: 0 0 0 1px rgba(0,0,0,0.05), 0 1px 1px rgba(0,0,0,0.05);
+    outline: none;
+  }
+  .hw-api-key-input:focus {
+    box-shadow: 0 0 0 1px rgba(37,99,235,0.35), 0 1px 1px rgba(0,0,0,0.05);
+  }
+  .hw-api-key-input::placeholder {
+    color: #a3a3a3;
+  }
+  .hw-api-key-save {
+    border: none;
+    border-radius: 8px;
+    padding: 8px 10px;
+    background: #2563eb;
+    color: #fff;
+    font-size: 12px;
+    font-weight: 600;
+    font-family: inherit;
+    line-height: 1;
+    cursor: pointer;
+    transition: background 0.15s ease;
+    flex-shrink: 0;
+  }
+  .hw-api-key-save:hover {
+    background: #1d4ed8;
+  }
+  .hw-api-key-save:disabled {
+    background: #93c5fd;
+    cursor: wait;
+  }
+  .hw-api-key-help {
+    font-size: 11px;
+    color: #737373;
+    line-height: 1.4;
+  }
+
   /* --- Shortcut row --- */
   .hw-settings-label-col {
     flex: 1;
     display: flex;
     flex-direction: column;
   }
-  .hw-settings-sublabel {
-    font-size: 11px;
-    font-weight: 500;
-    color: #a3a3a3;
-    letter-spacing: 0.05px;
-    line-height: 14px;
-  }
   .hw-shortcut-keys {
-    flex: 1;
     display: flex;
     align-items: center;
     gap: 2px;
@@ -294,73 +453,13 @@ const STYLES = /* css */ `
     font-size: 12px;
     font-weight: 500;
     color: #262626;
+    flex-shrink: 0;
+    margin-left: 10px;
   }
   .hw-key {
     display: flex;
     align-items: center;
     padding: 1px;
-  }
-
-  /* --- Bottom bar --- */
-  .hw-settings-bottom {
-    display: flex;
-    align-items: center;
-    gap: 5px;
-    padding: 0;
-  }
-  .hw-tokens-left {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    padding: 6px 12px 6px 6px;
-    background: rgba(255,255,255,0.8);
-    backdrop-filter: blur(60px);
-    -webkit-backdrop-filter: blur(60px);
-    border-radius: 8px;
-    box-shadow: 0 0 0 1px rgba(0,0,0,0.05), 0 1px 1px rgba(0,0,0,0.05);
-    flex-shrink: 0;
-  }
-  .hw-tokens-icon {
-    display: flex;
-    align-items: center;
-    flex-shrink: 0;
-  }
-  .hw-tokens-string {
-    display: flex;
-    align-items: center;
-    gap: 4px;
-    font-size: 12px;
-    font-weight: 500;
-    line-height: 14px;
-    letter-spacing: 0.01px;
-    white-space: nowrap;
-  }
-  .hw-tokens-count {
-    color: #171717;
-  }
-  .hw-tokens-label {
-    color: #a3a3a3;
-  }
-  .hw-upgrade-btn {
-    display: flex;
-    align-items: center;
-    padding: 6px 10px;
-    background: #2563eb;
-    border: none;
-    border-radius: 8px;
-    font-family: inherit;
-    font-size: 12px;
-    font-weight: 500;
-    color: #fff;
-    line-height: 14px;
-    letter-spacing: 0.01px;
-    cursor: pointer;
-    transition: background 0.15s;
-    white-space: nowrap;
-    flex-shrink: 0;
-  }
-  .hw-upgrade-btn:hover {
-    background: #1d4ed8;
   }
 
   /* --- Click-outside overlay --- */
@@ -378,21 +477,35 @@ const STYLES = /* css */ `
 export class HemingwayIndicator {
   private shadow: ShadowRoot;
   private pill: HTMLElement;
+  private pillLogoButton: HTMLButtonElement;
+  private pillUndoButton: HTMLButtonElement;
+  private pillRedoButton: HTMLButtonElement;
   private sheetAnchor: HTMLElement;
   private sheet: HTMLElement;
   private backdrop: HTMLElement;
   private visible: boolean = false;
   private sheetOpen: boolean = false;
+  private canUndo: boolean = false;
+  private canRedo: boolean = false;
 
   private settings: HemingwaySettings = {
     model: "claude-sonnet-4-6",
     styleGuide: "",
     copyBible: "",
     shortcut: "ctrl+shift+h",
+    notepadShortcut: "alt+shift+h",
+    hasApiKey: false,
+    connectionMode: "unknown",
+    projectRoot: "",
+    serverUrl: "",
   };
 
   /** Called with (key, value) when a setting changes in the UI */
-  onSettingsChange: ((key: keyof HemingwaySettings, value: string) => void) | null = null;
+  onSettingsChange: ((key: ClientSettingKey, value: string) => void) | null = null;
+  onApiKeySave: ((value: string) => Promise<boolean>) | null = null;
+  onGenerateStyleGuide: (() => Promise<StyleGuideGenerateStatus>) | null = null;
+  onUndoAction: (() => void) | null = null;
+  onRedoAction: (() => void) | null = null;
 
   constructor(host: HTMLElement) {
     this.shadow = host.attachShadow({ mode: "open" });
@@ -419,16 +532,45 @@ export class HemingwayIndicator {
 
     this.shadow.appendChild(this.sheetAnchor);
 
-    // --- Floating pill (blue circle with pen icon) ---
+    // --- Floating pill (logo + optional undo/redo controls) ---
     this.pill = document.createElement("div");
     this.pill.className = "hw-pill";
-    this.pill.innerHTML = `<svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M10 12.7628V16.2069C5.37931 15.2414 2.63218 18.3103 1.7931 20H0L20 0V8.64049L13.0955 15.5824L10 12.7628Z" fill="white" style="fill:white;fill-opacity:1;"/></svg>`;
-    this.pill.addEventListener("click", (e) => {
+    this.pillLogoButton = document.createElement("button");
+    this.pillLogoButton.type = "button";
+    this.pillLogoButton.className = "hw-pill-logo";
+    this.pillLogoButton.innerHTML = `<svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M10 12.7628V16.2069C5.37931 15.2414 2.63218 18.3103 1.7931 20H0L20 0V8.64049L13.0955 15.5824L10 12.7628Z" fill="white" style="fill:white;fill-opacity:1;"/></svg>`;
+    this.pillLogoButton.addEventListener("click", (e) => {
       e.stopPropagation();
       this.toggleSettings();
     });
+    this.pill.appendChild(this.pillLogoButton);
+
+    const actions = document.createElement("div");
+    actions.className = "hw-pill-actions";
+
+    this.pillUndoButton = document.createElement("button");
+    this.pillUndoButton.type = "button";
+    this.pillUndoButton.className = "hw-pill-action";
+    this.pillUndoButton.innerHTML = `${SVG_UNDO}<span>Undo</span>`;
+    this.pillUndoButton.addEventListener("click", (e) => {
+      e.stopPropagation();
+      this.onUndoAction?.();
+    });
+    actions.appendChild(this.pillUndoButton);
+
+    this.pillRedoButton = document.createElement("button");
+    this.pillRedoButton.type = "button";
+    this.pillRedoButton.className = "hw-pill-action";
+    this.pillRedoButton.innerHTML = `${SVG_REDO}<span>Redo</span>`;
+    this.pillRedoButton.addEventListener("click", (e) => {
+      e.stopPropagation();
+      this.onRedoAction?.();
+    });
+    actions.appendChild(this.pillRedoButton);
+    this.pill.appendChild(actions);
 
     this.shadow.appendChild(this.pill);
+    this.refreshPillActions();
 
     // Build initial sheet content
     this.buildSheet();
@@ -439,6 +581,7 @@ export class HemingwayIndicator {
   show(): void {
     this.visible = true;
     this.pill.classList.add("visible");
+    this.refreshPillActions();
   }
 
   hide(): void {
@@ -466,6 +609,18 @@ export class HemingwayIndicator {
 
   getSettings(): HemingwaySettings {
     return { ...this.settings };
+  }
+
+  setHistoryState(state: { canUndo: boolean; canRedo: boolean }): void {
+    this.canUndo = state.canUndo;
+    this.canRedo = state.canRedo;
+    this.refreshPillActions();
+  }
+
+  private refreshPillActions(): void {
+    this.pill.classList.toggle("has-history", this.canUndo || this.canRedo);
+    this.pillUndoButton.disabled = !this.canUndo;
+    this.pillRedoButton.disabled = !this.canRedo;
   }
 
   // --- Sheet open / close ---
@@ -498,14 +653,46 @@ export class HemingwayIndicator {
     const rows = document.createElement("div");
     rows.className = "hw-settings-rows";
 
+    rows.appendChild(this.buildConnectionRow());
     rows.appendChild(this.buildModelRow());
+    rows.appendChild(this.buildApiKeyRow());
     rows.appendChild(this.buildStyleguideRow());
-    rows.appendChild(this.buildShortcutRow());
+    rows.appendChild(this.buildShortcutRow("Overlay Shortcut", this.settings.shortcut));
 
     this.sheet.appendChild(rows);
+  }
 
-    // 3. Bottom bar
-    this.sheet.appendChild(this.buildBottomBar());
+  private buildConnectionRow(): HTMLElement {
+    const row = document.createElement("div");
+    row.className = "hw-settings-row-col";
+
+    const label = document.createElement("span");
+    label.className = "hw-settings-label";
+    label.textContent = "Connection";
+    row.appendChild(label);
+
+    const card = document.createElement("div");
+    card.className = "hw-connection-card";
+
+    const primary = document.createElement("span");
+    primary.className = "hw-connection-primary";
+    const modeLabel =
+      this.settings.connectionMode === "same-app"
+        ? "Same-app"
+        : this.settings.connectionMode === "standalone"
+          ? "Standalone"
+          : "Unknown";
+    const root = this.settings.projectRoot || "Unknown project";
+    primary.textContent = `${modeLabel} - ${root}`;
+    card.appendChild(primary);
+
+    const secondary = document.createElement("span");
+    secondary.className = "hw-connection-secondary";
+    secondary.textContent = this.settings.serverUrl || "(no endpoint)";
+    card.appendChild(secondary);
+
+    row.appendChild(card);
+    return row;
   }
 
   private buildModelRow(): HTMLElement {
@@ -609,13 +796,120 @@ export class HemingwayIndicator {
     const genBtn = document.createElement("button");
     genBtn.className = "hw-styleguide-generate";
     genBtn.textContent = "Generate";
+    genBtn.addEventListener("click", () => {
+      void (async () => {
+        const original = genBtn.textContent;
+        genBtn.disabled = true;
+        genBtn.textContent = "Generating...";
+        const status = (await this.onGenerateStyleGuide?.()) ?? "failed";
+        if (status === "created") {
+          genBtn.textContent = "Generated";
+        } else if (status === "exists") {
+          genBtn.textContent = "Exists";
+        } else {
+          genBtn.textContent = "Failed";
+        }
+        window.setTimeout(() => {
+          genBtn.textContent = original ?? "Generate";
+          genBtn.disabled = false;
+        }, 1200);
+      })();
+    });
     input.appendChild(genBtn);
 
     row.appendChild(input);
     return row;
   }
 
-  private buildShortcutRow(): HTMLElement {
+  private buildApiKeyRow(): HTMLElement {
+    const row = document.createElement("div");
+    row.className = "hw-settings-row-col";
+
+    const header = document.createElement("div");
+    header.className = "hw-settings-row hw-api-key-header";
+
+    const label = document.createElement("span");
+    label.className = "hw-settings-label";
+    label.textContent = "Anthropic API Key";
+    header.appendChild(label);
+
+    const status = document.createElement("span");
+    const configured = this.settings.hasApiKey;
+    status.className = `hw-api-key-status ${configured ? "configured" : "missing"}`;
+    status.textContent = configured ? "Configured" : "Missing";
+    header.appendChild(status);
+
+    row.appendChild(header);
+
+    const controls = document.createElement("div");
+    controls.className = "hw-api-key-controls";
+
+    const input = document.createElement("input");
+    input.className = "hw-api-key-input";
+    input.type = "password";
+    input.placeholder = configured
+      ? "Paste a new key to replace current key"
+      : "Paste sk-ant-api03-...";
+    input.setAttribute("spellcheck", "false");
+    input.setAttribute("autocomplete", "off");
+    controls.appendChild(input);
+
+    const saveButton = document.createElement("button");
+    saveButton.type = "button";
+    saveButton.className = "hw-api-key-save";
+    saveButton.textContent = "Save";
+    controls.appendChild(saveButton);
+
+    const save = async () => {
+      const value = input.value.trim();
+      if (!value) return;
+
+      saveButton.disabled = true;
+      const original = saveButton.textContent;
+      saveButton.textContent = "Saving...";
+
+      const ok = (await this.onApiKeySave?.(value)) ?? false;
+      if (ok) {
+        input.value = "";
+        this.settings.hasApiKey = true;
+        status.className = "hw-api-key-status configured";
+        status.textContent = "Configured";
+        saveButton.textContent = "Saved";
+        window.setTimeout(() => {
+          saveButton.textContent = original ?? "Save";
+        }, 1200);
+      } else {
+        saveButton.textContent = "Failed";
+        window.setTimeout(() => {
+          saveButton.textContent = original ?? "Save";
+        }, 1200);
+      }
+
+      saveButton.disabled = false;
+    };
+
+    saveButton.addEventListener("click", () => {
+      void save();
+    });
+
+    input.addEventListener("keydown", (event) => {
+      if (event.key === "Enter") {
+        event.preventDefault();
+        void save();
+      }
+    });
+
+    row.appendChild(controls);
+
+    const help = document.createElement("span");
+    help.className = "hw-api-key-help";
+    help.textContent = "Saved locally in .hemingway.local.json";
+    row.appendChild(help);
+
+    return row;
+  }
+
+  private buildShortcutRow(labelText: string, shortcut: string): HTMLElement {
     const row = document.createElement("div");
     row.className = "hw-settings-row";
 
@@ -624,13 +918,8 @@ export class HemingwayIndicator {
 
     const label = document.createElement("span");
     label.className = "hw-settings-label";
-    label.textContent = "Shortcut";
+    label.textContent = labelText;
     labelCol.appendChild(label);
-
-    const sublabel = document.createElement("span");
-    sublabel.className = "hw-settings-sublabel";
-    sublabel.textContent = "Click to record new";
-    labelCol.appendChild(sublabel);
 
     row.appendChild(labelCol);
 
@@ -638,7 +927,7 @@ export class HemingwayIndicator {
     keys.className = "hw-shortcut-keys";
 
     // Parse shortcut and display keys
-    const parts = this.settings.shortcut.split("+");
+    const parts = shortcut.split("+");
     for (const part of parts) {
       const key = document.createElement("span");
       key.className = "hw-key";
@@ -663,39 +952,4 @@ export class HemingwayIndicator {
     return row;
   }
 
-  private buildBottomBar(): HTMLElement {
-    const bar = document.createElement("div");
-    bar.className = "hw-settings-bottom";
-
-    // Tokens left
-    const tokens = document.createElement("div");
-    tokens.className = "hw-tokens-left";
-
-    const icon = document.createElement("span");
-    icon.className = "hw-tokens-icon";
-    icon.innerHTML = SVG_TOKENS;
-    tokens.appendChild(icon);
-
-    const str = document.createElement("div");
-    str.className = "hw-tokens-string";
-    const count = document.createElement("span");
-    count.className = "hw-tokens-count";
-    count.textContent = "2M";
-    str.appendChild(count);
-    const label = document.createElement("span");
-    label.className = "hw-tokens-label";
-    label.textContent = "tokens left";
-    str.appendChild(label);
-    tokens.appendChild(str);
-
-    bar.appendChild(tokens);
-
-    // Upgrade button
-    const upgrade = document.createElement("button");
-    upgrade.className = "hw-upgrade-btn";
-    upgrade.textContent = "Upgrade";
-    bar.appendChild(upgrade);
-
-    return bar;
-  }
 }

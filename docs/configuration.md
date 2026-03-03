@@ -4,9 +4,15 @@ Hemingway loads configuration from multiple sources in this order:
 
 1. Explicit runtime overrides
 2. Environment variables
-3. `hemingway.config.mjs`
-4. `package.json` under `hemingway`
-5. Internal defaults
+3. Local saved settings (`.hemingway.local.json`)
+4. `hemingway.config.mjs`
+5. `package.json` under `hemingway`
+6. Internal defaults
+
+Notes:
+
+- In Next.js one-process mode, prefer a plain `export default { ... }` config module in `hemingway.config.mjs` (no imports required).
+- If your config needs imports/computed values, place equivalent values under `package.json` -> `hemingway` for maximum runtime compatibility.
 
 ## Example Config
 
@@ -20,15 +26,18 @@ export default {
   copyBible: "./docs/copy-bible.md",
   referenceGuide: "./reference/saas-and-services-copy-guide.md",
   sourcePatterns: [
-    "components/**/*.{tsx,jsx,ts,js}",
-    "src/**/*.{tsx,jsx,ts,js}",
-    "app/**/*.{tsx,jsx,ts,js}",
-    "pages/**/*.{tsx,jsx,ts,js}",
-    "packages/**/*.{tsx,jsx,ts,js}",
+    "components/**/*.{tsx,jsx,ts,js,mdx,md,html,htm}",
+    "src/**/*.{tsx,jsx,ts,js,mdx,md,html,htm}",
+    "app/**/*.{tsx,jsx,ts,js,mdx,md,html,htm}",
+    "pages/**/*.{tsx,jsx,ts,js,mdx,md,html,htm}",
+    "content/**/*.{tsx,jsx,ts,js,mdx,md,html,htm}",
+    "site/**/*.{tsx,jsx,ts,js,mdx,md,html,htm}",
+    "packages/**/*.{tsx,jsx,ts,js,mdx,md,html,htm}",
   ],
   excludePatterns: ["node_modules", ".next", "dist", "build"],
   writeAdapter: "react", // "react" | "generic"
   shortcut: "ctrl+shift+h",
+  notepadShortcut: "alt+shift+h",
   accentColor: "#3b82f6",
 };
 ```
@@ -59,6 +68,7 @@ export default {
 - `sourcePatterns`:
   - Type: string[]
   - Purpose: files scanned for writeback candidates
+  - Notes: supports brace globs (for example `app/**/*.{tsx,jsx,mdx}`); if no match is found, Hemingway performs a one-time fallback scan across common app/content folders.
 - `excludePatterns`:
   - Type: string[]
   - Purpose: directories/files excluded from scanning
@@ -70,6 +80,10 @@ export default {
   - Type: string
   - Default: `ctrl+shift+h`
   - Purpose: overlay toggle shortcut
+- `notepadShortcut`:
+  - Type: string
+  - Default: `alt+shift+h`
+  - Purpose: open markdown notepad for page-wide copy edits
 - `accentColor`:
   - Type: string (hex)
   - Purpose: client UI accent color
@@ -80,6 +94,11 @@ export default {
   - Used when `apiKey` is missing
 - `HEMINGWAY_PORT`:
   - Overrides `port`
+
+Notes:
+
+- Hemingway reads `process.env` directly and does not load `.env` files by itself.
+- If you save an API key from the settings popover, it is written to `.hemingway.local.json` (gitignored).
 
 ## React Component Connection Options
 
@@ -100,4 +119,7 @@ Optional props:
 - `endpoint`: base route for Hemingway APIs (`/api/hemingway`)
 - `port`: standalone server port (used when `endpoint` is not provided)
 - `shortcut`: override shortcut at client bootstrap
+- `notepadShortcut`: override notepad shortcut at client bootstrap
 - `accentColor`: override overlay accent at client bootstrap
+
+When `endpoint` is omitted, the React wrapper will try `/api/hemingway` first, then fall back to `http://localhost:{port}`.

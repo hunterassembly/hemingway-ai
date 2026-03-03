@@ -35,25 +35,42 @@ interface UndoSnapshot {
   entries: UndoEntry[];
 }
 
+interface NotepadBlock {
+  id: number;
+  groupId: number;
+  groupOriginalText: string;
+  segmentIndex: number;
+  segmentKind: "full" | "text" | "url";
+  element: HTMLElement;
+  text: string;
+  tagName: string;
+  copyJob: string;
+  sectionLabel: string;
+}
+
 interface HemingwayConfig {
   serverUrl: string;
   shortcut: string;
+  notepadShortcut: string;
   accentColor: string;
 }
 
 interface HemingwayBootstrapConfig {
   serverUrl?: string;
   shortcut?: string;
+  notepadShortcut?: string;
   accentColor?: string;
 }
 
 const DEFAULTS: HemingwayConfig = {
   serverUrl: "http://localhost:4800",
   shortcut: "ctrl+shift+h",
+  notepadShortcut: "alt+shift+h",
   accentColor: "#3b82f6",
 };
 
 const MAX_MULTI_SELECT = 5;
+const MAX_UNDO_STEPS = 5;
 
 export class HemingwayOverlay {
   private active: boolean = false;
@@ -67,7 +84,9 @@ export class HemingwayOverlay {
   private multiMode: boolean = false;
   private previousAlternatives: Alternative[] = [];
   private previousMultiAlternatives: MultiAlternative[] = [];
-  private lastChange: UndoSnapshot | null = null;
+  private undoHistory: UndoSnapshot[] = [];
+  private redoHistory: UndoSnapshot[] = [];
+  private notepadBlocks: NotepadBlock[] = [];
 
   // Selection badge elements (page element → badge node)
   private selectionBadges: Map<HTMLElement, HTMLElement> = new Map();
@@ -120,14 +139,55 @@ export class HemingwayOverlay {
     this.discovery = new ElementDiscovery();
     this.popup = new HemingwayPopup(this.popupHost);
     this.indicator = new HemingwayIndicator(this.indicatorHost);
+    this.indicator.setSettings({ serverUrl: this.config.serverUrl });
 
     // Wire settings changes to server
-    this.indicator.onSettingsChange = (key: string, value: string) => {
-      fetch(`${this.config.serverUrl}/config`, {
+    const postSetting = async (key: string, value: string): Promise<void> => {
+      const res = await fetch(`${this.config.serverUrl}/config`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ [key]: value }),
-      }).catch((err) => console.error("[Hemingway] Failed to update config:", err));
+      });
+      if (!res.ok) {
+        throw new Error(`Config update failed (${res.status})`);
+      }
+      const data = await res.json();
+      this.indicator.setSettings({ ...data, serverUrl: this.config.serverUrl });
+    };
+    this.indicator.onSettingsChange = (key: string, value: string) => {
+      void postSetting(key, value).catch((err) =>
+        console.error("[Hemingway] Failed to update config:", err)
+      );
+    };
+    this.indicator.onApiKeySave = async (value: string) => {
+      try {
+        await postSetting("apiKey", value);
+        return true;
+      } catch (err) {
+        console.error("[Hemingway] Failed to save API key:", err);
+        return false;
+      }
+    };
+    this.indicator.onGenerateStyleGuide = async () => {
+      try {
+        const res = await fetch(`${this.config.serverUrl}/styleguide/generate`, {
+          method: "POST",
+        });
+        if (!res.ok) {
+          throw new Error(`Styleguide generation failed (${res.status})`);
+        }
+        const data = (await res.json()) as { created?: boolean };
+        return data.created ? "created" : "exists";
+      } catch (err) {
+        console.error("[Hemingway] Failed to generate style guide:", err);
+        return "failed";
+      }
+    };
+    this.indicator.onUndoAction = () => {
+      this.handleUndo();
+    };
+    this.indicator.onRedoAction = () => {
+      this.handleRedo();
     };
 
     // Load initial settings from server
@@ -154,10 +214,17 @@ export class HemingwayOverlay {
     };
     this.popup.onUndo = () => this.handleUndo();
     this.popup.onDismiss = () => this.handleDismiss();
+    this.popup.onNotepadApply = (markdown: string) => {
+      this.handleNotepadApply(markdown);
+    };
+    this.popup.onNotepadCopy = (markdown: string) => {
+      this.copyToClipboard(markdown);
+    };
 
     // Keyboard shortcut listener
     this._handleShortcut = this.handleShortcut.bind(this);
-    window.addEventListener("keydown", this._handleShortcut);
+    // Capture-phase listener so site scripts don't swallow shortcut events first.
+    window.addEventListener("keydown", this._handleShortcut, true);
 
     // Navigation blocker
     this._blockNavigation = this.blockNavigation.bind(this);
@@ -173,6 +240,7 @@ export class HemingwayOverlay {
     this.active = true;
 
     this.indicator.show();
+    this.syncHistoryControls();
     this.runDiscovery();
 
     // Block navigation clicks while active
@@ -215,7 +283,7 @@ export class HemingwayOverlay {
     this.deactivate();
     this.popup.destroy();
     this.indicator.destroy();
-    window.removeEventListener("keydown", this._handleShortcut);
+    window.removeEventListener("keydown", this._handleShortcut, true);
 
     if (this.shadowHost.parentElement) {
       this.shadowHost.parentElement.removeChild(this.shadowHost);
@@ -260,7 +328,7 @@ export class HemingwayOverlay {
 
     const item: SelectedItem = {
       element: el,
-      text: el.innerText?.trim() || "",
+      text: getElementReadableText(el),
       elementType: el.tagName.toLowerCase(),
       copyJob: classifyCopyJob(el),
     };
@@ -402,10 +470,25 @@ export class HemingwayOverlay {
     return { top, left };
   }
 
+  private positionNotepad(): { top: number; left: number } {
+    const top = window.scrollY + Math.max(16, window.innerHeight * 0.08);
+    const left = window.scrollX + 16;
+    return { top, left };
+  }
+
   // --- Event handlers ---
 
+  private getEventElement(e: Event): HTMLElement | null {
+    const current = e.currentTarget;
+    if (current instanceof HTMLElement) return current;
+    const target = e.target;
+    if (target instanceof HTMLElement) return target;
+    return null;
+  }
+
   private handleHover = (e: Event): void => {
-    const el = e.target as HTMLElement;
+    const el = this.getEventElement(e);
+    if (!el) return;
     // Skip hover styling on already-selected elements to avoid flicker
     if (this.isSelected(el)) return;
     el.style.outline = `1.5px dashed rgba(0, 122, 255, 0.35)`;
@@ -414,7 +497,8 @@ export class HemingwayOverlay {
   };
 
   private handleHoverOut = (e: Event): void => {
-    const el = e.target as HTMLElement;
+    const el = this.getEventElement(e);
+    if (!el) return;
     // Don't clear styling on selected elements
     if (this.isSelected(el)) return;
     el.style.outline = "";
@@ -426,7 +510,8 @@ export class HemingwayOverlay {
     e.preventDefault();
     e.stopPropagation();
 
-    const el = e.target as HTMLElement;
+    const el = this.getEventElement(e);
+    if (!el) return;
     const mouseEvent = e as MouseEvent;
     const isMultiClick = mouseEvent.metaKey || mouseEvent.ctrlKey;
 
@@ -448,7 +533,7 @@ export class HemingwayOverlay {
 
     const item: SelectedItem = {
       element: el,
-      text: el.innerText?.trim() || "",
+      text: getElementReadableText(el),
       elementType: el.tagName.toLowerCase(),
       copyJob: classifyCopyJob(el),
     };
@@ -502,10 +587,11 @@ export class HemingwayOverlay {
     // Hide popup if it's visible
     this.popup.hide();
 
-    const el = e.target as HTMLElement;
+    const el = this.getEventElement(e);
+    if (!el) return;
     const item: SelectedItem = {
       element: el,
-      text: el.innerText?.trim() || "",
+      text: getElementReadableText(el),
       elementType: el.tagName.toLowerCase(),
       copyJob: classifyCopyJob(el),
     };
@@ -573,10 +659,9 @@ export class HemingwayOverlay {
     // Write to source files
     const result = await this.postWriteFor(el, newText, oldText);
 
-    // Store undo snapshot
-    this.lastChange = {
+    this.pushUndoSnapshot({
       entries: [{ element: el, oldText, newText, writeResult: result }],
-    };
+    });
 
     // Position popup near element for done toast
     const rect = el.getBoundingClientRect();
@@ -598,10 +683,291 @@ export class HemingwayOverlay {
   }
 
   private handleShortcut(e: KeyboardEvent): void {
+    if (e.defaultPrevented) return;
+
+    if (this.active && isUndoHotkey(e) && !isEditingTextInput(e)) {
+      if (this.hasUndoHistory()) {
+        e.preventDefault();
+        void this.handleUndo();
+      }
+      return;
+    }
+
+    if (this.active && isRedoHotkey(e) && !isEditingTextInput(e)) {
+      if (this.hasRedoHistory()) {
+        e.preventDefault();
+        void this.handleRedo();
+      }
+      return;
+    }
+
+    if (matchesShortcut(e, this.config.notepadShortcut)) {
+      e.preventDefault();
+      this.openNotepad();
+      return;
+    }
+
     if (matchesShortcut(e, this.config.shortcut)) {
       e.preventDefault();
-      this.toggle();
+      if (this.active) {
+        this.openNotepad();
+      } else {
+        this.activate();
+      }
     }
+  }
+
+  private openNotepad(): void {
+    if (!this.active) {
+      this.activate();
+    }
+
+    this.clearSelection();
+    this.popup.hide();
+
+    const blocks = this.collectNotepadBlocks();
+    if (blocks.length === 0) {
+      return;
+    }
+
+    this.notepadBlocks = blocks;
+    const markdown = this.buildNotepadMarkdown(blocks);
+    this.popup.showNotepad(this.positionNotepad(), markdown);
+  }
+
+  private collectNotepadBlocks(): NotepadBlock[] {
+    const found = Array.from(this.discovery.discover())
+      .filter((el) => !!getElementReadableText(el))
+      .sort((a, b) => this.compareDomPosition(a, b));
+
+    const sectionIndexes = new Map<HTMLElement, number>();
+    const sectionLabels = new Map<HTMLElement, string>();
+    const blocks: NotepadBlock[] = [];
+    let nextGroupId = 1;
+    let nextSectionIndex = 1;
+
+    for (const el of found) {
+      const section = this.findSectionContainer(el);
+      if (section && !sectionIndexes.has(section)) {
+        sectionIndexes.set(section, nextSectionIndex++);
+      }
+
+      const sectionLabel = this.buildSectionLabel(section, sectionIndexes, sectionLabels);
+      const fullText = getElementReadableText(el);
+      const segments = splitTextIntoUrlSegments(fullText);
+      const hasMixedUrlText =
+        segments.length > 1 && segments.some((segment) => segment.kind === "url");
+      const groupId = nextGroupId++;
+
+      if (hasMixedUrlText) {
+        let segmentIndex = 0;
+        for (const segment of segments) {
+          blocks.push({
+            id: blocks.length + 1,
+            groupId,
+            groupOriginalText: fullText,
+            segmentIndex: segmentIndex++,
+            segmentKind: segment.kind,
+            element: el,
+            text: segment.text,
+            tagName: el.tagName.toLowerCase(),
+            copyJob: segment.kind === "url" ? "url-token" : classifyCopyJob(el),
+            sectionLabel,
+          });
+        }
+      } else {
+        blocks.push({
+          id: blocks.length + 1,
+          groupId,
+          groupOriginalText: fullText,
+          segmentIndex: 0,
+          segmentKind: "full",
+          element: el,
+          text: fullText,
+          tagName: el.tagName.toLowerCase(),
+          copyJob: classifyCopyJob(el),
+          sectionLabel,
+        });
+      }
+    }
+
+    return blocks;
+  }
+
+  private buildSectionLabel(
+    section: HTMLElement | null,
+    sectionIndexes: Map<HTMLElement, number>,
+    sectionLabels: Map<HTMLElement, string>
+  ): string {
+    if (!section) {
+      return "Section 1 - page";
+    }
+
+    const cached = sectionLabels.get(section);
+    if (cached) return cached;
+
+    const index = sectionIndexes.get(section) ?? 1;
+    const heading = this.extractSectionHeading(section);
+    const role = gatherContext(section).sectionRole;
+
+    const label = heading ? `Section ${index} - ${role} - ${heading}` : `Section ${index} - ${role}`;
+    sectionLabels.set(section, label);
+    return label;
+  }
+
+  private findSectionContainer(el: HTMLElement): HTMLElement | null {
+    const section = el.closest("section");
+    if (section) return section as HTMLElement;
+
+    const sectionLike = el.closest("[role='region'], [role='main'], main, article, .section");
+    if (sectionLike) return sectionLike as HTMLElement;
+
+    let current: HTMLElement | null = el;
+    while (current && current.parentElement !== document.body) {
+      current = current.parentElement;
+    }
+    return current;
+  }
+
+  private extractSectionHeading(section: HTMLElement): string {
+    const heading = section.querySelector("h1, h2, h3, h4, h5, h6");
+    if (!heading) return "";
+
+    const text = getElementReadableText(heading as HTMLElement);
+    if (!text) return "";
+
+    return text.replace(/\s+/g, " ").slice(0, 80);
+  }
+
+  private buildNotepadMarkdown(blocks: NotepadBlock[]): string {
+    const path = `${window.location.pathname}${window.location.search}`;
+    const lines: string[] = [
+      "# Hemingway Notepad",
+      "",
+      `Page: ${path || "/"}`,
+      "",
+    ];
+
+    let currentSection = "";
+    for (const block of blocks) {
+      if (block.sectionLabel !== currentSection) {
+        currentSection = block.sectionLabel;
+        lines.push(`## ${currentSection}`);
+        lines.push("");
+      }
+
+      lines.push(
+        `<!-- hw:id:${block.id} kind:${block.segmentKind} tag:${block.tagName} copyJob:${block.copyJob} -->`
+      );
+      lines.push(block.text);
+      lines.push("");
+    }
+
+    return lines.join("\n").trim() + "\n";
+  }
+
+  private parseNotepadMarkdown(markdown: string): Map<number, string> {
+    const lines = markdown.replace(/\r\n/g, "\n").split("\n");
+    const parsed = new Map<number, string>();
+    let currentId: number | null = null;
+    let buffer: string[] = [];
+
+    const flush = () => {
+      if (currentId === null) return;
+      while (buffer.length > 0 && !buffer[buffer.length - 1].trim()) {
+        buffer.pop();
+      }
+      parsed.set(currentId, buffer.join("\n").trim());
+    };
+
+    for (const line of lines) {
+      const marker = line.match(/^<!--\s*hw:id:(\d+)\b.*-->$/);
+      if (marker) {
+        flush();
+        currentId = Number(marker[1]);
+        buffer = [];
+        continue;
+      }
+
+      if (currentId !== null) {
+        buffer.push(line);
+      }
+    }
+
+    flush();
+    return parsed;
+  }
+
+  private async handleNotepadApply(markdown: string): Promise<void> {
+    if (this.notepadBlocks.length === 0) return;
+
+    const parsed = this.parseNotepadMarkdown(markdown);
+    const grouped = new Map<number, NotepadBlock[]>();
+    for (const block of this.notepadBlocks) {
+      const existing = grouped.get(block.groupId);
+      if (existing) {
+        existing.push(block);
+      } else {
+        grouped.set(block.groupId, [block]);
+      }
+    }
+
+    const entries: UndoEntry[] = [];
+
+    for (const blocks of grouped.values()) {
+      const ordered = [...blocks].sort((a, b) => a.segmentIndex - b.segmentIndex);
+      if (ordered.length === 0) continue;
+
+      const oldText = ordered[0].groupOriginalText;
+      const parts = ordered.map((block) => {
+        const parsedText = parsed.get(block.id);
+        if (parsedText === undefined) return block.text;
+        return parsedText.trim();
+      });
+      const newText = normalizeNotepadText(parts.join(" "));
+      if (!newText || newText === oldText) continue;
+
+      ordered[0].element.innerText = newText;
+      const result = await this.postWriteFor(ordered[0].element, newText, oldText);
+      entries.push({
+        element: ordered[0].element,
+        oldText,
+        newText,
+        writeResult: result,
+      });
+    }
+
+    if (entries.length === 0) {
+      return;
+    }
+
+    this.pushUndoSnapshot({ entries });
+
+    const allSuccess = entries.every((entry) => entry.writeResult.success);
+    if (allSuccess) {
+      this.popup.showDone({ multiCount: entries.length, canUndo: this.hasUndoHistory() });
+    } else {
+      const changed = entries.map((entry) => entry.newText).join("\n\n");
+      await this.copyToClipboard(changed);
+      this.popup.showDone({
+        clipboard: true,
+        multiCount: entries.length,
+        canUndo: this.hasUndoHistory(),
+      });
+    }
+
+    clearTimeout(this.autoHideTimer);
+    this.autoHideTimer = window.setTimeout(() => {
+      this.popup.hide();
+      this.clearSelection();
+    }, 4000);
+  }
+
+  private compareDomPosition(a: HTMLElement, b: HTMLElement): number {
+    const pos = a.compareDocumentPosition(b);
+    if (pos & Node.DOCUMENT_POSITION_FOLLOWING) return -1;
+    if (pos & Node.DOCUMENT_POSITION_PRECEDING) return 1;
+    return 0;
   }
 
   private blockNavigation = (e: Event): void => {
@@ -696,10 +1062,9 @@ export class HemingwayOverlay {
     // Write to source files
     const result = await this.postWriteFor(selectedItem.element, alt.text, oldText);
 
-    // Store undo snapshot
-    this.lastChange = {
+    this.pushUndoSnapshot({
       entries: [{ element: selectedItem.element, oldText, newText: alt.text, writeResult: result }],
-    };
+    });
 
     // Record style preference (fire-and-forget)
     fetch(`${this.config.serverUrl}/preferences`, {
@@ -723,10 +1088,9 @@ export class HemingwayOverlay {
     // Write to source files
     const result = await this.postWriteFor(selectedItem.element, text, oldText);
 
-    // Store undo snapshot
-    this.lastChange = {
+    this.pushUndoSnapshot({
       entries: [{ element: selectedItem.element, oldText, newText: text, writeResult: result }],
-    };
+    });
 
     await this.showWriteResult(result, text);
   }
@@ -830,7 +1194,7 @@ export class HemingwayOverlay {
     }
 
     // Store undo snapshot
-    this.lastChange = { entries };
+    this.pushUndoSnapshot({ entries });
 
     // Record style preference (fire-and-forget)
     fetch(`${this.config.serverUrl}/preferences`, {
@@ -842,12 +1206,16 @@ export class HemingwayOverlay {
     // Show done with multi count
     const allSuccess = entries.every((e) => e.writeResult.success);
     if (allSuccess) {
-      this.popup.showDone({ multiCount: entries.length, canUndo: true });
+      this.popup.showDone({ multiCount: entries.length, canUndo: this.hasUndoHistory() });
     } else {
       // Copy all texts to clipboard as fallback
       const allTexts = alt.texts.map((t) => t.text).join("\n\n");
       await this.copyToClipboard(allTexts);
-      this.popup.showDone({ clipboard: true, multiCount: entries.length, canUndo: true });
+      this.popup.showDone({
+        clipboard: true,
+        multiCount: entries.length,
+        canUndo: this.hasUndoHistory(),
+      });
     }
 
     this.autoHideTimer = window.setTimeout(() => {
@@ -858,12 +1226,36 @@ export class HemingwayOverlay {
 
   // --- Shared handlers ---
 
+  private pushUndoSnapshot(snapshot: UndoSnapshot): void {
+    this.undoHistory.push(snapshot);
+    if (this.undoHistory.length > MAX_UNDO_STEPS) {
+      this.undoHistory.shift();
+    }
+    this.redoHistory = [];
+    this.syncHistoryControls();
+  }
+
+  private hasUndoHistory(): boolean {
+    return this.undoHistory.length > 0;
+  }
+
+  private hasRedoHistory(): boolean {
+    return this.redoHistory.length > 0;
+  }
+
+  private syncHistoryControls(): void {
+    this.indicator.setHistoryState({
+      canUndo: this.hasUndoHistory(),
+      canRedo: this.hasRedoHistory(),
+    });
+  }
+
   private async showWriteResult(result: WriteResult, newText: string): Promise<void> {
     if (!result.success) {
       await this.copyToClipboard(newText);
-      this.popup.showDone({ clipboard: true, canUndo: true });
+      this.popup.showDone({ clipboard: true, canUndo: this.hasUndoHistory() });
     } else {
-      this.popup.showDone({ file: result.file, line: result.line, canUndo: true });
+      this.popup.showDone({ file: result.file, line: result.line, canUndo: this.hasUndoHistory() });
     }
     // Don't auto-hide — the done phase has an undo button, so let the user interact.
     // It will be dismissed when undo completes or the user clicks away / presses Escape.
@@ -876,11 +1268,12 @@ export class HemingwayOverlay {
   private autoHideTimer: number = 0;
 
   private async handleUndo(): Promise<void> {
-    if (!this.lastChange) return;
+    const snapshot = this.undoHistory.pop();
+    if (!snapshot) return;
 
     clearTimeout(this.autoHideTimer);
 
-    const { entries } = this.lastChange;
+    const { entries } = snapshot;
 
     // Revert in reverse order (last written → first) to keep file offsets correct
     for (let i = entries.length - 1; i >= 0; i--) {
@@ -895,13 +1288,43 @@ export class HemingwayOverlay {
       }
     }
 
-    this.lastChange = null;
-    this.popup.showDone({ reverted: true });
+    this.redoHistory.push(snapshot);
 
-    setTimeout(() => {
-      this.popup.hide();
-      this.clearSelection();
-    }, 1500);
+    const remaining = this.undoHistory.length;
+    this.popup.showDone({ reverted: true, canUndo: remaining > 0, undoRemaining: remaining });
+    this.syncHistoryControls();
+
+    if (remaining === 0) {
+      setTimeout(() => {
+        this.popup.hide();
+        this.clearSelection();
+      }, 1500);
+    }
+  }
+
+  private async handleRedo(): Promise<void> {
+    const snapshot = this.redoHistory.pop();
+    if (!snapshot) return;
+
+    clearTimeout(this.autoHideTimer);
+
+    for (const entry of snapshot.entries) {
+      entry.element.innerText = entry.newText;
+      if (entry.writeResult.success) {
+        await this.postWriteFor(entry.element, entry.newText, entry.oldText);
+      }
+    }
+
+    this.undoHistory.push(snapshot);
+    if (this.undoHistory.length > MAX_UNDO_STEPS) {
+      this.undoHistory.shift();
+    }
+
+    this.popup.showDone({
+      multiCount: snapshot.entries.length > 1 ? snapshot.entries.length : undefined,
+      canUndo: this.hasUndoHistory(),
+    });
+    this.syncHistoryControls();
   }
 
   private handleDismiss(): void {
@@ -919,7 +1342,7 @@ export class HemingwayOverlay {
     if (this.isInsideTrackedElement(target)) return;
 
     // Something outside was clicked — dismiss popup and clear selection
-    if (this.selection.length > 0) {
+    if (this.selection.length > 0 || this.popup.isVisible()) {
       this.popup.hide();
       this.clearSelection();
     }
@@ -942,7 +1365,13 @@ export class HemingwayOverlay {
       const res = await fetch(`${this.config.serverUrl}/config`);
       if (res.ok) {
         const data = await res.json();
-        this.indicator.setSettings(data);
+        this.indicator.setSettings({ ...data, serverUrl: this.config.serverUrl });
+        if (typeof data.shortcut === "string") {
+          this.config.shortcut = data.shortcut;
+        }
+        if (typeof data.notepadShortcut === "string") {
+          this.config.notepadShortcut = data.notepadShortcut;
+        }
         if (data.model) {
           this.popup.setModel(data.model);
         }
@@ -1008,6 +1437,102 @@ function normalizeBaseUrl(value: string): string {
   return value;
 }
 
+function getElementReadableText(el: HTMLElement): string {
+  const visible = normalizeNotepadText(el.innerText || "");
+  if (visible) return visible;
+  return normalizeNotepadText(el.textContent || "");
+}
+
+function normalizeNotepadText(value: string): string {
+  return value.replace(/\s+/g, " ").trim();
+}
+
+function splitTextIntoUrlSegments(
+  text: string
+): Array<{ kind: "text" | "url"; text: string }> {
+  const input = text.trim();
+  if (!input) return [];
+
+  const urlPattern = /(https?:\/\/[^\s]+|www\.[^\s]+)/gi;
+  const segments: Array<{ kind: "text" | "url"; text: string }> = [];
+  let lastIndex = 0;
+
+  for (const match of input.matchAll(urlPattern)) {
+    const raw = match[0];
+    if (typeof raw !== "string") continue;
+    const start = match.index ?? 0;
+    if (start > lastIndex) {
+      const head = normalizeNotepadText(input.slice(lastIndex, start));
+      if (head) {
+        segments.push({ kind: "text", text: head });
+      }
+    }
+
+    const url = normalizeNotepadText(raw);
+    if (url) {
+      segments.push({ kind: "url", text: url });
+    }
+    lastIndex = start + raw.length;
+  }
+
+  if (lastIndex < input.length) {
+    const tail = normalizeNotepadText(input.slice(lastIndex));
+    if (tail) {
+      segments.push({ kind: "text", text: tail });
+    }
+  }
+
+  if (segments.length === 0) {
+    return [{ kind: "text", text: input }];
+  }
+
+  return segments;
+}
+
+function isMacPlatform(): boolean {
+  return /Mac|iPhone|iPad/.test(navigator.platform ?? navigator.userAgent);
+}
+
+function isUndoHotkey(e: KeyboardEvent): boolean {
+  if (e.key.toLowerCase() !== "z" || e.shiftKey || e.altKey) return false;
+  return isMacPlatform() ? e.metaKey : e.ctrlKey;
+}
+
+function isRedoHotkey(e: KeyboardEvent): boolean {
+  if (e.altKey) return false;
+  const key = e.key.toLowerCase();
+  if (isMacPlatform()) {
+    return key === "z" && e.metaKey && e.shiftKey;
+  }
+  if (key === "z" && e.ctrlKey && e.shiftKey) return true;
+  return key === "y" && e.ctrlKey && !e.shiftKey;
+}
+
+function isEditableElement(el: Element | null): boolean {
+  if (!el) return false;
+  if (el instanceof HTMLTextAreaElement) return true;
+  if (el instanceof HTMLInputElement) return true;
+  if ((el as HTMLElement).isContentEditable) return true;
+  if (el.getAttribute("role") === "textbox") return true;
+  return false;
+}
+
+function getDeepActiveElement(root: Document | ShadowRoot): Element | null {
+  let active: Element | null = root.activeElement;
+  while (active && active.shadowRoot && active.shadowRoot.activeElement) {
+    active = active.shadowRoot.activeElement;
+  }
+  return active;
+}
+
+function isEditingTextInput(e: KeyboardEvent): boolean {
+  const target = e.target instanceof Element ? e.target : null;
+  if (isEditableElement(target)) return true;
+
+  const active = getDeepActiveElement(document);
+  return isEditableElement(active);
+}
+
 // --- Shortcut matching ---
 
 function matchesShortcut(e: KeyboardEvent, shortcut: string): boolean {
@@ -1015,7 +1540,7 @@ function matchesShortcut(e: KeyboardEvent, shortcut: string): boolean {
   const key = parts[parts.length - 1];
   const modifiers = new Set(parts.slice(0, -1));
 
-  const isMac = /Mac|iPhone|iPad/.test(navigator.platform ?? navigator.userAgent);
+  const isMac = isMacPlatform();
 
   const needsMeta = modifiers.has("meta") || modifiers.has("cmd") || modifiers.has("command");
   const needsCtrl = modifiers.has("ctrl") || modifiers.has("control");
@@ -1025,7 +1550,8 @@ function matchesShortcut(e: KeyboardEvent, shortcut: string): boolean {
   // On Mac, treat "ctrl" as Cmd (metaKey) since that's the standard convention
   if (needsCtrl && !needsMeta) {
     if (isMac) {
-      if (!e.metaKey) return false;
+      // Support both Command and Control on Mac for compatibility.
+      if (!e.metaKey && !e.ctrlKey) return false;
     } else {
       if (!e.ctrlKey) return false;
     }

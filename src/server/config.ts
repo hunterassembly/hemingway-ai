@@ -1,4 +1,4 @@
-import { readFile } from "node:fs/promises";
+import { readFile, unlink, writeFile } from "node:fs/promises";
 import { join } from "node:path";
 import { pathToFileURL } from "node:url";
 
@@ -13,6 +13,7 @@ export interface HemingwayConfig {
   excludePatterns: string[];
   writeAdapter: "react" | "generic";
   shortcut: string;
+  notepadShortcut: string;
   accentColor: string;
 }
 
@@ -24,32 +25,45 @@ const DEFAULTS: HemingwayConfig = {
   copyBible: "./docs/copy-bible.md",
   referenceGuide: "./reference/saas-and-services-copy-guide.md",
   sourcePatterns: [
-    "components/**/*.tsx",
-    "components/**/*.jsx",
-    "components/**/*.ts",
-    "components/**/*.js",
-    "src/**/*.tsx",
-    "src/**/*.jsx",
-    "src/**/*.ts",
-    "src/**/*.js",
-    "app/**/*.tsx",
-    "app/**/*.jsx",
-    "app/**/*.ts",
-    "app/**/*.js",
-    "pages/**/*.tsx",
-    "pages/**/*.jsx",
-    "pages/**/*.ts",
-    "pages/**/*.js",
-    "packages/**/*.tsx",
-    "packages/**/*.jsx",
-    "packages/**/*.ts",
-    "packages/**/*.js",
+    "components/**/*.{tsx,jsx,ts,js,mdx,md,html,htm}",
+    "src/**/*.{tsx,jsx,ts,js,mdx,md,html,htm}",
+    "app/**/*.{tsx,jsx,ts,js,mdx,md,html,htm}",
+    "pages/**/*.{tsx,jsx,ts,js,mdx,md,html,htm}",
+    "content/**/*.{tsx,jsx,ts,js,mdx,md,html,htm}",
+    "site/**/*.{tsx,jsx,ts,js,mdx,md,html,htm}",
+    "packages/**/*.{tsx,jsx,ts,js,mdx,md,html,htm}",
   ],
   excludePatterns: ["node_modules", ".next", "dist", "build"],
   writeAdapter: "react",
   shortcut: "ctrl+shift+h",
+  notepadShortcut: "alt+shift+h",
   accentColor: "#3b82f6",
 };
+
+const LOCAL_CONFIG_FILENAME = ".hemingway.local.json";
+
+/**
+ * Some runtimes (notably certain bundled Next route contexts) can reject
+ * dynamic file URL imports for local config modules. For local dev we can
+ * safely evaluate simple `export default ...` config modules as a fallback.
+ */
+function evaluateConfigModuleSource(source: string): Partial<HemingwayConfig> | null {
+  if (!/\bexport\s+default\b/.test(source)) return null;
+  if (/\bimport\s+/.test(source)) return null;
+
+  const transformed = source.replace(/\bexport\s+default\b/, "return");
+  try {
+    const evaluator = new Function(transformed);
+    const value = evaluator();
+    if (value && typeof value === "object") {
+      return value as Partial<HemingwayConfig>;
+    }
+  } catch {
+    // ignore fallback parse/eval failures
+  }
+
+  return null;
+}
 
 /**
  * Try to dynamically import hemingway.config.mjs from the project root.
@@ -61,9 +75,70 @@ async function loadConfigFile(projectRoot: string): Promise<Partial<HemingwayCon
     const mod = await import(fileUrl);
     return (mod.default ?? mod) as Partial<HemingwayConfig>;
   } catch {
-    // Config file doesn't exist or failed to load — that's fine
+    try {
+      const source = await readFile(configPath, "utf-8");
+      const evaluated = evaluateConfigModuleSource(source);
+      if (evaluated) return evaluated;
+    } catch {
+      // Config file doesn't exist or failed to read — that's fine
+    }
     return null;
   }
+}
+
+/**
+ * Read local persisted overrides written by the settings popover.
+ */
+async function loadLocalConfig(projectRoot: string): Promise<Partial<HemingwayConfig> | null> {
+  const localPath = join(projectRoot, LOCAL_CONFIG_FILENAME);
+  try {
+    const raw = await readFile(localPath, "utf-8");
+    const parsed = JSON.parse(raw) as Record<string, unknown>;
+    const next: Partial<HemingwayConfig> = {};
+    if (typeof parsed.apiKey === "string") {
+      next.apiKey = parsed.apiKey;
+    }
+    return next;
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * Persist selected local config keys for developer-only runtime conveniences.
+ */
+export async function persistLocalConfig(
+  updates: Partial<Pick<HemingwayConfig, "apiKey">>
+): Promise<void> {
+  const localPath = join(process.cwd(), LOCAL_CONFIG_FILENAME);
+  let current: Record<string, unknown> = {};
+
+  try {
+    const raw = await readFile(localPath, "utf-8");
+    current = JSON.parse(raw) as Record<string, unknown>;
+  } catch {
+    current = {};
+  }
+
+  if (typeof updates.apiKey === "string") {
+    const normalized = updates.apiKey.trim();
+    if (normalized.length > 0) {
+      current.apiKey = normalized;
+    } else {
+      delete current.apiKey;
+    }
+  }
+
+  if (Object.keys(current).length === 0) {
+    try {
+      await unlink(localPath);
+    } catch {
+      // ignore missing-file cleanup failures
+    }
+    return;
+  }
+
+  await writeFile(localPath, `${JSON.stringify(current, null, 2)}\n`, "utf-8");
 }
 
 /**
@@ -89,9 +164,10 @@ async function loadPackageJsonConfig(projectRoot: string): Promise<Partial<Hemin
  * Priority (highest to lowest):
  * 1. Explicit overrides passed as argument
  * 2. Environment variables (ANTHROPIC_API_KEY, HEMINGWAY_PORT)
- * 3. hemingway.config.mjs
- * 4. package.json "hemingway" key
- * 5. Defaults
+ * 3. Local saved settings (.hemingway.local.json)
+ * 4. hemingway.config.mjs
+ * 5. package.json "hemingway" key
+ * 6. Defaults
  */
 export async function loadConfig(
   overrides?: Partial<HemingwayConfig>
@@ -101,6 +177,7 @@ export async function loadConfig(
   // Load file-based config (config file takes precedence over package.json)
   const fileConfig = await loadConfigFile(projectRoot);
   const pkgConfig = await loadPackageJsonConfig(projectRoot);
+  const localConfig = await loadLocalConfig(projectRoot);
 
   // Environment variable overrides
   const envOverrides: Partial<HemingwayConfig> = {};
@@ -119,6 +196,7 @@ export async function loadConfig(
     ...DEFAULTS,
     ...(pkgConfig ?? {}),
     ...(fileConfig ?? {}),
+    ...(localConfig ?? {}),
     ...envOverrides,
     ...(overrides ?? {}),
   };

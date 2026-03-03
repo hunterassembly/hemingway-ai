@@ -3,6 +3,15 @@ import { join, relative } from "node:path";
 import { getWriteAdapter } from "./write-adapters.js";
 
 const PROJECT_ROOT = process.cwd();
+const FALLBACK_SOURCE_PATTERNS = [
+  "app/**/*.{tsx,jsx,ts,js,mdx,md,html,htm}",
+  "pages/**/*.{tsx,jsx,ts,js,mdx,md,html,htm}",
+  "components/**/*.{tsx,jsx,ts,js,mdx,md,html,htm}",
+  "src/**/*.{tsx,jsx,ts,js,mdx,md,html,htm}",
+  "content/**/*.{tsx,jsx,ts,js,mdx,md,html,htm}",
+  "site/**/*.{tsx,jsx,ts,js,mdx,md,html,htm}",
+  "packages/**/*.{tsx,jsx,ts,js,mdx,md,html,htm}",
+];
 
 interface Match {
   file: string;
@@ -32,11 +41,15 @@ function globToRegExp(pattern: string): RegExp {
       i += 2;
       // Skip trailing slash after **
       if (pattern[i] === "/") i++;
+    } else if (ch === "?") {
+      // ? — match exactly one character except /
+      re += "[^/]";
+      i++;
     } else if (ch === "*") {
       // * — match anything except /
       re += "[^/]*";
       i++;
-    } else if (".+^${}()|[]\\".includes(ch)) {
+    } else if (".+^${}()|[]\\?".includes(ch)) {
       re += "\\" + ch;
       i++;
     } else {
@@ -45,6 +58,67 @@ function globToRegExp(pattern: string): RegExp {
     }
   }
   return new RegExp("^" + re + "$");
+}
+
+/**
+ * Expand one-or-more brace groups in a glob string:
+ *  - Example: "app/(any depth)/*.{tsx,jsx}" expands into two concrete patterns.
+ */
+function expandBracePattern(pattern: string): string[] {
+  const openIndex = pattern.indexOf("{");
+  if (openIndex === -1) return [pattern];
+
+  let depth = 0;
+  let closeIndex = -1;
+  for (let i = openIndex; i < pattern.length; i++) {
+    const ch = pattern[i];
+    if (ch === "{") depth++;
+    if (ch === "}") {
+      depth--;
+      if (depth === 0) {
+        closeIndex = i;
+        break;
+      }
+    }
+  }
+
+  // Unbalanced brace — treat as literal and continue.
+  if (closeIndex === -1) return [pattern];
+
+  const prefix = pattern.slice(0, openIndex);
+  const suffix = pattern.slice(closeIndex + 1);
+  const inner = pattern.slice(openIndex + 1, closeIndex);
+
+  const options: string[] = [];
+  let optionStart = 0;
+  let optionDepth = 0;
+
+  for (let i = 0; i <= inner.length; i++) {
+    const ch = inner[i];
+    if (ch === "{") optionDepth++;
+    if (ch === "}") optionDepth--;
+    if ((ch === "," && optionDepth === 0) || i === inner.length) {
+      options.push(inner.slice(optionStart, i));
+      optionStart = i + 1;
+    }
+  }
+
+  const expanded: string[] = [];
+  for (const option of options) {
+    expanded.push(...expandBracePattern(`${prefix}${option}${suffix}`));
+  }
+  return expanded;
+}
+
+function expandBracePatterns(patterns: string[]): string[] {
+  const expanded = new Set<string>();
+  for (const pattern of patterns) {
+    for (const variant of expandBracePattern(pattern)) {
+      const normalized = variant.trim();
+      if (normalized) expanded.add(normalized);
+    }
+  }
+  return Array.from(expanded);
 }
 
 /**
@@ -98,13 +172,14 @@ async function getSourceFiles(
   excludePatterns: string[]
 ): Promise<string[]> {
   const matchedFiles = new Set<string>();
+  const expandedPatterns = expandBracePatterns(patterns);
 
   // Build regexes from patterns
-  const regexes = patterns.map(globToRegExp);
+  const regexes = expandedPatterns.map(globToRegExp);
 
   // Determine base directories to scan from patterns
   const baseDirs = new Set<string>();
-  for (const pattern of patterns) {
+  for (const pattern of expandedPatterns) {
     // Extract the leading static portion of the pattern
     const firstWild = pattern.search(/[*?[{]/);
     if (firstWild === -1) {
@@ -134,6 +209,14 @@ async function getSourceFiles(
   }
 
   return Array.from(matchedFiles);
+}
+
+function getFallbackPatterns(sourcePatterns: string[]): string[] {
+  const configured = new Set(expandBracePatterns(sourcePatterns));
+  return FALLBACK_SOURCE_PATTERNS.filter((pattern) => {
+    const variants = expandBracePattern(pattern);
+    return variants.some((variant) => !configured.has(variant));
+  });
 }
 
 // ---------------------------------------------------------------------------
@@ -305,6 +388,8 @@ export async function writeText(params: {
   file?: string;
   line?: number;
   matchCount?: number;
+  scannedFileCount?: number;
+  usedFallbackScan?: boolean;
   error?: string;
 }> {
   const { oldText, newText, context, sourcePatterns, excludePatterns, writeAdapter } = params;
@@ -329,6 +414,8 @@ export async function writeText(params: {
   }
 
   const allMatches: Match[] = [];
+  let scannedFileCount = sourceFiles.length;
+  let usedFallbackScan = false;
 
   for (const file of sourceFiles) {
     // Skip editor-related files
@@ -368,15 +455,96 @@ export async function writeText(params: {
   }
 
   if (allMatches.length === 0) {
+    const fallbackPatterns = getFallbackPatterns(sourcePatterns);
+    if (fallbackPatterns.length > 0) {
+      let fallbackFiles: string[] = [];
+      try {
+        fallbackFiles = await getSourceFiles(fallbackPatterns, excludePatterns);
+      } catch {
+        fallbackFiles = [];
+      }
+
+      // Avoid re-scanning files from the primary pass.
+      const primaryFileSet = new Set(sourceFiles);
+      const uniqueFallbackFiles = fallbackFiles.filter((file) => !primaryFileSet.has(file));
+
+      if (uniqueFallbackFiles.length > 0) {
+        scannedFileCount += uniqueFallbackFiles.length;
+        for (const file of uniqueFallbackFiles) {
+          if (file.includes("/editor/")) continue;
+          if (!adapter.supportsFile(file)) continue;
+
+          let source: string;
+          try {
+            source = await readFile(file, "utf-8");
+          } catch {
+            continue;
+          }
+
+          const variants = entityVariants(oldText);
+          for (const variant of variants) {
+            const matches = findMatches(source, variant);
+            for (const m of matches) {
+              allMatches.push({
+                file,
+                index: m.index,
+                line: getLineNumber(source, m.index),
+                originalSpan: source.substring(m.index, m.index + m.length),
+                score:
+                  scoreMatch(source, m.index, context) +
+                  (adapter.scoreMatch
+                    ? adapter.scoreMatch({
+                        filePath: file,
+                        source,
+                        matchIndex: m.index,
+                        context,
+                      })
+                    : 0),
+              });
+            }
+          }
+        }
+      }
+    }
+  }
+
+  if (allMatches.length > 0 && scannedFileCount > sourceFiles.length) {
+    usedFallbackScan = true;
+    console.log(
+      `[Hemingway] No primary writeback match found. Recovered match via fallback scan across ${scannedFileCount} files.`
+    );
+  }
+
+  if (allMatches.length === 0) {
     return {
       success: false,
-      error: `Text not found in source files: "${oldText.substring(0, 80)}..."`,
+      scannedFileCount,
+      error:
+        `Text not found in source files after scanning ${scannedFileCount} files: ` +
+        `"${oldText.substring(0, 80)}..."`,
     };
   }
 
   // Sort by score descending, take best match
   allMatches.sort((a, b) => b.score - a.score);
   const best = allMatches[0];
+
+  // Fallback scans are intentionally broad; require a clearer winner.
+  if (usedFallbackScan && allMatches.length > 1) {
+    const second = allMatches[1];
+    const scoreGap = best.score - second.score;
+    if (scoreGap < 3) {
+      return {
+        success: false,
+        scannedFileCount,
+        usedFallbackScan,
+        matchCount: allMatches.length,
+        error:
+          `Ambiguous fallback matches (${allMatches.length} candidates, top score gap ${scoreGap}). ` +
+          "Narrow sourcePatterns for deterministic writeback.",
+      };
+    }
+  }
 
   if (allMatches.length > 1) {
     console.log(
@@ -406,5 +574,7 @@ export async function writeText(params: {
     file: relativePath,
     line: best.line,
     matchCount: allMatches.length,
+    scannedFileCount,
+    usedFallbackScan,
   };
 }
