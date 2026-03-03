@@ -701,19 +701,9 @@ export class HemingwayOverlay {
       return;
     }
 
-    if (matchesShortcut(e, this.config.notepadShortcut)) {
-      e.preventDefault();
-      this.openNotepad();
-      return;
-    }
-
     if (matchesShortcut(e, this.config.shortcut)) {
       e.preventDefault();
-      if (this.active) {
-        this.openNotepad();
-      } else {
-        this.activate();
-      }
+      this.toggle();
     }
   }
 
