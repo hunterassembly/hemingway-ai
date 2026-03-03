@@ -11,11 +11,6 @@ const navSections = [
       { href: "/", label: "Overview" },
       { href: "/install/", label: "Install" },
       { href: "/features/", label: "Features" },
-    ],
-  },
-  {
-    title: "Resources",
-    links: [
       { href: "/changelog/", label: "Changelog" },
       { href: "/faq/", label: "FAQ" },
     ],
@@ -30,14 +25,9 @@ function isActive(href: string, current: string): boolean {
 
 <aside class="sidebar">
   <div class="sidebar-inner">
-    <a href="/" class="sidebar-logo">
-      <img src="/hemingway.svg" alt="hemingway" height="18" />
-    </a>
-
     <nav class="sidebar-nav">
       {navSections.map((section) => (
         <div class="nav-section">
-          {section.title && <span class="nav-section-title">{section.title}</span>}
           {section.links.map((link) => (
             <a
               href={link.href}
@@ -76,48 +66,33 @@ function isActive(href: string, current: string): boolean {
 
 <style>
   .sidebar {
-    position: fixed;
+    position: sticky;
     top: 0;
     left: 0;
-    bottom: 0;
-    width: var(--sidebar-width);
-    border-right: 1px solid var(--border);
-    background: var(--bg);
-    z-index: 100;
-    overflow-y: auto;
+    z-index: 999;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
   }
 
   .sidebar-inner {
     display: flex;
     flex-direction: column;
     min-height: 100%;
-    padding: 28px 24px;
-  }
-
-  .sidebar-logo {
-    display: flex;
-    align-items: center;
-    text-decoration: none;
-    margin-bottom: 32px;
-    line-height: 1;
-  }
-
-  .sidebar-logo img {
-    height: 18px;
-    width: auto;
+    padding: 20px;
   }
 
   .sidebar-nav {
     display: flex;
     flex-direction: column;
-    gap: 20px;
     flex: 1;
   }
 
   .nav-section {
     display: flex;
     flex-direction: column;
-    gap: 2px;
+    align-items: start;
+    gap: 6px;
   }
 
   .nav-section-title {
@@ -129,21 +104,38 @@ function isActive(href: string, current: string): boolean {
   }
 
   .nav-link {
-    font-size: 13px;
-    color: var(--text-muted);
+    font-size: 18px;
+    font-weight: 500;
+    color: #fff;
     text-decoration: none;
-    padding: 4px 0;
-    transition: color 0.15s;
+    padding: 0.5em 0.75em;
+    border-radius: 9999px;
+    background: var(--accent);
+    transition: background 0.15s, opacity 0.2s ease, transform 0.2s ease;
     line-height: 1.4;
+    backdrop-filter: blur(12px);
+    user-select: none;
   }
 
   .nav-link:hover {
-    color: var(--text);
+    background: var(--text);
   }
 
   .nav-link.active {
-    color: var(--text);
-    font-weight: 500;
+    background: var(--text);
+  }
+
+  @media (max-width: 640px) {
+    .nav-link {
+      opacity: 0;
+      transform: translateY(-8px);
+    }
+
+    .nav-link:nth-child(1) { transition-delay: 0s; }
+    .nav-link:nth-child(2) { transition-delay: 0.03s; }
+    .nav-link:nth-child(3) { transition-delay: 0.06s; }
+    .nav-link:nth-child(4) { transition-delay: 0.09s; }
+    .nav-link:nth-child(5) { transition-delay: 0.12s; }
   }
 
   .sidebar-footer {
@@ -183,11 +175,5 @@ function isActive(href: string, current: string): boolean {
 
   .github-link:hover {
     color: var(--text);
-  }
-
-  @media (max-width: 768px) {
-    .sidebar {
-      display: none;
-    }
   }
 </style>
