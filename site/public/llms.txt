@@ -1,0 +1,25 @@
+# hemingway-ai
+
+Hemingway is a local development copy-editing companion for marketing sites.
+It provides a browser overlay that generates alternatives and writes accepted edits back to source files.
+
+## Canonical
+- Site: https://hellohemingway.com/
+- Repository: https://github.com/hunterassembly/hemingway-ai
+- npm: https://www.npmjs.com/package/hemingway-ai
+
+## Docs
+- Overview: https://hellohemingway.com/
+- Installation: https://hellohemingway.com/install/
+- Features: https://hellohemingway.com/features/
+- FAQ: https://hellohemingway.com/faq/
+- Changelog: https://hellohemingway.com/changelog/
+
+## Runtime Model
+- Local server process on localhost (default port 4800).
+- Browser overlay discovers editable text and requests alternatives.
+- Accepted edits are written back to project source files.
+
+## License
+- PolyForm Shield 1.0.0: https://polyformproject.org/licenses/shield/1.0.0/
+- Repository license file: https://github.com/hunterassembly/hemingway-ai/blob/main/LICENSE

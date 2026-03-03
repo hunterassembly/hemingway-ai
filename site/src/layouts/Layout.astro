@@ -4,14 +4,30 @@ import Sidebar from "../components/Sidebar.astro";
 interface Props {
   title: string;
   description?: string;
+  ogImage?: string;
+  canonical?: string;
+  noindex?: boolean;
 }
 
 const {
   title,
   description = "AI-powered copy editing for your marketing site.",
+  ogImage = "/ui-img-0001@2x.jpg",
+  canonical,
+  noindex = false,
 } = Astro.props;
 
 const currentPath = Astro.url.pathname;
+const siteOrigin = (Astro.site?.origin ?? "https://hellohemingway.com").replace(/\/$/, "");
+const canonicalUrl = canonical ?? new URL(currentPath, `${siteOrigin}/`).toString();
+
+const toAbsoluteUrl = (value: string): string => {
+  if (/^https?:\/\//i.test(value)) return value;
+  return new URL(value, `${siteOrigin}/`).toString();
+};
+
+const ogImageUrl = toAbsoluteUrl(ogImage);
+const robotsContent = noindex ? "noindex, nofollow" : "index, follow";
 ---
 
 <!doctype html>
@@ -20,6 +36,23 @@ const currentPath = Astro.url.pathname;
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="description" content={description} />
+    <meta name="robots" content={robotsContent} />
+    <link rel="canonical" href={canonicalUrl} />
+
+    <meta property="og:site_name" content="Hemingway AI" />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonicalUrl} />
+    <meta property="og:image" content={ogImageUrl} />
+    <meta property="og:image:width" content="1600" />
+    <meta property="og:image:height" content="1066" />
+    <meta property="og:image:alt" content="Hemingway AI overlay interface" />
+
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={ogImageUrl} />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <link rel="icon" href="/favicon.ico" />
     <meta name="generator" content={Astro.generator} />

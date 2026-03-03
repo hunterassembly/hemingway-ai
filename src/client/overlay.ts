@@ -71,6 +71,7 @@ const DEFAULTS: HemingwayConfig = {
 
 const MAX_MULTI_SELECT = 5;
 const MAX_UNDO_STEPS = 5;
+const DONE_TOAST_AUTO_HIDE_MS = 2000;
 
 export class HemingwayOverlay {
   private active: boolean = false;
@@ -950,7 +951,7 @@ export class HemingwayOverlay {
     this.autoHideTimer = window.setTimeout(() => {
       this.popup.hide();
       this.clearSelection();
-    }, 4000);
+    }, DONE_TOAST_AUTO_HIDE_MS);
   }
 
   private compareDomPosition(a: HTMLElement, b: HTMLElement): number {
@@ -1208,10 +1209,11 @@ export class HemingwayOverlay {
       });
     }
 
+    clearTimeout(this.autoHideTimer);
     this.autoHideTimer = window.setTimeout(() => {
       this.popup.hide();
       this.clearSelection();
-    }, 4000);
+    }, DONE_TOAST_AUTO_HIDE_MS);
   }
 
   // --- Shared handlers ---
@@ -1247,12 +1249,12 @@ export class HemingwayOverlay {
     } else {
       this.popup.showDone({ file: result.file, line: result.line, canUndo: this.hasUndoHistory() });
     }
-    // Don't auto-hide — the done phase has an undo button, so let the user interact.
-    // It will be dismissed when undo completes or the user clicks away / presses Escape.
+    // Keep the done confirmation brief and non-blocking.
+    clearTimeout(this.autoHideTimer);
     this.autoHideTimer = window.setTimeout(() => {
       this.popup.hide();
       this.clearSelection();
-    }, 4000);
+    }, DONE_TOAST_AUTO_HIDE_MS);
   }
 
   private autoHideTimer: number = 0;
