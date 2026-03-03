@@ -2,12 +2,12 @@
 
 :root {
   --bg: #ffffff;
-  --text: rgb(24, 24, 24);
+  --text: #262626;
   --text-muted: rgb(110, 110, 110);
   --text-dim: rgba(0, 0, 0, 0.35);
   --border: rgb(230, 230, 230);
   --border-subtle: rgba(22, 36, 27, 0.06);
-  --accent: #3b82f6;
+  --accent: #2563EB;
   --code-bg: rgb(245, 245, 245);
   --sidebar-width: 200px;
   --content-max-width: 700px;
@@ -56,27 +56,24 @@ code {
 }
 
 /* ---- Page layout ---- */
-.page-content {
-  margin-left: var(--sidebar-width);
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-}
 
-.page-content main {
-  flex: 1;
+.page-content main > article {
+  width: 100%;
+  min-width: 0;
   max-width: var(--content-max-width);
-  padding: 48px 48px 80px;
+  margin: 0 auto;
 }
 
 .site-footer {
   padding: 32px 48px;
-  max-width: var(--content-max-width);
+  width: 100%;
 }
 
 .site-footer p {
   font-size: 13px;
   color: var(--text-muted);
+  max-width: var(--content-max-width);
+  margin: 0 auto;
 }
 
 .site-footer a {
@@ -192,6 +189,7 @@ code {
   overflow-x: auto;
   margin-bottom: 1.25rem;
   line-height: 1.6;
+  min-width: 0;
 }
 
 .docs-content pre code {
@@ -207,13 +205,15 @@ code {
   background: #f0f0ee;
   color: #2a2a2a;
   border-radius: 6px;
-  padding: 20px 24px;
-  overflow-x: auto;
   margin-bottom: 16px;
+  width: 100%;
+  min-width: 0;
 }
 
 .code-block pre {
   margin: 0;
+  padding: 20px 24px;
+  overflow-x: auto;
 }
 
 .code-block code {
@@ -287,19 +287,4 @@ code {
 
 .docs-content details p {
   padding-bottom: 1rem;
-}
-
-/* ---- Mobile ---- */
-@media (max-width: 768px) {
-  .page-content {
-    margin-left: 0;
-  }
-
-  .page-content main {
-    padding: 24px 20px 60px;
-  }
-
-  .site-footer {
-    padding: 24px 20px;
-  }
 }
