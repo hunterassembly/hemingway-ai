@@ -71,7 +71,7 @@ The marketing page + live demo surface.
 2. **How it works** — 3 steps: Select text → See alternatives → Apply with one click
 3. **Features** — 4-6 cards: Local-first, Framework-agnostic, Source-aware, Learns your style, Claude-powered, Zero deps
 4. **Quick Start** — Compact code block with 4-step setup, linking to `/install` for full guide
-5. **Footer** — GitHub, npm, MIT license, "Made by Hunter Assembly"
+5. **Footer** — GitHub, npm, PolyForm Shield license, "Made by Hunter Assembly"
 
 **Demo behavior:** The "Try it on this page" button loads the real hemingway client IIFE bundle. The fetch interceptor (installed on page load) intercepts all calls and returns pre-generated alternatives. Only active on the homepage.
 

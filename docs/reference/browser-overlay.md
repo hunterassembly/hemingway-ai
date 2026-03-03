@@ -23,8 +23,7 @@ The overlay coordinates five concerns:
 
 - Instantiated automatically when `overlay.iife.js` loads; exposed as `window.__hemingway`.
 - Toggled by configured shortcuts:
-  - Overlay mode (`ctrl+shift+h` default client config)
-  - Notepad mode (`alt+shift+h` default client config)
+  - Overlay mode (`ctrl+shift+h` default client config), press again to deactivate
 - While active, undo/redo hotkeys target Hemingway history:
   - Undo: `cmd/ctrl+z`
   - Redo: `cmd/ctrl+shift+z` (also `ctrl+y` on non-Mac)
@@ -90,9 +89,7 @@ This context is core to prompt quality.
 - `loading`: progress state while awaiting API
 - `alternatives`: selectable variants with regenerate/apply controls
 - `done`: write result, clipboard fallback, optional undo affordance
-- `notepad`: page-wide markdown editor with block markers for bulk edits
-  - Mixed copy lines that contain URL(s) are tokenized so URL text appears as its own editable block.
-  - URL token edits only change rendered text, not anchor `href` attributes.
+- `notepad`: page-wide markdown editor (currently hidden in active UX)
 
 Modes:
 

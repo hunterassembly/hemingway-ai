@@ -69,8 +69,7 @@ Typical local setup:
 1. Run Hemingway server.
 2. Run target app dev server.
 3. Inject script or React component.
-4. Use shortcut to activate.
-5. Use notepad shortcut for page-wide markdown editing.
+4. Use shortcut to toggle overlay on/off.
 
 Recommended config for cross-React projects:
 
@@ -98,7 +97,7 @@ Recommended config for cross-React projects:
 - Write route returns "Text not found"
   - Source patterns too narrow, text changed post-selection, ambiguous source content, or non-contiguous source strings.
 - Shortcut not matching user expectation
-  - Check configured shortcuts (`shortcut`, `notepadShortcut`) and platform modifier semantics in `overlay.ts`.
+  - Check configured shortcut (`shortcut`) and platform modifier semantics in `overlay.ts`.
 
 ## Consistency Checklist For Maintainers
 

@@ -107,10 +107,11 @@ function findAlternatives(text: string): Alternative[] | null {
 
 /** Generic fallback alternatives when no pre-generated match exists. */
 function fallbackAlternatives(text: string): Alternative[] {
+  const trimmed = text.trim();
   return [
-    { label: "[Clarity]", text: `${text} -- clearer` },
-    { label: "[Punch]", text: `${text} -- punchier` },
-    { label: "[Conversational]", text: `${text} -- friendlier` },
+    { label: "[Clarity]", text: `${trimmed} (clearer)` },
+    { label: "[Specificity]", text: `${trimmed} (more specific)` },
+    { label: "[Conversion]", text: `${trimmed} (more action-oriented)` },
   ];
 }
 

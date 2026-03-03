@@ -1,127 +1,152 @@
 {
-  "better copy, one click at a time": [
-    { "label": "[Clarity]", "text": "Rewrite any line of copy in seconds" },
-    { "label": "[Punch]", "text": "Ship sharper copy, faster" },
-    { "label": "[Conversational]", "text": "Your copy deserves a second opinion" }
+  "click any text. get better copy.": [
+    { "label": "[Clarity]", "text": "Edit on-page copy without leaving your browser." },
+    { "label": "[Specificity]", "text": "Select any heading, paragraph, button, or link and get three context-aware rewrites." },
+    { "label": "[Conversion]", "text": "Turn rough page copy into publish-ready lines in a single pass." }
   ],
-  "ai-powered copy alternatives for your marketing site. select any text, see better options, apply instantly.": [
-    { "label": "[Clarity]", "text": "Highlight any heading, paragraph, or button on your site. Get three AI-generated rewrites and apply your favorite with one click." },
-    { "label": "[Punch]", "text": "Select. Rewrite. Ship. Claude generates copy alternatives tuned to your brand and page context." },
-    { "label": "[Conversational]", "text": "Think of it as a writing partner that lives in your browser. Pick any text, get smarter options, and update your source files instantly." }
+  "click any text": [
+    { "label": "[Clarity]", "text": "Edit copy directly on the page." },
+    { "label": "[Specificity]", "text": "Select any line in your UI and generate alternatives in place." },
+    { "label": "[Conversion]", "text": "Start rewriting your page copy now." }
+  ],
+  "get better copy": [
+    { "label": "[Clarity]", "text": "Get stronger copy in seconds." },
+    { "label": "[Specificity]", "text": "Generate three alternatives tuned to context and copy job." },
+    { "label": "[Conversion]", "text": "Ship sharper messaging faster." }
+  ],
+  "hemingway turns your dev site into a copy editing surface. click any heading, paragraph, or button — get three claude-powered alternatives calibrated to context and position. apply one and it writes back to your source file.": [
+    { "label": "[Clarity]", "text": "Hemingway turns your dev site into a copy editing surface. Click any heading, paragraph, or button, generate three alternatives, and apply the one you want." },
+    { "label": "[Specificity]", "text": "Click any element on your page and Hemingway generates three Claude alternatives using section context, page position, and copy job." },
+    { "label": "[Conversion]", "text": "Rewrite live page copy in seconds, apply your favorite option, and keep momentum while you build." }
+  ],
+  "copy editing surface": [
+    { "label": "[Clarity]", "text": "Live copy editing, directly in your browser." },
+    { "label": "[Specificity]", "text": "An editable layer over your running dev site for fast copy iteration." },
+    { "label": "[Conversion]", "text": "Treat your live page like an editable copy draft." }
   ],
   "try it on this page": [
-    { "label": "[Clarity]", "text": "See it in action" },
-    { "label": "[Punch]", "text": "Launch the demo" },
-    { "label": "[Conversational]", "text": "Give it a spin" }
+    { "label": "[Clarity]", "text": "Edit this page live" },
+    { "label": "[Specificity]", "text": "Generate rewrites on this page" },
+    { "label": "[Conversion]", "text": "Start rewriting now" }
   ],
   "how it works": [
-    { "label": "[Clarity]", "text": "Three simple steps" },
-    { "label": "[Punch]", "text": "Dead-simple workflow" },
-    { "label": "[Authority]", "text": "The hemingway workflow" }
+    { "label": "[Clarity]", "text": "How Hemingway works" },
+    { "label": "[Specificity]", "text": "Three steps from selection to source update" },
+    { "label": "[Conversion]", "text": "Rewrite copy in three quick moves" }
   ],
-  "select text": [
-    { "label": "[Clarity]", "text": "Highlight any element" },
-    { "label": "[Punch]", "text": "Click to target" },
-    { "label": "[Conversational]", "text": "Pick your copy" }
+  "click any heading, paragraph, button, or link on your dev site. hemingway outlines everything that's editable.": [
+    { "label": "[Clarity]", "text": "Click any heading, paragraph, button, or link. Hemingway highlights what you can edit." },
+    { "label": "[Specificity]", "text": "Hemingway scans your page and outlines editable copy so you can target the exact line you want to improve." },
+    { "label": "[Conversion]", "text": "Pick the line, highlight it, and move to better copy immediately." }
   ],
-  "click any heading, paragraph, or button on your dev site.": [
-    { "label": "[Clarity]", "text": "Click any text element on your local dev server to select it for rewriting." },
-    { "label": "[Punch]", "text": "Headlines, body copy, CTAs -- everything is fair game." },
-    { "label": "[Conversational]", "text": "Just click on whatever text you want to improve. Headings, paragraphs, buttons -- all work." }
+  "get three claude-written alternatives. each one is calibrated to its copy job — hero headline, section opener, cta label — and to where it falls in your page's narrative arc.": [
+    { "label": "[Clarity]", "text": "Get three Claude alternatives for each selection, each written for the role that line plays on the page." },
+    { "label": "[Specificity]", "text": "Every option is tuned to copy job and narrative position, so a hero headline reads differently from a CTA label." },
+    { "label": "[Conversion]", "text": "Review three strategic options and choose the one that best moves the reader forward." }
   ],
-  "see alternatives": [
-    { "label": "[Clarity]", "text": "Review AI rewrites" },
-    { "label": "[Punch]", "text": "Get instant options" },
-    { "label": "[Conversational]", "text": "Browse your rewrites" }
-  ],
-  "get three claude-powered rewrites tailored to your page context.": [
-    { "label": "[Clarity]", "text": "Claude generates three alternatives based on your surrounding copy and brand voice." },
-    { "label": "[Punch]", "text": "Three context-aware rewrites appear instantly, each with a different angle." },
-    { "label": "[Conversational]", "text": "You will see three options from Claude, each written to fit the rest of your page." }
-  ],
-  "apply instantly": [
-    { "label": "[Clarity]", "text": "Update your source" },
-    { "label": "[Punch]", "text": "One-click publish" },
-    { "label": "[Conversational]", "text": "Ship it live" }
-  ],
-  "one click updates your source files. no copy-paste needed.": [
-    { "label": "[Clarity]", "text": "Click apply and the change writes directly to your source file. No manual editing required." },
-    { "label": "[Punch]", "text": "Pick a winner and it lands in your codebase. Done." },
-    { "label": "[Conversational]", "text": "Hit apply and your actual source file updates. No clipboard, no switching tabs." }
+  "one click updates the live page and writes the change back to your source file. no copy-paste. no round-trips.": [
+    { "label": "[Clarity]", "text": "Apply once to update the live page and write the change to your source file." },
+    { "label": "[Specificity]", "text": "Hemingway updates the DOM and your underlying source in one step, so edits are ready to commit." },
+    { "label": "[Conversion]", "text": "Pick your winner, apply it, and keep shipping without context switching." }
   ],
   "features": [
-    { "label": "[Clarity]", "text": "What you get" },
-    { "label": "[Punch]", "text": "Built for real workflows" },
-    { "label": "[Authority]", "text": "Core capabilities" }
+    { "label": "[Clarity]", "text": "Key features" },
+    { "label": "[Specificity]", "text": "Capabilities built for real copy workflows" },
+    { "label": "[Conversion]", "text": "Everything you need to rewrite faster" }
   ],
   "local-first": [
-    { "label": "[Clarity]", "text": "Runs on your machine" },
-    { "label": "[Punch]", "text": "Privacy by default" },
-    { "label": "[Authority]", "text": "Fully local" }
+    { "label": "[Clarity]", "text": "Built for local development" },
+    { "label": "[Specificity]", "text": "Runs on localhost with no external dashboard layer" },
+    { "label": "[Conversion]", "text": "Keep copy iteration private and fast" }
   ],
-  "runs on localhost. your copy never leaves your machine.": [
-    { "label": "[Clarity]", "text": "Everything runs on your local dev server. Your content stays on your machine." },
-    { "label": "[Punch]", "text": "No cloud. No data sharing. Just you, your machine, and better copy." },
-    { "label": "[Conversational]", "text": "Your copy never gets sent anywhere. It all stays right on your laptop." }
+  "everything runs on localhost. your copy goes to anthropic's api and nowhere else.": [
+    { "label": "[Clarity]", "text": "Everything runs on localhost. Your copy is only sent to Anthropic for generation." },
+    { "label": "[Specificity]", "text": "Hemingway keeps runtime local and sends generation requests only to Anthropic's API." },
+    { "label": "[Conversion]", "text": "Keep your workflow local while still getting high-quality AI rewrites." }
   ],
   "framework-agnostic": [
-    { "label": "[Clarity]", "text": "Works with any stack" },
-    { "label": "[Punch]", "text": "One tag, every framework" },
-    { "label": "[Authority]", "text": "Universal compatibility" }
+    { "label": "[Clarity]", "text": "Works with your stack" },
+    { "label": "[Specificity]", "text": "One integration path for React, Vue, Svelte, Astro, or plain HTML" },
+    { "label": "[Conversion]", "text": "Add once, use everywhere" }
   ],
-  "one script tag works with react, vue, astro, or plain html.": [
-    { "label": "[Clarity]", "text": "A single script tag integrates with any framework -- React, Vue, Svelte, Astro, or static HTML." },
-    { "label": "[Punch]", "text": "React? Vue? Astro? Plain HTML? One line of code. That is it." },
-    { "label": "[Conversational]", "text": "Drop in one script tag and it works no matter what you are building with." }
+  "one script tag works with react, vue, svelte, astro, or plain html.": [
+    { "label": "[Clarity]", "text": "Use one script tag across React, Vue, Svelte, Astro, or plain HTML." },
+    { "label": "[Specificity]", "text": "A single client script integrates Hemingway into modern frameworks and static sites alike." },
+    { "label": "[Conversion]", "text": "Drop one script into your app and start rewriting immediately." }
   ],
   "writes to source": [
-    { "label": "[Clarity]", "text": "Edits your actual files" },
-    { "label": "[Punch]", "text": "Real file updates" },
-    { "label": "[Authority]", "text": "Source-level changes" }
+    { "label": "[Clarity]", "text": "Writes to real source files" },
+    { "label": "[Specificity]", "text": "Applies selected copy directly to the matching file and line" },
+    { "label": "[Conversion]", "text": "Edit once, commit faster" }
   ],
   "changes go back to your actual source files, not just the dom.": [
-    { "label": "[Clarity]", "text": "Every edit writes directly to your source code, not just the browser preview." },
-    { "label": "[Punch]", "text": "No DOM hacks. Your source files get the update, ready to commit." },
-    { "label": "[Conversational]", "text": "When you apply a change, it goes straight into your actual files. Not just the page." }
+    { "label": "[Clarity]", "text": "Changes are written back to source files, not just the live DOM." },
+    { "label": "[Specificity]", "text": "Hemingway resolves matching source text and updates the file so your edit persists in code." },
+    { "label": "[Conversion]", "text": "Keep the winning copy without manual copy-paste." }
   ],
-  "learns your style": [
-    { "label": "[Clarity]", "text": "Adapts to your voice" },
-    { "label": "[Punch]", "text": "Gets smarter over time" },
-    { "label": "[Conversational]", "text": "Knows what you like" }
+  "context-aware": [
+    { "label": "[Clarity]", "text": "Context-aware suggestions" },
+    { "label": "[Specificity]", "text": "Uses section role, page position, and copy job before generating" },
+    { "label": "[Conversion]", "text": "Get options that fit the moment on the page" }
+  ],
+  "hemingway builds a page brief before every generation — narrative stage, section role, copy job. claude gets a brief, not just a string.": [
+    { "label": "[Clarity]", "text": "Hemingway builds a page brief before each generation so Claude gets context, not just raw text." },
+    { "label": "[Specificity]", "text": "Each request includes narrative stage, section role, and copy job to improve option quality and consistency." },
+    { "label": "[Conversion]", "text": "Generate alternatives that match your page strategy, not just individual lines." }
+  ],
+  "learns your preferences": [
+    { "label": "[Clarity]", "text": "Learns what you pick" },
+    { "label": "[Specificity]", "text": "Adapts output using your selection history over time" },
+    { "label": "[Conversion]", "text": "Get better-fitting options every session" }
   ],
   "tracks which alternatives you pick and adapts future suggestions.": [
-    { "label": "[Clarity]", "text": "Remembers your preferences and adjusts future rewrites to match your brand voice." },
-    { "label": "[Punch]", "text": "Every pick trains the next suggestion. Your taste becomes the model." },
-    { "label": "[Conversational]", "text": "The more you use it, the better it gets at writing the way you want." }
+    { "label": "[Clarity]", "text": "Hemingway tracks which options you choose and adjusts future suggestions accordingly." },
+    { "label": "[Specificity]", "text": "Pick history is used as preference signal so new alternatives better match your voice." },
+    { "label": "[Conversion]", "text": "Use it regularly and spend less time rewriting each new page." }
   ],
-  "claude-powered": [
-    { "label": "[Clarity]", "text": "Powered by Anthropic" },
-    { "label": "[Punch]", "text": "Best-in-class AI" },
-    { "label": "[Authority]", "text": "Anthropic Claude inside" }
+  "style guide support": [
+    { "label": "[Clarity]", "text": "Bring your style guide" },
+    { "label": "[Specificity]", "text": "Include your brand voice document in every generation request" },
+    { "label": "[Conversion]", "text": "Keep every rewrite aligned to your brand" }
   ],
-  "uses anthropic's claude for copy that actually sounds good.": [
-    { "label": "[Clarity]", "text": "Backed by Anthropic's Claude, so every rewrite reads naturally and on-brand." },
-    { "label": "[Punch]", "text": "Claude writes copy that sounds human. Because the best AI copy is the kind nobody questions." },
-    { "label": "[Conversational]", "text": "Under the hood it is Claude, so the suggestions actually sound like a real person wrote them." }
+  "point hemingway at your brand voice doc. it's included in every generation request.": [
+    { "label": "[Clarity]", "text": "Point Hemingway to your brand voice doc and it will be included in generation." },
+    { "label": "[Specificity]", "text": "Style guide content is added to each prompt so alternatives stay consistent with your tone rules." },
+    { "label": "[Conversion]", "text": "Set voice once and keep output consistent across pages." }
   ],
-  "zero dependencies": [
-    { "label": "[Clarity]", "text": "Nothing extra to install" },
-    { "label": "[Punch]", "text": "Lean and clean" },
-    { "label": "[Authority]", "text": "Dependency-free" }
+  "quick start": [
+    { "label": "[Clarity]", "text": "Quick start" },
+    { "label": "[Specificity]", "text": "Install, run, and activate in minutes" },
+    { "label": "[Conversion]", "text": "Get running now" }
   ],
-  "no runtime deps. just node.js and your browser.": [
-    { "label": "[Clarity]", "text": "No extra libraries required. All you need is Node.js and a browser." },
-    { "label": "[Punch]", "text": "Zero bloat. Node, a browser, and you are shipping." },
-    { "label": "[Conversational]", "text": "There is nothing else to install. If you have Node and a browser, you are good to go." }
+  "full installation guide": [
+    { "label": "[Clarity]", "text": "Read the full install guide" },
+    { "label": "[Specificity]", "text": "See full setup steps and config options" },
+    { "label": "[Conversion]", "text": "Open setup guide" }
   ],
-  "get started in 30 seconds": [
-    { "label": "[Clarity]", "text": "Quick setup guide" },
-    { "label": "[Punch]", "text": "Up and running in four lines" },
-    { "label": "[Conversational]", "text": "Ready in half a minute" }
+  "deep dive into features": [
+    { "label": "[Clarity]", "text": "Explore features" },
+    { "label": "[Specificity]", "text": "See capability details and usage patterns" },
+    { "label": "[Conversion]", "text": "See what Hemingway can do" }
+  ],
+  "view the changelog": [
+    { "label": "[Clarity]", "text": "Read the changelog" },
+    { "label": "[Specificity]", "text": "Review recent releases and improvements" },
+    { "label": "[Conversion]", "text": "See what's new" }
+  ],
+  "frequently asked questions": [
+    { "label": "[Clarity]", "text": "Read the FAQ" },
+    { "label": "[Specificity]", "text": "Find answers on setup, writeback, and integration" },
+    { "label": "[Conversion]", "text": "Get quick answers" }
   ],
   "npm install hemingway-ai": [
     { "label": "[Clarity]", "text": "npm install hemingway-ai" },
-    { "label": "[Punch]", "text": "npm install hemingway-ai" },
-    { "label": "[Conversational]", "text": "npm install hemingway-ai" }
+    { "label": "[Specificity]", "text": "npm install hemingway-ai" },
+    { "label": "[Conversion]", "text": "npm install hemingway-ai" }
+  ],
+  "npx hemingway-ai": [
+    { "label": "[Clarity]", "text": "npx hemingway-ai" },
+    { "label": "[Specificity]", "text": "npx hemingway-ai" },
+    { "label": "[Conversion]", "text": "npx hemingway-ai" }
   ]
 }

@@ -72,7 +72,7 @@ import { Hemingway } from "hemingway-ai/react";
 
 ### 6. Activate
 
-Press **Cmd/Ctrl+Shift+H** for overlay mode and **Alt+Shift+H** for notepad mode (or your configured shortcuts).
+Press **Cmd/Ctrl+Shift+H** to toggle overlay mode on/off (or your configured shortcut).
 
 ## Config
 
@@ -95,7 +95,7 @@ const config = {
   excludePatterns: ['node_modules', '.next', 'dist', 'build'],
   writeAdapter: 'react', // 'react' | 'generic'
   shortcut: 'ctrl+shift+h',
-  notepadShortcut: 'alt+shift+h',
+  notepadShortcut: 'alt+shift+h', // reserved; notepad UI is currently hidden
   accentColor: '#3b82f6',
 };
 
@@ -111,7 +111,6 @@ Next.js one-process note:
 
 - **Click any text** to get AI-generated copy alternatives
 - **Double-click** for inline editing with source file writes
-- **Page notepad mode** — edit all discovered copy at once in markdown
 - **Style guide aware** — feed it your brand voice docs
 - **Framework agnostic** — works with any dev server via script tag or React component
 - **Source mapping** — writes changes back to your source files
@@ -146,4 +145,4 @@ Detailed, agent-oriented system docs live in:
 
 ## License
 
-MIT
+PolyForm Shield 1.0.0. See [LICENSE](./LICENSE).

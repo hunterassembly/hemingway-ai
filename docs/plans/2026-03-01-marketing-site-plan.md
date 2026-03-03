@@ -105,7 +105,7 @@ git commit -m "feat(site): scaffold Astro marketing site with Vercel adapter"
 - Responsive: on mobile, links collapse to a menu or wrap
 
 **Footer design:**
-- GitHub link, npm link, "MIT License", "Made by Hunter Assembly"
+- GitHub link, npm link, "PolyForm Shield License", "Made by Hunter Assembly"
 - Consistent across all pages
 
 **Step 1: Build Nav.astro**
@@ -176,7 +176,7 @@ Compact code block with the 4-step setup. Links to `/install` for the full guide
 npm install hemingway-ai
 npx hemingway-ai
 # Add to your site: <script src="http://localhost:4800/client.js"></script>
-# Press Cmd+Shift+C to activate
+# Press Cmd+Shift+H to toggle on/off
 ```
 
 **Step 5: Wire all components into index.astro**
@@ -285,7 +285,7 @@ Q&A pairs organized by category using `<details>` / `<summary>` for expand/colla
 **General:**
 - What is hemingway? → AI copy editing overlay for marketing sites
 - Who is it for? → Developers and marketing teams iterating on copy
-- Is it free? → Yes, MIT licensed. You need your own Anthropic API key.
+- Is it free? → Licensed under PolyForm Shield. You need your own Anthropic API key.
 
 **Setup:**
 - What frameworks does it work with? → Any — React, Vue, Astro, plain HTML, etc.

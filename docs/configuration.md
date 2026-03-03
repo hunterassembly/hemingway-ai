@@ -37,7 +37,7 @@ export default {
   excludePatterns: ["node_modules", ".next", "dist", "build"],
   writeAdapter: "react", // "react" | "generic"
   shortcut: "ctrl+shift+h",
-  notepadShortcut: "alt+shift+h",
+  notepadShortcut: "alt+shift+h", // reserved; notepad UI is currently hidden
   accentColor: "#3b82f6",
 };
 ```
@@ -83,7 +83,7 @@ export default {
 - `notepadShortcut`:
   - Type: string
   - Default: `alt+shift+h`
-  - Purpose: open markdown notepad for page-wide copy edits
+  - Purpose: reserved for the notepad feature (currently hidden)
 - `accentColor`:
   - Type: string (hex)
   - Purpose: client UI accent color
@@ -119,7 +119,7 @@ Optional props:
 - `endpoint`: base route for Hemingway APIs (`/api/hemingway`)
 - `port`: standalone server port (used when `endpoint` is not provided)
 - `shortcut`: override shortcut at client bootstrap
-- `notepadShortcut`: override notepad shortcut at client bootstrap
+- `notepadShortcut`: reserved override for notepad shortcut (currently hidden)
 - `accentColor`: override overlay accent at client bootstrap
 
 When `endpoint` is omitted, the React wrapper will try `/api/hemingway` first, then fall back to `http://localhost:{port}`.

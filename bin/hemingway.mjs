@@ -34,8 +34,7 @@ if (values.help) {
     2. Set \x1b[36mANTHROPIC_API_KEY\x1b[0m in your environment
     3. Run \x1b[36mnpx hemingway-ai\x1b[0m in one terminal
     4. Run your dev server in another terminal
-    5. Press \x1b[36mCmd/Ctrl+Shift+H\x1b[0m for overlay mode
-       Press \x1b[36mAlt+Shift+H\x1b[0m for notepad mode
+    5. Press \x1b[36mCmd/Ctrl+Shift+H\x1b[0m to toggle overlay on/off
 `);
   process.exit(0);
 }
@@ -73,7 +72,7 @@ const config = {
   excludePatterns: ['node_modules', '.next', 'dist', 'build'],
   writeAdapter: 'react',
   shortcut: 'ctrl+shift+h',
-  notepadShortcut: 'alt+shift+h',
+  notepadShortcut: 'alt+shift+h', // reserved; notepad UI is currently hidden
   accentColor: '#3b82f6',
 };
 

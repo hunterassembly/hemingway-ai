@@ -10,6 +10,12 @@ All notable changes to this project are documented in this file.
 - Writeback now honors configured `sourcePatterns` consistently in same-app mode (including non-default folders such as `lib/**`).
 - Discovery skips composite wrapper nodes whose visible text is assembled from multiple child literals, reducing false-selectable elements that lead to clipboard fallback.
 - Overlay text capture now falls back to normalized `textContent` when `innerText` is empty during typing/animated render phases.
+- Main overlay shortcut now consistently toggles on/off and no longer opens notepad on the second keypress.
+
+### Changed
+
+- Updated package metadata and docs to reflect the PolyForm Shield 1.0.0 license.
+- Updated site install/FAQ copy to match current shortcut behavior and config defaults.
 
 ## [0.1.1] - Unreleased
 

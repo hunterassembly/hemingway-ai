@@ -73,38 +73,43 @@ function App() {"{"}
       </tr>
       <tr>
         <td><code>styleGuide</code></td>
-        <td><code>""</code></td>
+        <td><code>"./docs/style-guide.md"</code></td>
         <td>Path to your brand voice / style guide markdown</td>
       </tr>
       <tr>
         <td><code>copyBible</code></td>
-        <td><code>""</code></td>
+        <td><code>"./docs/copy-bible.md"</code></td>
         <td>Path to your copy bible markdown</td>
       </tr>
       <tr>
         <td><code>referenceGuide</code></td>
-        <td><code>""</code></td>
+        <td><code>"./reference/saas-and-services-copy-guide.md"</code></td>
         <td>Path to any additional reference doc for generation</td>
       </tr>
       <tr>
         <td><code>sourcePatterns</code></td>
-        <td><code>["src/**/*.{"{"}tsx,astro,vue{"}"}"]</code></td>
+        <td><code>["components/**/*.{"{"}tsx,jsx,ts,js,mdx,md,html,htm{"}"}", "src/**/*.{"{"}tsx,jsx,ts,js,mdx,md,html,htm{"}"}", ...]</code></td>
         <td>Glob patterns for source files to search during write-back</td>
       </tr>
       <tr>
         <td><code>excludePatterns</code></td>
-        <td><code>["node_modules", "dist"]</code></td>
+        <td><code>["node_modules", ".next", "dist", "build"]</code></td>
         <td>Patterns to exclude from write-back search</td>
       </tr>
       <tr>
         <td><code>writeAdapter</code></td>
-        <td><code>"auto"</code></td>
-        <td>Write-back strategy (<code>auto</code>, <code>heuristic</code>, or <code>exact</code>)</td>
+        <td><code>"react"</code></td>
+        <td>Write-back strategy (<code>react</code> or <code>generic</code>)</td>
       </tr>
       <tr>
         <td><code>shortcut</code></td>
-        <td><code>"meta+shift+h"</code></td>
+        <td><code>"ctrl+shift+h"</code></td>
         <td>Keyboard shortcut to toggle the overlay</td>
+      </tr>
+      <tr>
+        <td><code>notepadShortcut</code></td>
+        <td><code>"alt+shift+h"</code></td>
+        <td>Reserved for notepad mode (currently hidden)</td>
       </tr>
       <tr>
         <td><code>accentColor</code></td>
@@ -119,13 +124,22 @@ function App() {"{"}
 export default {"{"}
   port: 4800,
   model: "claude-sonnet-4-6",
-  styleGuide: "./docs/brand-voice.md",
+  styleGuide: "./docs/style-guide.md",
   copyBible: "./docs/copy-bible.md",
-  referenceGuide: "",
-  sourcePatterns: ["src/**/*.{"{"}{"{"}tsx,astro,vue{"}"}{"}"}"],
-  excludePatterns: ["node_modules", "dist"],
-  writeAdapter: "auto",
-  shortcut: "meta+shift+h",
+  referenceGuide: "./reference/saas-and-services-copy-guide.md",
+  sourcePatterns: [
+    "components/**/*.{"{"}tsx,jsx,ts,js,mdx,md,html,htm{"}"}",
+    "src/**/*.{"{"}tsx,jsx,ts,js,mdx,md,html,htm{"}"}",
+    "app/**/*.{"{"}tsx,jsx,ts,js,mdx,md,html,htm{"}"}",
+    "pages/**/*.{"{"}tsx,jsx,ts,js,mdx,md,html,htm{"}"}",
+    "content/**/*.{"{"}tsx,jsx,ts,js,mdx,md,html,htm{"}"}",
+    "site/**/*.{"{"}tsx,jsx,ts,js,mdx,md,html,htm{"}"}",
+    "packages/**/*.{"{"}tsx,jsx,ts,js,mdx,md,html,htm{"}"}",
+  ],
+  excludePatterns: ["node_modules", ".next", "dist", "build"],
+  writeAdapter: "react",
+  shortcut: "ctrl+shift+h",
+  notepadShortcut: "alt+shift+h", // reserved; notepad UI is currently hidden
   accentColor: "#3b82f6",
 {"}"}</code></pre>
 
@@ -157,7 +171,7 @@ export default {"{"}
     <li>The Hemingway server is running and shows a startup message in your terminal.</li>
     <li><code>http://localhost:4800/health</code> returns <code>{"{"}"ok": true{"}"}</code>.</li>
     <li>The client script is loading without errors in the browser console.</li>
-    <li>Pressing Cmd+Shift+H toggles the overlay on your dev site.</li>
+    <li>Pressing Cmd+Shift+H (or Ctrl+Shift+H on Windows/Linux) toggles the overlay on your dev site.</li>
     <li>Clicking a text element outlines it and shows the Hemingway panel.</li>
   </ol>
 
