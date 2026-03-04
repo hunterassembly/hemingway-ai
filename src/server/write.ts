@@ -552,18 +552,55 @@ export async function writeText(params: {
     );
   }
 
+  // Re-read the file and guard against TOCTOU race conditions.
+  // The file may have changed between the scan pass and now (dev server
+  // hot-reload, file watchers, a preceding write landing first).
+  const source = await readFile(best.file, "utf-8");
+
+  let finalIndex = best.index;
+  let finalLength = best.originalSpan.length;
+
+  if (source.substring(finalIndex, finalIndex + finalLength) !== best.originalSpan) {
+    // File changed since scan — re-find the original span in the current content.
+    const occurrences: number[] = [];
+    let searchFrom = 0;
+    while (searchFrom < source.length) {
+      const idx = source.indexOf(best.originalSpan, searchFrom);
+      if (idx === -1) break;
+      occurrences.push(idx);
+      searchFrom = idx + 1;
+    }
+
+    if (occurrences.length === 0) {
+      return {
+        success: false,
+        scannedFileCount,
+        usedFallbackScan,
+        matchCount: allMatches.length,
+        error:
+          `File changed and original text no longer found in ${relative(PROJECT_ROOT, best.file)}: ` +
+          `"${best.originalSpan.substring(0, 80)}..."`,
+      };
+    }
+
+    // Pick the occurrence closest to the original position.
+    finalIndex = occurrences.reduce((closest, idx) =>
+      Math.abs(idx - best.index) < Math.abs(closest - best.index) ? idx : closest
+    );
+  }
+
+  // Compute normalizeReplacement against the *current* span, not the stale one.
+  const currentSpan = source.substring(finalIndex, finalIndex + finalLength);
   const replacement = adapter.normalizeReplacement
     ? adapter.normalizeReplacement({
         filePath: best.file,
-        originalSpan: best.originalSpan,
+        originalSpan: currentSpan,
         replacement: newText,
       })
     : newText;
 
-  // Perform replacement
-  const source = await readFile(best.file, "utf-8");
-  const before = source.substring(0, best.index);
-  const after = source.substring(best.index + best.originalSpan.length);
+  const before = source.substring(0, finalIndex);
+  const after = source.substring(finalIndex + finalLength);
   const modified = before + replacement + after;
 
   await writeFile(best.file, modified, "utf-8");
