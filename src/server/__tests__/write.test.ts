@@ -15,6 +15,9 @@ vi.mock("node:fs/promises", async () => {
     await vi.importActual<typeof import("node:fs/promises")>("node:fs/promises");
   return {
     ...actual,
+    stat: async (...args: any[]) => {
+      return (actual as any).stat(...args);
+    },
     readFile: async (...args: any[]) => {
       const p = String(args[0]);
       const n = (state.readCounts.get(p) ?? 0) + 1;

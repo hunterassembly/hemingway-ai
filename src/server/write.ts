@@ -1,4 +1,4 @@
-import { readdir, readFile, writeFile } from "node:fs/promises";
+import { readdir, readFile, writeFile, stat } from "node:fs/promises";
 import { join, relative } from "node:path";
 import { getWriteAdapter } from "./write-adapters.js";
 
@@ -555,63 +555,97 @@ export async function writeText(params: {
   // Re-read the file and guard against TOCTOU race conditions.
   // The file may have changed between the scan pass and now (dev server
   // hot-reload, file watchers, a preceding write landing first).
-  const source = await readFile(best.file, "utf-8");
+  //
+  // We use a compare-and-swap loop: read the file, compute the replacement,
+  // then verify the file hasn't changed before writing. If it has, retry.
+  const MAX_CAS_RETRIES = 3;
 
-  let finalIndex = best.index;
-  let finalLength = best.originalSpan.length;
+  for (let attempt = 0; attempt < MAX_CAS_RETRIES; attempt++) {
+    const fileStat = await stat(best.file);
+    const versionBefore = `${fileStat.mtimeMs}:${fileStat.size}`;
+    const source = await readFile(best.file, "utf-8");
 
-  if (source.substring(finalIndex, finalIndex + finalLength) !== best.originalSpan) {
-    // File changed since scan — re-find the original span in the current content.
-    const occurrences: number[] = [];
-    let searchFrom = 0;
-    while (searchFrom < source.length) {
-      const idx = source.indexOf(best.originalSpan, searchFrom);
-      if (idx === -1) break;
-      occurrences.push(idx);
-      searchFrom = idx + 1;
+    let finalIndex = best.index;
+    const finalLength = best.originalSpan.length;
+
+    if (source.substring(finalIndex, finalIndex + finalLength) !== best.originalSpan) {
+      // File changed since scan — re-find the original span in the current content.
+      const occurrences: number[] = [];
+      let searchFrom = 0;
+      while (searchFrom < source.length) {
+        const idx = source.indexOf(best.originalSpan, searchFrom);
+        if (idx === -1) break;
+        occurrences.push(idx);
+        searchFrom = idx + 1;
+      }
+
+      if (occurrences.length === 0) {
+        return {
+          success: false,
+          scannedFileCount,
+          usedFallbackScan,
+          matchCount: allMatches.length,
+          error:
+            `File changed and original text no longer found in ${relative(PROJECT_ROOT, best.file)}: ` +
+            `"${best.originalSpan.substring(0, 80)}..."`,
+        };
+      }
+
+      // Pick the occurrence closest to the original position.
+      finalIndex = occurrences.reduce((closest, idx) =>
+        Math.abs(idx - best.index) < Math.abs(closest - best.index) ? idx : closest
+      );
     }
 
-    if (occurrences.length === 0) {
-      return {
-        success: false,
-        scannedFileCount,
-        usedFallbackScan,
-        matchCount: allMatches.length,
-        error:
-          `File changed and original text no longer found in ${relative(PROJECT_ROOT, best.file)}: ` +
-          `"${best.originalSpan.substring(0, 80)}..."`,
-      };
+    // Compute normalizeReplacement against the *current* span, not the stale one.
+    const currentSpan = source.substring(finalIndex, finalIndex + finalLength);
+    const replacement = adapter.normalizeReplacement
+      ? adapter.normalizeReplacement({
+          filePath: best.file,
+          originalSpan: currentSpan,
+          replacement: newText,
+        })
+      : newText;
+
+    const before = source.substring(0, finalIndex);
+    const after = source.substring(finalIndex + finalLength);
+    const modified = before + replacement + after;
+
+    // Compare-and-swap: verify the file hasn't changed since we read it.
+    const fileStatAfter = await stat(best.file);
+    const versionAfter = `${fileStatAfter.mtimeMs}:${fileStatAfter.size}`;
+
+    if (versionBefore !== versionAfter) {
+      // File changed while we were computing the replacement — retry.
+      console.log(
+        `[Hemingway] File changed during write computation (attempt ${attempt + 1}/${MAX_CAS_RETRIES}), retrying...`
+      );
+      continue;
     }
 
-    // Pick the occurrence closest to the original position.
-    finalIndex = occurrences.reduce((closest, idx) =>
-      Math.abs(idx - best.index) < Math.abs(closest - best.index) ? idx : closest
-    );
+    await writeFile(best.file, modified, "utf-8");
+
+    // Recompute line number from current source in case finalIndex shifted.
+    const finalLine = getLineNumber(source, finalIndex);
+
+    const relativePath = relative(PROJECT_ROOT, best.file);
+    return {
+      success: true,
+      file: relativePath,
+      line: finalLine,
+      matchCount: allMatches.length,
+      scannedFileCount,
+      usedFallbackScan,
+    };
   }
 
-  // Compute normalizeReplacement against the *current* span, not the stale one.
-  const currentSpan = source.substring(finalIndex, finalIndex + finalLength);
-  const replacement = adapter.normalizeReplacement
-    ? adapter.normalizeReplacement({
-        filePath: best.file,
-        originalSpan: currentSpan,
-        replacement: newText,
-      })
-    : newText;
-
-  const before = source.substring(0, finalIndex);
-  const after = source.substring(finalIndex + finalLength);
-  const modified = before + replacement + after;
-
-  await writeFile(best.file, modified, "utf-8");
-
-  const relativePath = relative(PROJECT_ROOT, best.file);
   return {
-    success: true,
-    file: relativePath,
-    line: best.line,
-    matchCount: allMatches.length,
+    success: false,
     scannedFileCount,
     usedFallbackScan,
+    matchCount: allMatches.length,
+    error:
+      `File kept changing during write (${MAX_CAS_RETRIES} retries exhausted) for ${relative(PROJECT_ROOT, best.file)}. ` +
+      "A concurrent process may be modifying the file too rapidly.",
   };
 }
